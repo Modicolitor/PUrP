@@ -24,17 +24,18 @@ bl_info = {   ###für export als addon
 
 
 
-modules = addon_auto_imports.setup_addon_modules(
-    __path__, __name__, ignore_packages=[], ignore_modules=[]
-)
+#modules = addon_auto_imports.setup_addon_modules(
+#    __path__, __name__, ignore_packages=[], ignore_modules=[]
+#)
 
 
 from bpy.types import Scene, Image, Object
 from .ui import PP_PT_PuzzlePrintMenu 
+from .ui import PUrP_RotationGizmo
 from .bun import PP_OT_AddSingleCoupling
 from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_DeleteCoupling
-
+from .bun import PP_OT_Ini
 
 #PP_OT_AddSingleCoupling = operators.PP_OT_AddSingleCoupling
 #PP_OT_ApplyCoupling = operators.PP_OT_ApplyCoupling
@@ -43,30 +44,14 @@ from .bun import PP_OT_DeleteCoupling
 '''define the Centerobject and make it globally avaiable'''
 
 #####Centerobj Pointer
-Scene.PUrP_CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
 
-
-#bpy.types.Scene.CenterObj_name = bpy.props.StringProperty()
-#bpy.context.scene.CenterObj_name = bpy.data.objects['Cube'].name
-
-#CenterObj = bpy.data.objects[bpy.context.scene.CenterObj_name]
-#
-# 
-# #musss wieder rein
-CenterObj = bpy.context.scene.PUrP_CenterObj
-
-
-###Puzzle Ur print Element Name  
-bpy.types.Scene.PUrP_name = bpy.props.StringProperty()
-bpy.context.scene.PUrP_name = "PUrP_"
-PUrP_name = bpy.context.scene.PUrP_name
 
 
 
 
 
     
-classes = (PP_PT_PuzzlePrintMenu,PP_OT_AddSingleCoupling,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling) 
+classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Init) 
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
         

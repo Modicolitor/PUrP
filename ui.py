@@ -22,19 +22,60 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
         flow = layout.grid_flow(row_major=True, columns=0, even_columns=False, even_rows=False, align=True)
         col = flow.column()
         row = layout.row()
-        #row.template_ID(context.view_layer.objects, "active", filter='AVAILABLE')
-        col.template_ID(context.scene, "PUrP_CenterObj", filter='AVAILABLE')
         
-        subcol = col.column()
-        subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
-        subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
-        subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
-        if "Connector" in context.object.name: 
-            subcol.prop(context.object.rotation_euler, 'x', text = "x-rotation")    
-       
+        if not context.scene.PUrP_CenterObj:
+            subcol.operator("pup.init", icon="MOD_OCEAN")pup.init
+        else:
+            #row.template_ID(context.view_layer.objects, "active", filter='AVAILABLE')
+            col.template_ID(context.scene, "PUrP_CenterObj", filter='AVAILABLE')
+            
+            subcol = col.column()
+            subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
+            if "Connector" in context.object.name: 
+                subcol.prop(context.object, "rotation_euler", text = "Rotation")    
+        
 
-        
-   # col = layout.column(align=True)  ### col befehl packt die werte in einen kasten
-#    row = layout.row(align=True)
-    
+from bpy.types import (
+    GizmoGroup,
+)
+
+
+class PUrP_RotationGizmo(GizmoGroup):
+    bl_idname = "OBJECT_GGT_test_camera"
+    bl_label = "Object Camera Test Widget"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'WINDOW'
+    bl_options = {'3D', 'PERSISTENT'}
+
+    @classmethod
+    def poll(cls, context):
+        ob = context.object
+        return (ob and ob.type == 'CAMERA')
+
+    def setup(self, context):
+        # Run an operator using the dial gizmo
+        ob = context.object
+        mpr = self.gizmos.new("GIZMO_GT_dial_3d")
+        props = mpr.target_set_operator("transform.rotate")
+        props.constraint_axis = False, False, True
+        props.orient_type = 'LOCAL'
+        props.release_confirm = True
+
+        mpr.matrix_basis = ob.matrix_world.normalized()
+        mpr.line_width = 3
+
+        mpr.color = 0.8, 0.2, 0.8
+        mpr.alpha = 0.5
+
+        mpr.color_highlight = 1.0, 0.5, 1.0
+        mpr.alpha_highlight = 1.0
+
+        self.roll_widget = mpr
+
+    def refresh(self, context):
+        ob = context.object
+        mpr = self.roll_widget
+        mpr.matrix_basis = ob.matrix_world.normalized()     
     

@@ -260,4 +260,26 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
         return{"FINISHED"} 
      
-     
+class PP_OT_Ini(bpy.types.Operator):
+    bl_label="Initialize PuzzleUrPrint"
+    bl_idname="pup.init"
+    
+    def execute(self, context):
+        
+        active = context.view_layer.objects.active
+        objects = bpy.data.objects
+        
+        Scene.PUrP_CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
+
+
+        CenterObj = bpy.context.scene.PUrP_CenterObj
+        CenterObj = active
+
+        ###Puzzle Ur print Element Name  
+        bpy.types.Scene.PUrP_name = bpy.props.StringProperty()
+        bpy.context.scene.PUrP_name = "PUrP_"
+        PUrP_name = bpy.context.scene.PUrP_name
+                
+        
+
+        return{"FINISHED"} 
