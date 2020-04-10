@@ -23,19 +23,28 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
         col = flow.column()
         row = layout.row()
         
-        if not context.scene.PUrP_CenterObj:
-            subcol.operator("pup.init", icon="MOD_OCEAN")pup.init
-        else:
-            #row.template_ID(context.view_layer.objects, "active", filter='AVAILABLE')
-            col.template_ID(context.scene, "PUrP_CenterObj", filter='AVAILABLE')
+        try:
+            bpy.context.scene.PUrP_name = "PUrP_"
+        except:
+            #bpy.ops.pup.init()
+            pass
             
-            subcol = col.column()
-            subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
-            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
-            subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
-            if "Connector" in context.object.name: 
-                subcol.prop(context.object, "rotation_euler", text = "Rotation")    
+       
+       # else:
+        #row.template_ID(context.view_layer.objects, "active", filter='AVAILABLE')
+        try:
+            col.template_ID(context.scene, "PUrP_CenterObj", filter='AVAILABLE')
+        except:
+            pass
         
+        subcol = col.column()
+        subcol.operator("pup.init", icon="MOD_OCEAN")
+        subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
+        subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+        subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
+        if "Connector" in context.object.name: 
+            subcol.prop(context.object, "rotation_euler", text = "Rotation")    
+    
 
 from bpy.types import (
     GizmoGroup,

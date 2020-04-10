@@ -51,7 +51,7 @@ from .bun import PP_OT_Ini
 
 
     
-classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Init) 
+classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini) 
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
         

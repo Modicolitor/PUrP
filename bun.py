@@ -1,6 +1,8 @@
 import bpy
 import mathutils
 from math import radians
+from bpy.types import Scene, Image, Object
+
 
 '''Operator in Blender'''            
 
@@ -265,7 +267,8 @@ class PP_OT_Ini(bpy.types.Operator):
     bl_idname="pup.init"
     
     def execute(self, context):
-        
+        from bpy.types import Scene, Image, Object
+
         active = context.view_layer.objects.active
         objects = bpy.data.objects
         
