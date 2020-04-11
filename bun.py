@@ -271,7 +271,16 @@ class PP_OT_Ini(bpy.types.Operator):
 
         active = context.view_layer.objects.active
         objects = bpy.data.objects
+        scene = context.scene
         
+        MColName = "PuzzleUrPrint"
+
+        if bpy.data.collections.find(MColName) < 0: 
+            collection = bpy.data.collections.new(name=MColName) # makes collection
+            #scene.collection.children.link(collection) ###### when its not linked the user can not delete and break the ui, better solution for init behaviour necessary
+
+
+
         Scene.PUrP_CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
 
 
