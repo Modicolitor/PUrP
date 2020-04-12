@@ -27,7 +27,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             
         if "PuzzleUrPrint" in data.collections: 
             try:
-                col.template_ID(context.scene, "PUrP_CenterObj", filter='AVAILABLE')
+                col.template_ID(context.scene.PUrP, "CenterObj", filter='AVAILABLE')
             except:
                 pass    
                     
@@ -36,8 +36,10 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
-            if "Connector" in context.object.name: 
-                subcol.prop(context.object, "rotation_euler", text = "Rotation")    
+            
+            for ob in context.selected_objects:
+                if "Connector" in context.object.name: 
+                    subcol.prop(context.object, "rotation_euler", text = "Rotation")    
 
         else: 
             col.operator("pup.init", icon="MOD_OCEAN")        
@@ -45,6 +47,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 from bpy.types import (
     GizmoGroup,
 )
+
+
 
 
 class PUrP_RotationGizmo(GizmoGroup):

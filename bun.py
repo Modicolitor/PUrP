@@ -2,7 +2,7 @@ import bpy
 import mathutils
 from math import radians
 from bpy.types import Scene, Image, Object
-
+#from .properties import PUrPropertyGroup
 
 '''Operator in Blender'''            
 
@@ -21,16 +21,24 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         #def createSingleCoupling():
         context = bpy.context
         data = bpy.data
-        PUrP_CenterObj = context.scene.PUrP_CenterObj
-        
+        active = context.object
+        CenterObj = context.scene.PUrP.CenterObj
+        PUrP_name  = context.scene.PUrP.PUrP_name
+
+        if active.type == "MESH":
+            if PUrP_name in active.name:
+                CenterObj = context.scene.PUrP.CenterObj
+            else: 
+                CenterObj = active
+                context.scene.PUrP.CenterObj = CenterObj
         ####apply scale 
         
         
-        PUrP_name  = context.scene.PUrP_name
+      
         
         
-        if PUrP_CenterObj.type == 'MESH':
-            CenterObj_name = context.scene.PUrP_CenterObj.name
+        if CenterObj.type == 'MESH':
+            CenterObj_name = CenterObj.name
             bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0, 0, 0))
             context.object.name = str(PUrP_name) + "SingleConnector"
             newname_mainplane = context.object.name  
@@ -72,9 +80,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             mod.object = context.object
             mod.operation = 'UNION'
             
-            
-            context.view_layer.objects.active =  data.objects[newname_mainplane]
-            
+            active = context.view_layer.objects.active
+            active =  data.objects[newname_mainplane]
+            active.select_set(True)
 
             return{"FINISHED"}     
 
@@ -120,8 +128,8 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         context = bpy.context 
         data = bpy.data
         selected = context.selected_objects[:]
-        CenterObj = context.scene.PUrP_CenterObj
-        PUrP_name = bpy.context.scene.PUrP_name
+        CenterObj = context.scene.PUrP.CenterObj
+        PUrP_name = bpy.context.scene.PUrP.PUrP_name
         
         #### start conditions: seperators selected 
         
@@ -221,6 +229,15 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_label="DeleteCouplings"
     bl_idname="rem.coup"
     
+    @classmethod
+    def poll(cls, context):
+        print(f"My area is {context.area.type}")
+        if "SingleConnector" in context.view_layer.objects.active.name:
+            return True
+        else:
+            return False
+
+
     def execute(self, context):
         
         active = context.view_layer.objects.active
@@ -228,13 +245,13 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
         
         
         if "SingleConnector" in active.name:
-            name_active = str(active.name)
+            name_active = active.name
             for obj in objects:                          #####schau in allen Objekten
-                if name_active in obj.name:              #####wenn der name des aktiven obj im namen des objects passt dann
+                if name_active == obj.name:              #####wenn der name des aktiven obj im namen des objects passt dann
                     
                     
                     ###delete centerobj modifiers
-                    Centerobj = context.scene.PUrP_CenterObj
+                    Centerobj = context.scene.PUrP.CenterObj
                     print('Centerobj is called '+str(Centerobj.name))
                     for mod in Centerobj.modifiers:
                         if mod.name == obj.name:
@@ -256,7 +273,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                     
                     
             print('connector')
-             
+            active = context.scene.PUrP.CenterObj 
         else:
             print("No connectorselected")
 
@@ -268,11 +285,15 @@ class PP_OT_Ini(bpy.types.Operator):
     
     def execute(self, context):
         from bpy.types import Scene, Image, Object
-
+        from .properties import PUrPropertyGroup
         active = context.view_layer.objects.active
         objects = bpy.data.objects
         scene = context.scene
         
+        #########
+
+        bpy.types.Scene.PUrP = bpy.props.PointerProperty(type=PUrPropertyGroup)
+        #########
         MColName = "PuzzleUrPrint"
 
         if bpy.data.collections.find(MColName) < 0: 
@@ -281,16 +302,16 @@ class PP_OT_Ini(bpy.types.Operator):
 
 
 
-        Scene.PUrP_CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
+        #Scene.PUrP.CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
 
 
-        CenterObj = bpy.context.scene.PUrP_CenterObj
+        CenterObj = bpy.context.scene.PUrP.CenterObj
         CenterObj = active
 
         ###Puzzle Ur print Element Name  
-        bpy.types.Scene.PUrP_name = bpy.props.StringProperty()
-        bpy.context.scene.PUrP_name = "PUrP_"
-        PUrP_name = bpy.context.scene.PUrP_name
+        #bpy.types.Scene.PUrP.PUrP_name = bpy.props.StringProperty()
+        bpy.context.scene.PUrP.PUrP_name = "PUrP_"
+        
                 
         
 
