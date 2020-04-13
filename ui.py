@@ -33,10 +33,14 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                     
             subcol = col.column()
             
+            subcol.prop(context.scene.PUrP, "SingleCouplingModes", text = 'Coupling Mode')
+            subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
+
             subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             
+
             for ob in context.selected_objects:
                 if "Connector" in context.object.name: 
                     subcol.prop(context.object, "rotation_euler", text = "Rotation")    

@@ -22,8 +22,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         context = bpy.context
         data = bpy.data
         active = context.view_layer.objects.active
-        CenterObj = context.scene.PUrP.CenterObj
-        PUrP_name  = context.scene.PUrP.PUrP_name
+        PUrP = context.scene.PUrP
+        CenterObj = PUrP.CenterObj
+        PUrP_name  = PUrP.PUrP_name
 
         if active.type == "MESH":
             if PUrP_name in active.name:
@@ -37,28 +38,31 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
       
         
         
-        if CenterObj.type == 'MESH':
-            CenterObj_name = CenterObj.name
-            bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0, 0, 0))
-            context.object.name = str(PUrP_name) + "SingleConnector"
-            newname_mainplane = context.object.name  
-            
-            bpy.ops.object.modifier_add(type='SOLIDIFY')
-            context.object.display_type = 'WIRE'
-            #context.object.show_in_front = True
-
-            context.object.parent = data.objects[CenterObj_name]
-        # bpy.types.Object.connector_children = bpy.props.CollectionProperty()
-            
-            ###set boolean for the slice plane
-            mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
-            mod.object = data.objects[newname_mainplane]
-            mod.operation = 'DIFFERENCE'
-
-            
-            
+    
+        CenterObj_name = CenterObj.name
+        bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0, 0, 0))
+        context.object.name = str(PUrP_name) + "SingleConnector"
+        newname_mainplane = context.object.name  
         
+        bpy.ops.object.modifier_add(type='SOLIDIFY')
+        context.object.display_type = 'WIRE'
+        #context.object.show_in_front = True
+
+        context.object.parent = data.objects[CenterObj_name]
+
+        
+        ###set boolean for the slice plane
+        mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
+        mod.object = data.objects[newname_mainplane]
+        mod.operation = 'DIFFERENCE'
+
+        print(f'Mode aktivated: {PUrP.SingleCouplingModes}')
+        if PUrP.SingleCouplingModes == "3":
+            active =  data.objects[newname_mainplane]
             
+            
+
+        elif PUrP.SingleCouplingModes == "2": 
             #add negativ object 
             bpy.ops.mesh.primitive_cube_add(size=1,location=(0,0,0.45))
             context.object.name = str(newname_mainplane)+"_diff"
@@ -66,7 +70,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.display_type = 'WIRE'    
             context.object.show_in_front = True
             context.object.hide_select = True
-            
+            #####
             mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
             mod.object = context.object
             mod.operation = 'DIFFERENCE'
@@ -78,28 +82,42 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.parent = data.objects[newname_mainplane]
             context.object.display_type = 'WIRE'
             context.object.show_in_front = True
-            active.select_set(False)
             context.object.hide_select = True
-            
 
-
-            active.select_set(False)
-            
             mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
             mod.object = context.object
             mod.operation = 'UNION'
+
+        elif PUrP.SingleCouplingModes == "1":
+            bpy.ops.mesh.primitive_cube_add(size=1,location=(0,0,0.0))
+            context.object.name = str(newname_mainplane)+"_diff"
+            context.object.scale.z = 3 
+
+            context.object.parent = data.objects[newname_mainplane]
+            context.object.display_type = 'WIRE'    
+            context.object.show_in_front = True
+            context.object.hide_select = True
+            #####
+            mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
+            mod.object = context.object
+            mod.operation = 'DIFFERENCE'
+
+            unioncopy = context.object.copy()
+            unioncopy.data = context.object.data.copy()
+            unioncopy.animation_data_clear()
+            unioncopy.name = str(newname_mainplane)+"_union"
+            unioncopy.scale.x *= PUrP.Oversize  
+            unioncopy.scale.y *= PUrP.Oversize  
+            unioncopy.scale.z *= PUrP.Oversize  
+            #context.scene.objects.link(unioncopy)
             
-            for ob in context.selected_objects:
-                print(f"Deselt Obj: {ob.name}")
-                ob.select_set(False)
+        return{"FINISHED"} 
+       
+        
+        
 
-
-            
-            active =  data.objects[newname_mainplane]
-            active.select_set(True)
-
-        return{"FINISHED"}     
-
+       
+       
 
 
 
@@ -325,8 +343,10 @@ class PP_OT_Ini(bpy.types.Operator):
 
         ###Puzzle Ur print Element Name  
         #bpy.types.Scene.PUrP.PUrP_name = bpy.props.StringProperty()
-        bpy.context.scene.PUrP.PUrP_name = "PUrP_"
-        
+        PUrP = bpy.context.scene.PUrP
+        PUrP.PUrP_name = "PUrP_"
+        #PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
+
                 
         
 
@@ -347,7 +367,7 @@ class PP_OT_OversizeOperator(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
             self.delta = event.mouse_x - self.init_value
             self.value = self.init_scale_x + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
-            print(f"MouspositionX: {self.value}")
+            #print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
