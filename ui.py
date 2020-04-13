@@ -61,16 +61,16 @@ class PUrP_RotationGizmo(GizmoGroup):
     @classmethod
     def poll(cls, context):
         ob = context.object
-        return (ob and ob.type == 'CAMERA')
+        return (ob and ob.type == 'MESH' and "SingleConnector" in context.view_layer.objects.active.name)
 
     def setup(self, context):
         # Run an operator using the dial gizmo
         ob = context.object
         mpr = self.gizmos.new("GIZMO_GT_dial_3d")
-        props = mpr.target_set_operator("transform.rotate")
-        props.constraint_axis = False, False, True
-        props.orient_type = 'LOCAL'
-        props.release_confirm = True
+        props = mpr.target_set_operator("object.oversize")
+        #props.constraint_axis = True, True, True
+        #props.orient_type = 'LOCAL'
+        #props.release_confirm = True
 
         mpr.matrix_basis = ob.matrix_world.normalized()
         mpr.line_width = 3

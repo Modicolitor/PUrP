@@ -280,6 +280,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
         return{"FINISHED"} 
      
 class PP_OT_Ini(bpy.types.Operator):
+
     bl_label="Initialize PuzzleUrPrint"
     bl_idname="pup.init"
     
@@ -316,3 +317,19 @@ class PP_OT_Ini(bpy.types.Operator):
         
 
         return{"FINISHED"} 
+
+
+class PP_OT_OversizeOperator(bpy.types.Operator):
+    bl_idname = "object.oversize"
+    bl_label = "oversize"
+
+    def execute(self, context):
+        
+        
+        context.object.scale.x += 0.01 
+        context.object.scale.y += 0.01 
+        context.object.scale.z += 0.01 
+        return {'FINISHED'}
+
+
+
