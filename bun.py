@@ -12,16 +12,16 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
     
     @classmethod 
     def poll(cls,context):
-      #  if context.area.type == 'VIEW_3D':
-         return True 
-       # return False
+        if context.view_layer.objects.active != None:                 #context.area.type == 'VIEW_3D':
+            return True 
+        return False
         
     def execute(self, context):
         #createSingleCoupling()
         #def createSingleCoupling():
         context = bpy.context
         data = bpy.data
-        active = context.object
+        active = context.view_layer.objects.active
         CenterObj = context.scene.PUrP.CenterObj
         PUrP_name  = context.scene.PUrP.PUrP_name
 
@@ -45,6 +45,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             
             bpy.ops.object.modifier_add(type='SOLIDIFY')
             context.object.display_type = 'WIRE'
+            #context.object.show_in_front = True
+
             context.object.parent = data.objects[CenterObj_name]
         # bpy.types.Object.connector_children = bpy.props.CollectionProperty()
             
@@ -62,6 +64,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.name = str(newname_mainplane)+"_diff"
             context.object.parent = data.objects[newname_mainplane]
             context.object.display_type = 'WIRE'    
+            context.object.show_in_front = True
             context.object.hide_select = True
             
             mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
@@ -74,17 +77,28 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.name = str(newname_mainplane)+"_union"
             context.object.parent = data.objects[newname_mainplane]
             context.object.display_type = 'WIRE'
+            context.object.show_in_front = True
+            active.select_set(False)
             context.object.hide_select = True
+            
+
+
+            active.select_set(False)
             
             mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
             mod.object = context.object
             mod.operation = 'UNION'
             
-            active = context.view_layer.objects.active
+            for ob in context.selected_objects:
+                print(f"Deselt Obj: {ob.name}")
+                ob.select_set(False)
+
+
+            
             active =  data.objects[newname_mainplane]
             active.select_set(True)
 
-            return{"FINISHED"}     
+        return{"FINISHED"}     
 
 
 
@@ -231,8 +245,8 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        print(f"My area is {context.area.type}")
-        if "SingleConnector" in context.view_layer.objects.active.name:
+        
+        if (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name):
             return True
         else:
             return False
@@ -247,7 +261,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
         if "SingleConnector" in active.name:
             name_active = active.name
             for obj in objects:                          #####schau in allen Objekten
-                if name_active == obj.name:              #####wenn der name des aktiven obj im namen des objects passt dann
+                if (str(name_active) + '_diff' == obj.name) or (str(name_active) + '_union' == obj.name) or (str(name_active) + '_fix' == obj.name) or (str(name_active) == obj.name):              #####wenn der name des aktiven obj im namen des objects passt dann
                     
                     
                     ###delete centerobj modifiers
@@ -322,14 +336,42 @@ class PP_OT_Ini(bpy.types.Operator):
 class PP_OT_OversizeOperator(bpy.types.Operator):
     bl_idname = "object.oversize"
     bl_label = "oversize"
-
+    bl_options = {'REGISTER',"UNDO"}
     def execute(self, context):
-        
-        
-        context.object.scale.x += 0.01 
-        context.object.scale.y += 0.01 
-        context.object.scale.z += 0.01 
+        context.object.scale.x = self.value 
+        context.object.scale.y = self.value 
+        context.object.scale.z = self.value 
         return {'FINISHED'}
+
+    def modal(self, context, event):
+        if event.type == 'MOUSEMOVE':  # Apply
+            self.delta = event.mouse_x - self.init_value
+            self.value = self.init_scale_x + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
+            print(f"MouspositionX: {self.value}")
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            context.object.location.x = self.init_scale_x
+            context.object.location.y = self.init_scale_y
+            context.object.location.z = self.init_scale_z
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+       # self.window_width = context.window.width 
+        self.init_scale_x = context.object.scale.x 
+        self.init_scale_y = context.object.scale.y 
+        self.init_scale_z = context.object.scale.z
+        self.init_value = event.mouse_x
+
+        self.value = context.object.scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 
 
