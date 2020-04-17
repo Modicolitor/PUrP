@@ -79,35 +79,38 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         elif PUrP.SingleCouplingModes == "2": ####Male - female 
             #add negativ object 
             loc.z += 0.45
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_diff' , 1, loc)
+            self.genPrimitive(context, CenterObj, newname_mainplane, '_diff' , loc)
 
             #add positiv object 
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_union', 0.95, loc)
+            self.genPrimitive(context, CenterObj, newname_mainplane, '_union', loc)
             
 
         elif PUrP.SingleCouplingModes == "1":       #stick 
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_diff', 1, loc)
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_fix', 0.8, loc)          
+            self.genPrimitive(context, CenterObj, newname_mainplane, '_diff', loc)
+            self.genPrimitive(context, CenterObj, newname_mainplane, '_fix', loc)          
 
             
             #context.scene.objects.link(unioncopy)
             
         return{"FINISHED"} 
     
-    def genPrimitive(self, context, CenterObj, newname_mainplane, nameadd, size, loc):
+    def genPrimitive(self, context, CenterObj, newname_mainplane, nameadd, loc):
         PUrP = bpy.context.scene.PUrP
-        
+        size = PUrP.CoupSize
+        if nameadd == "_diff":
+            size *= PUrP.Oversize
+
         if self.PrimTypes == "1":
             print("I'm in...")
             bpy.ops.mesh.primitive_cube_add(size=size,location=loc)
         elif self.PrimTypes == "2":
-            bpy.ops.mesh.primitive_cylinder_add(vertices=self.CylVert, radius=size/2, depth=1, enter_editmode=False, location=loc)
+            bpy.ops.mesh.primitive_cylinder_add(vertices=self.CylVert, radius=size, depth=1, enter_editmode=False, location=loc)
 
         elif self.PrimTypes == "3":
-            bpy.ops.mesh.primitive_cone_add(vertices=self.CylVert, radius1=size/2, radius2=0, depth=2, enter_editmode=False, location=loc)
+            bpy.ops.mesh.primitive_cone_add(vertices=self.CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
 
-        if PUrP.SingleCouplingModes == "1":  #### scale die sticks
-            context.object.scale.z *= 3
+          #### scale die sticks
+        context.object.scale.z *= PUrP.zScale
 
         context.object.name = str(newname_mainplane)+ str(nameadd)
         context.object.parent = bpy.data.objects[newname_mainplane]
@@ -128,6 +131,22 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         
 
        
+
+class PP_OT_ExChangeCoupOperator(bpy.types.Operator):
+    bl_idname = "object.pp_ot_exchangecoup"
+    bl_label = "ExChangeCoup"
+    bl
+
+    @classmethod
+    def poll(self, context):
+        return True
+
+
+    def execute(self, context):
+        
+        print("here I'am an")
+        
+        return {'FINISHED'}
        
 
 
@@ -159,6 +178,7 @@ def applyRemoveCouplMods(context, daughter, connector, side):
                 daughter.modifiers.remove(mod)
     else:
         print("Somethings Wrong with side determin" )
+
 
 
 class PP_OT_ApplyCoupling(bpy.types.Operator):
@@ -265,8 +285,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
         return{"FINISHED"} 
 
-def modifier_sucher(name):
-    name
+
   
 class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_label="DeleteCouplings"
@@ -357,7 +376,7 @@ class PP_OT_Ini(bpy.types.Operator):
         PUrP = bpy.context.scene.PUrP
         PUrP.PUrP_name = "PUrP_"
         #PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
-
+        #CylVert 
                 
         
 

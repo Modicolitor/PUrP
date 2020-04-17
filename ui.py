@@ -38,8 +38,21 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 
             props = subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
             props.PrimTypes = context.scene.PUrP.SingleCouplingTypes
-            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+            props.CylVert = context.scene.PUrP.CylVert
+
+            PUrP = context.scene.PUrP
+            subcol.label(text="AddingCouplings")
+            subcol.prop(context.scene.PUrP, "CutThickness", text = 'Cut Thickness')    
+            if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":
+                subcol.prop(context.scene.PUrP, "CylVert", text = 'Vertices')
+            
+            subcol.prop(context.scene.PUrP, "CoupSize", text = 'Size')    
+            subcol.prop(context.scene.PUrP, "zScale", text = 'z-scale')
+            subcol.prop(context.scene.PUrP, "Oversize", text = 'oversize')
+            subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+            
             
 
             for ob in context.selected_objects:
