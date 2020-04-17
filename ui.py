@@ -32,11 +32,12 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 pass    
                     
             subcol = col.column()
-            
-            subcol.prop(context.scene.PUrP, "SingleCouplingModes", text = 'Coupling Mode')
+            subcol.label(text="Coupling Mode")
+            subcol.prop(context.scene.PUrP, "SingleCouplingModes", expand=True)
             subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
 
-            subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
+            props = subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
+            props.PrimTypes = context.scene.PUrP.SingleCouplingTypes
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             

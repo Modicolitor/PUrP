@@ -7,7 +7,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     PUrP_name = bpy.props.StringProperty(name="My Int")
     Oversize = bpy.props.FloatProperty(name="DynamicOversize", default = 1.0)
     SingleCouplingTypes = bpy.props.EnumProperty(
-        name='SingleCoupltypes',
+        name='',  #SingleCoupltypes
         description='List of forms avaiable in single connector mode',
         items=[ ('1','Cube',''),
                 ('2','Cylinder', ''),
