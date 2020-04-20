@@ -49,6 +49,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.prop(context.scene.PUrP, "CoupSize", text = 'Size')    
             subcol.prop(context.scene.PUrP, "zScale", text = 'z-scale')
             subcol.prop(context.scene.PUrP, "Oversize", text = 'oversize')
+            subcol.operator("object.exchangecoup", text="Apply New Settings")
             subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an

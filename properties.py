@@ -19,7 +19,9 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     SingleCouplingTypes = bpy.props.EnumProperty(
         name='',  #SingleCoupltypes
         description='List of forms avaiable in single connector mode',
-        items=[ ('1','Cube',''),
+        default='1',
+        items=[ ('0', '',''),
+                ('1','Cube',''),
                 ('2','Cylinder', ''),
                 ('3','Cone',''),
                 ]

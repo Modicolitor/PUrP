@@ -33,6 +33,7 @@ from bpy.types import Scene, Image, Object
 from .ui import PP_PT_PuzzlePrintMenu 
 from .ui import PUrP_RotationGizmo
 from .bun import PP_OT_AddSingleCoupling
+from .bun import PP_OT_ExChangeCoup
 from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_DeleteCoupling
 from .bun import PP_OT_Ini
@@ -53,7 +54,7 @@ from .properties import PUrPropertyGroup
 
 
     
-classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini, PP_OT_OversizeOperator, PUrPropertyGroup) 
+classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ExChangeCoup,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini, PP_OT_OversizeOperator, PUrPropertyGroup) 
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
         
