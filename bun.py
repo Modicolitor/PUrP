@@ -80,73 +80,84 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
         mod.object = data.objects[newname_mainplane]
         mod.operation = 'DIFFERENCE'
-
         
         loc = mathutils.Vector((0,0,0))
+        coupModeDivision(CenterObj, newname_mainplane, loc)
 
-        print(f'Mode aktivated: {PUrP.SingleCouplingModes}')   
-        if PUrP.SingleCouplingModes == "3":                     # flatCut
-            active =  data.objects[newname_mainplane]
-              
-        elif PUrP.SingleCouplingModes == "2": ####Male - female 
-            #add negativ object 
-            loc.z += 0.45
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_diff', loc)
-
-            #add positiv object 
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_union', loc)
-            
-
-        elif PUrP.SingleCouplingModes == "1":       #stick 
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_stick_diff', loc )
-            self.genPrimitive(context, CenterObj, newname_mainplane, '_stick_fix', loc)          
-        if CenterObj.location != (0,0,0):
-            cursorloc.x -= CenterObj.location.x  
-            cursorloc.y -= CenterObj.location.y
-            cursorloc.z -= CenterObj.location.z
-            #context.scene.objects.link(unioncopy)
+        
+        cursorloc.x -= CenterObj.location.x  
+        cursorloc.y -= CenterObj.location.y
+        cursorloc.z -= CenterObj.location.z
+        #context.scene.objects.link(unioncopy)
 
         data.objects[newname_mainplane].location += cursorloc
         context.scene.cursor.location = cursorlocori  
+        
         return{"FINISHED"} 
+        
     
-    def genPrimitive(self, context, CenterObj, newname_mainplane, nameadd, loc):
-        PUrP = bpy.context.scene.PUrP
-        size = PUrP.CoupSize
-        if nameadd == "_diff":
-            size *= PUrP.Oversize
+def coupModeDivision(CenterObj, newname_mainplane,loc):
+    context = bpy.context
+    PUrP = bpy.context.scene.PUrP
+    
+    
+    if PUrP.SingleCouplingModes == "3":                     # flatCut
+        active =  data.objects[newname_mainplane]
+            
+    elif PUrP.SingleCouplingModes == "2": ####Male - female 
+        #add negativ object 
+        loc.z += 0.45
+        genPrimitive(CenterObj, newname_mainplane, '_diff', loc)
 
-        if self.PrimTypes == "1":
-            print("I'm in...")
-            bpy.ops.mesh.primitive_cube_add(size=size,location=loc)
-        elif self.PrimTypes == "2":
-            bpy.ops.mesh.primitive_cylinder_add(vertices=self.CylVert, radius=size, depth=1, enter_editmode=False, location=loc)
-
-        elif self.PrimTypes == "3":
-            bpy.ops.mesh.primitive_cone_add(vertices=self.CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
-
-          #### scale die sticks
-        context.object.scale.z *= PUrP.zScale
-
-        context.object.name = str(newname_mainplane)+ str(nameadd)
-        context.object.parent = bpy.data.objects[newname_mainplane]
-        context.object.display_type = 'WIRE'    
-        context.object.show_in_front = True
-        context.object.hide_select = True
-
-        if ("_diff" in bpy.context.object.name) or ("_union" in bpy.context.object.name):
-            mod = CenterObj.modifiers.new(name = context.object.name, type = "BOOLEAN")
-            mod.object = context.object
-            if nameadd == "_diff":
-                mod.operation = 'DIFFERENCE'
-            elif nameadd == '_union':
-                mod.operation = 'UNION'
-        else:
-            pass
-
+        #add positiv object 
+        genPrimitive(CenterObj, newname_mainplane, '_union', loc)
         
 
-       
+    elif PUrP.SingleCouplingModes == "1":       #stick 
+        genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
+        genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)          
+    
+
+
+def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
+    context = bpy.context
+    PUrP = bpy.context.scene.PUrP
+    size = PUrP.CoupSize
+    PrimTypes = context.scene.PUrP.SingleCouplingTypes
+    CylVert = PUrP.CylVert
+
+
+    if nameadd == "_diff":
+        size *= PUrP.Oversize
+
+    if PrimTypes == "1":
+        bpy.ops.mesh.primitive_cube_add(size=size,location=loc)
+    elif PrimTypes == "2":
+        bpy.ops.mesh.primitive_cylinder_add(vertices=CylVert, radius=size, depth=1, enter_editmode=False, location=loc)
+
+    elif PrimTypes == "3":
+        bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
+
+        #### scale die sticks
+    context.object.scale.z *= PUrP.zScale
+
+    context.object.name = str(newname_mainplane)+ str(nameadd)
+    context.object.parent = bpy.data.objects[newname_mainplane]
+    context.object.display_type = 'WIRE'    
+    context.object.show_in_front = True
+    context.object.hide_select = True
+
+    if ("_diff" in bpy.context.object.name) or ("_union" in bpy.context.object.name):
+        mod = CenterObj.modifiers.new(name = context.object.name, type = "BOOLEAN")
+        mod.object = context.object
+        if nameadd == "_diff":
+            mod.operation = 'DIFFERENCE'
+        elif nameadd == '_union':
+            mod.operation = 'UNION'
+    else:
+        pass
+
+
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
     bl_idname = "object.exchangecoup"
@@ -160,7 +171,29 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
     def execute(self, context):
         
-        print("here I'am an")
+        context = bpy.context 
+        data = bpy.data
+        CenterObj = context.scene.PUrP.CenterObj
+        PUrP_name = bpy.context.scene.PUrP.PUrP_name
+        selected = context.selected_objects[:]
+
+        for obj in selected: 
+            if PUrP_name in obj.name:
+                
+                for mod in obj.parent.modifiers:
+                    if obj.name in mod.name:
+                        obj.parent.modifiers.remove(mod)
+
+                for child in obj.children:
+                    child.hide_select = False
+                    child.select_set(True)
+                    obj.select_set(False)
+                    bpy.ops.object.delete(use_global=False)
+
+                loc = mathutils.Vector((0,0,0))
+                coupModeDivision(CenterObj, obj.name, loc)
+                
+        
         
         return {'FINISHED'}
        
@@ -368,27 +401,6 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                 obj.select_set(True)
                 print(f'selected objects{context.selected_objects}')
                 bpy.ops.object.delete(use_global=False)
-
-                #for obj in objects:                          #####schau in allen Objekten
-                #    if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_fix' == mod.name) or (str(obj.name) == mod.name):              #####wenn der name des aktiven obj im namen des objects passt dann
-                        
-                        
-                        ###delete centerobj modifiers
-                      #  Centerobj = context.scene.PUrP.CenterObj
-                      #  print('Centerobj is called '+str(Centerobj.name))
-                     #   for mod in Centerobj.modifiers:
-                     #       if mod.name == obj.name:
-                     #           Centerobj.modifiers.remove(mod)
-                        
-                        
-                      #  obj.hide_select = False    ###  selectierbar machen 
-                        #active = obj
-                        
-                    #    for ob in context.selected_objects:
-                      #      ob.select_set(False)
-                        
-                   #     obj.select_set(True)
-                   #     bpy.ops.object.delete(use_global=False)
 
             context.view_layer.objects.active = context.scene.PUrP.CenterObj 
            
