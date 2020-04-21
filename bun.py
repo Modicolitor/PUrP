@@ -2,6 +2,8 @@ import bpy
 import mathutils
 from math import radians
 from bpy.types import Scene, Image, Object
+import random
+
 #from .properties import PUrPropertyGroup
 
 '''Operator in Blender'''            
@@ -42,6 +44,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         PUrP = context.scene.PUrP
         CenterObj = PUrP.CenterObj
         PUrP_name  = PUrP.PUrP_name
+        cursorloc = context.scene.cursor.location
+        cursorlocori = context.scene.cursor.location
         #Prim = self.PrimTypes
        
 
@@ -60,14 +64,15 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         ####apply scale 
             
         CenterObj_name = CenterObj.name
-        bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0, 0, 0))
-        context.object.name = str(PUrP_name) + "SingleConnector"
+        Centerloc = CenterObj.location
+        bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0,0,0))
+        context.object.name = str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
         newname_mainplane = context.object.name  
         
         bpy.ops.object.modifier_add(type='SOLIDIFY')
         context.object.display_type = 'WIRE'
         #context.object.show_in_front = True
-
+        
         context.object.parent = data.objects[CenterObj_name]
 
         
@@ -76,7 +81,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         mod.object = data.objects[newname_mainplane]
         mod.operation = 'DIFFERENCE'
 
-        cursorloc = context.scene.cursor.location
+        
         loc = mathutils.Vector((0,0,0))
 
         print(f'Mode aktivated: {PUrP.SingleCouplingModes}')   
@@ -95,10 +100,14 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         elif PUrP.SingleCouplingModes == "1":       #stick 
             self.genPrimitive(context, CenterObj, newname_mainplane, '_stick_diff', loc )
             self.genPrimitive(context, CenterObj, newname_mainplane, '_stick_fix', loc)          
-
-        
+        if CenterObj.location != (0,0,0):
+            cursorloc.x -= CenterObj.location.x  
+            cursorloc.y -= CenterObj.location.y
+            cursorloc.z -= CenterObj.location.z
             #context.scene.objects.link(unioncopy)
+
         data.objects[newname_mainplane].location += cursorloc
+        context.scene.cursor.location = cursorlocori  
         return{"FINISHED"} 
     
     def genPrimitive(self, context, CenterObj, newname_mainplane, nameadd, loc):
@@ -207,10 +216,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 context.view_layer.objects.active = obj
                 bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)    #### apply rotation centerplane obj damit die vector rechnung funktioniert
 
-            
-
                 CouplingNormal = obj.data.vertices[0].normal
-                
                 ctl = False
                 n= 0
                 Daughtertwo_side = "NULL" 
@@ -232,26 +238,17 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                         DaughterOne_side = "POSITIV"
                         DaughterTwo_side = "NEGATIV"
                         self.applyRemoveCouplMods(context, DaughterOne, obj, DaughterOne_side)
-                        
-                        
                     elif direction > 0: 
-                        
                         ctl = True
                         print('negativ seite')
                         DaughterOne_side = "NEGATIV"
                         DaughterTwo_side = "POSITIV" 
                         self.applyRemoveCouplMods(context, DaughterOne, obj, DaughterOne_side)
-                                
-                                #bpy.ops.object.modifier_remove(mod.name)
-                                #C.object.modifiers.remove(C.object.modifiers['PUrP_SingleConnector_diff']
+                               
                     else:
                         print('Probleme with side detection') 
   
                 self.applyRemoveCouplMods(context, DaughterTwo, obj, DaughterTwo_side)
-            
-                
-
-
                 #deleConnector (later propably with checkbox)
                 context.view_layer.objects.active = obj   
                 self.removeCoupling(context, obj)
@@ -322,9 +319,13 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 bpy.ops.object.delete(use_global=False)
             elif 'fix' in child.name:
                 child.display_type = 'SOLID'
+                child.location = mathutils.Vector((0,0,0))
+
                 child.parent = context.scene.PUrP.CenterObj
                 child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
                 child.hide_select = False
+        Coupl.select_set(True)
+        bpy.ops.object.delete(use_global=False)
 
 class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_label="DeleteCouplings"
@@ -354,19 +355,22 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                     
                     #name_active = obj.name
                 for child in obj.children:
-                    ob.hide_select = False
+                    child.hide_select = False
                     child.select_set(True)
+                    bpy.ops.object.delete(use_global=False)
                 
                 ######entferne modifier und zwar immer auch wenn es schon zerlegt ist
                 for mod in obj.parent.modifiers:
-                    if obj.name in mod.name:                    #######!!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
+                    if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_stick_fix' == mod.name) or (str(obj.name) + '_stick_diff' == mod.name) or (str(obj.name) == mod.name):                 #######!!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
+                        print(f'I delete modifier {mod.name}')
                         obj.parent.modifiers.remove(mod)
 
                 obj.select_set(True)
+                print(f'selected objects{context.selected_objects}')
                 bpy.ops.object.delete(use_global=False)
 
                 #for obj in objects:                          #####schau in allen Objekten
-                #    if (str(name_active) + '_diff' == obj.name) or (str(name_active) + '_union' == obj.name) or (str(name_active) + '_fix' == obj.name) or (str(name_active) == obj.name):              #####wenn der name des aktiven obj im namen des objects passt dann
+                #    if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_fix' == mod.name) or (str(obj.name) == mod.name):              #####wenn der name des aktiven obj im namen des objects passt dann
                         
                         
                         ###delete centerobj modifiers
