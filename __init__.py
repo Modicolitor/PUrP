@@ -38,6 +38,7 @@ from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_DeleteCoupling
 from .bun import PP_OT_Ini
 from .bun import PP_OT_OversizeOperator
+from .bun import AppendFromFileOperator
 from .properties import PUrPropertyGroup
 
 #PP_OT_AddSingleCoupling = operators.PP_OT_AddSingleCoupling
@@ -54,7 +55,7 @@ from .properties import PUrPropertyGroup
 
 
     
-classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ExChangeCoup,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini, PP_OT_OversizeOperator, PUrPropertyGroup) 
+classes = (PP_PT_PuzzlePrintMenu,PUrP_RotationGizmo,PP_OT_AddSingleCoupling,PP_OT_ExChangeCoup,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini, PP_OT_OversizeOperator, AppendFromFileOperator, PUrPropertyGroup) 
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
         

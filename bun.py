@@ -126,7 +126,6 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     PrimTypes = context.scene.PUrP.SingleCouplingTypes
     CylVert = PUrP.CylVert
 
-
     if nameadd == "_diff":
         size *= PUrP.Oversize
 
@@ -196,13 +195,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         
         
         return {'FINISHED'}
-       
-
-
-
-
-
-
+ 
 class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label="ApplyCouplings"
     bl_idname="apl.coup"
@@ -490,3 +483,56 @@ class PP_OT_OversizeOperator(bpy.types.Operator):
 
 
 
+class AppendFromFileOperator(bpy.types.Operator):
+    bl_idname = "object.appendfromfile"
+    bl_label = "appendFromFile"
+
+    def execute(self, context):
+        
+        self.appendCoupling("Cube")
+        
+        
+        return {'FINISHED'}
+
+    def appendCoupling(self, object):
+        #blendfile = "//repository.blend" #/full/path/to/
+        #section   = "\\Objects\\"
+        #object    = object
+
+        #filepath  = blendfile# + section 
+        #directory = blendfile + section #+ object
+        #filename  = object
+
+    
+        #bpy.ops.wm.append(
+         #   filepath=filepath, 
+         #   filename=filename,
+          #  directory=directory)
+        #filepath = "/repository.blend"
+        filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
+        with bpy.data.libraries.load(filepath) as (data_from, data_to):
+            print('I am in')
+            data_to.objects = [name for name in data_from.objects]
+        
+        for obj in data_to.objects:
+            bpy.context.collection.objects.link(obj)
+
+        
+
+        # write selected objects and their data to a blend file
+        #data_blocks = set(bpy.context.selected_objects)
+        #bpy.data.libraries.write(filepath, data_blocks)
+
+
+
+        '''https://devtalk.blender.org/t/append-entire-scene-python-to-current-scene/280/8
+        FILEPATH = '/home/januz/tmp/appen_test.blend'
+        with bpy.data.libraries.load(FILEPATH) as (data_from, data_to):
+            data_to.objects = [name for name in data_from.objects]
+            print('These are the objs: ', data_to.objects)
+
+        # Objects have to be linked to show up in a scene
+        for obj in data_to.objects:
+            bpy.context.scene.objects.link(obj)'''
+
+        #https://docs.blender.org/api/current/bpy.path.html    

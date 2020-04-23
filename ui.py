@@ -54,6 +54,10 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             
+            subcol = col.column()
+            subcol.label(text ='Test Button für Appens')
+            subcol.operator("object.appendfromfile")
+            
             
 
             for ob in context.selected_objects:
