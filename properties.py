@@ -26,11 +26,21 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                 ('3','Cone',''),
                 ]
         )
+    PlanarCouplingTypes = bpy.props.EnumProperty(
+        name='',  #SingleCoupltypes
+        description='List of forms avaiable in single connector mode',
+        default='1',
+        items=[ ('1','Cubic',''),
+                ('2','Dovetail', ''),
+                ('3','Puzzle',''),
+                ]
+        )
     SingleCouplingModes = bpy.props.EnumProperty(
         name='SingleCouplModes',
         description='List of forms avaiable in single connector mode',
         items=[ ('1','Stick',''),
                 ('2','Male-Female', ''),
                 ('3','FlatCut',''),
+                ('4','Planar',''),
                 ]
         )

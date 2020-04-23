@@ -34,7 +34,10 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol = col.column()
             subcol.label(text="Coupling Mode")
             subcol.prop(context.scene.PUrP, "SingleCouplingModes", expand=True)
-            subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
+            if context.scene.PUrP.SingleCouplingModes != 4:
+                subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
+            else:
+                subcol.prop(context.scene.PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
             props = subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
             props.PrimTypes = context.scene.PUrP.SingleCouplingTypes
@@ -55,7 +58,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             
             subcol = col.column()
-            subcol.label(text ='Test Button für Appens')
+            subcol.label(text ='Test Button für Appends')
             subcol.operator("object.appendfromfile")
             
             

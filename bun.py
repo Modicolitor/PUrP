@@ -3,6 +3,7 @@ import mathutils
 from math import radians
 from bpy.types import Scene, Image, Object
 import random
+import os
 
 #from .properties import PUrPropertyGroup
 
@@ -116,8 +117,8 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     elif PUrP.SingleCouplingModes == "1":       #stick 
         genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
         genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)          
-    
-
+    elif PUrP.SingleCouplingModes == "4":
+        appendPlanar()
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     context = bpy.context
@@ -155,6 +156,28 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
             mod.operation = 'UNION'
     else:
         pass
+
+
+def appendPlanar(newname_mainplane, nameadd):
+    PUrP = bpy.context.scene.PUrP
+    
+    appendCoupling(planar, objectname)
+
+def appendCoupling(filename, objectname):
+        
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        subpath = "blend" + os.sep + filename
+        cp = os.path.join(script_path, subpath)
+    
+        
+        #filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
+        with bpy.data.libraries.load(cp) as (data_from, data_to):
+            print('I am in')
+            data_to.objects = [name for name in data_from.objects if name == objectname]
+        
+        for obj in data_to.objects:
+            bpy.context.collection.objects.link(obj)
+            obj.location = mathutils.Vector((0,0,0))
 
 
 
@@ -489,33 +512,28 @@ class AppendFromFileOperator(bpy.types.Operator):
 
     def execute(self, context):
         
-        self.appendCoupling("Cube")
+        self.appendCoupling("Cubic")
+        self.appendCoupling("Puzzle")
+        self.appendCoupling("Dovetail")
         
         
         return {'FINISHED'}
 
-    def appendCoupling(self, object):
-        #blendfile = "//repository.blend" #/full/path/to/
-        #section   = "\\Objects\\"
-        #object    = object
-
-        #filepath  = blendfile# + section 
-        #directory = blendfile + section #+ object
-        #filename  = object
-
+    def appendCoupling(self, objectname):
+        
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        subpath = "blend" + os.sep + "planar.blend"
+        cp = os.path.join(script_path, subpath)
     
-        #bpy.ops.wm.append(
-         #   filepath=filepath, 
-         #   filename=filename,
-          #  directory=directory)
-        #filepath = "/repository.blend"
-        filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
-        with bpy.data.libraries.load(filepath) as (data_from, data_to):
+        
+        #filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
+        with bpy.data.libraries.load(cp) as (data_from, data_to):
             print('I am in')
-            data_to.objects = [name for name in data_from.objects]
+            data_to.objects = [name for name in data_from.objects if name == objectname]
         
         for obj in data_to.objects:
             bpy.context.collection.objects.link(obj)
+            obj.location = mathutils.Vector((0,0,0))
 
         
 
@@ -534,5 +552,7 @@ class AppendFromFileOperator(bpy.types.Operator):
         # Objects have to be linked to show up in a scene
         for obj in data_to.objects:
             bpy.context.scene.objects.link(obj)'''
+
+        ##https://stackoverflow.com/questions/33447680/blender-open-and-parse-a-blend-file-from-python-script
 
         #https://docs.blender.org/api/current/bpy.path.html    
