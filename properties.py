@@ -9,6 +9,13 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     CoupSize = bpy.props.FloatProperty(name="Size", default = 1.0)
     Oversize = bpy.props.FloatProperty(name="DynamicOversize", default = 1.0)
     zScale = bpy.props.FloatProperty(name="zScale", default = 1.0)
+    GlobalScale = bpy.props.FloatProperty(name="Globalscale ", default = 1.0)
+
+    LineDistance = bpy.props.FloatProperty(name="Linedistance", default = 5.0)
+    LineCount = bpy.props.IntProperty(name="Linecount", default = 1)
+    LineLength = bpy.props.IntProperty(name="Linelength", default = 5)
+
+
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
         description='Set the resolution of the cylic objects',
@@ -20,21 +27,22 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name='',  #SingleCoupltypes
         description='List of forms avaiable in single connector mode',
         default='1',
-        items=[ ('0', '',''),
-                ('1','Cube',''),
+        items=[ ('1','Cube',''),
                 ('2','Cylinder', ''),
                 ('3','Cone',''),
                 ]
         )
+    
     PlanarCouplingTypes = bpy.props.EnumProperty(
-        name='',  #SingleCoupltypes
-        description='List of forms avaiable in single connector mode',
+        name='',  #PlanarCoupltypes
+        description='List of forms avaiable in planar connector mode',
         default='1',
-        items=[ ('1','Cubic',''),
+        items=[ ('1','Cubic',' '),
                 ('2','Dovetail', ''),
                 ('3','Puzzle',''),
                 ]
         )
+    
     SingleCouplingModes = bpy.props.EnumProperty(
         name='SingleCouplModes',
         description='List of forms avaiable in single connector mode',

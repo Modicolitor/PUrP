@@ -34,7 +34,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol = col.column()
             subcol.label(text="Coupling Mode")
             subcol.prop(context.scene.PUrP, "SingleCouplingModes", expand=True)
-            if context.scene.PUrP.SingleCouplingModes != 4:
+            if context.scene.PUrP.SingleCouplingModes != '4':
                 subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
             else:
                 subcol.prop(context.scene.PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
@@ -49,9 +49,15 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":
                 subcol.prop(context.scene.PUrP, "CylVert", text = 'Vertices')
             
+            subcol.prop(context.scene.PUrP, "GlobalScale", text = 'Globalscalefaktor')
             subcol.prop(context.scene.PUrP, "CoupSize", text = 'Size')    
             subcol.prop(context.scene.PUrP, "zScale", text = 'z-scale')
             subcol.prop(context.scene.PUrP, "Oversize", text = 'oversize')
+            if context.scene.PUrP.SingleCouplingModes == '4':
+                subcol.prop(context.scene.PUrP, "LineLength", text = 'LineLength')
+                subcol.prop(context.scene.PUrP, "LineCount", text = 'Linecount')
+                subcol.prop(context.scene.PUrP, "LineDistance", text = 'Linedistance')
+
             subcol.operator("object.exchangecoup", text="Apply New Settings")
             subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an

@@ -61,37 +61,50 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
                     context.scene.PUrP.CenterObj = CenterObj
         else:
             active = context.scene.PUrP.CenterObj
+            active.select_set(True) 
 
         ####apply scale 
-            
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
         CenterObj_name = CenterObj.name
         Centerloc = CenterObj.location
-        bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0,0,0))
-        context.object.name = str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
-        newname_mainplane = context.object.name  
         
-        bpy.ops.object.modifier_add(type='SOLIDIFY')
-        context.object.display_type = 'WIRE'
-        #context.object.show_in_front = True
         
-        context.object.parent = data.objects[CenterObj_name]
+        #####make slice plane when not planar
+        if PUrP.SingleCouplingModes != "4":
+            bpy.ops.mesh.primitive_plane_add(size=6, enter_editmode=False, location=(0,0,0))
+            context.object.name = str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+            newname_mainplane = context.object.name  
+            
+            bpy.ops.object.modifier_add(type='SOLIDIFY')
+            context.object.display_type = 'WIRE'
+            #context.object.show_in_front = True
+            
+            context.object.parent = data.objects[CenterObj_name]
 
-        
-        ###set boolean for the slice plane
-        mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
-        mod.object = data.objects[newname_mainplane]
-        mod.operation = 'DIFFERENCE'
-        
+            
+            ###set boolean for the slice plane
+            mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
+            mod.object = data.objects[newname_mainplane]
+            mod.operation = 'DIFFERENCE'
+        else:
+            newname_mainplane = "Null"   ### for planar
+
+
         loc = mathutils.Vector((0,0,0))
+        print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
         coupModeDivision(CenterObj, newname_mainplane, loc)
 
-        
+    
         cursorloc.x -= CenterObj.location.x  
         cursorloc.y -= CenterObj.location.y
         cursorloc.z -= CenterObj.location.z
         #context.scene.objects.link(unioncopy)
 
-        data.objects[newname_mainplane].location += cursorloc
+        if PUrP.SingleCouplingModes != "4":
+            data.objects[newname_mainplane].location += cursorloc
+        elif PUrP.SingleCouplingModes == "4":
+            context.object.location += cursorloc
+
         context.scene.cursor.location = cursorlocori  
         
         return{"FINISHED"} 
@@ -118,7 +131,8 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
         genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
         genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)          
     elif PUrP.SingleCouplingModes == "4":
-        appendPlanar()
+        print(f'CenterObj {CenterObj.name} vor genplanar. Active {bpy.context.object.name} ')
+        genPlanar()
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     context = bpy.context
@@ -138,9 +152,10 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     elif PrimTypes == "3":
         bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
 
-        #### scale die sticks
+        #### z-scale die sticks 
     context.object.scale.z *= PUrP.zScale
-
+    
+    #### make name relative to the Couplingmainplain
     context.object.name = str(newname_mainplane)+ str(nameadd)
     context.object.parent = bpy.data.objects[newname_mainplane]
     context.object.display_type = 'WIRE'    
@@ -158,10 +173,90 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
         pass
 
 
-def appendPlanar(newname_mainplane, nameadd):
+def genPlanar():
+    context = bpy.context
     PUrP = bpy.context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+    LineLength = PUrP.LineLength
+    LineCount = PUrP.LineCount
+    LineDistance = PUrP.LineDistance
+    CenterObj = PUrP.CenterObj
+    height = 3
+    type = PUrP.PlanarCouplingTypes
+
     
-    appendCoupling(planar, objectname)
+    ### I don't know how to get the name from the enum property might be simpler 
+    if type == "1":      
+        objectname = "Cubic"
+    elif type == "2":      
+        objectname = "Dovetail"
+    elif type == "1":      
+        objectname = "Puzzle"
+    else: 
+        objectname = "Cubic"
+    
+    newname = str(PUrP_name) + "PlanarConnector_" + str(random.randint(1, 999))
+    nameadd = "_diff"
+
+    appendCoupling("planar.blend", objectname)
+    print(f'nache append active {context.object.name}, CenterObj {CenterObj.name}')
+    context.object.name = str(newname)+ str(nameadd)
+
+    print(f'active {context.object.name}, CenterObj {CenterObj.name}')
+
+    context.object.parent = CenterObj
+    context.object.display_type = 'WIRE'    
+    context.object.show_in_front = True
+    
+    selected = context.selected_objects[:]
+    for ob in selected:
+        ob.select_set(False)
+    
+    bpy.ops.object.editmode_toggle()
+
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"use_normal_flip":False, "mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, height)})
+    #"mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False, "use_accurate":False}
+    bpy.ops.object.editmode_toggle()
+
+
+    obj = context.object
+    ###scale it a bit smaller than in the file 
+    adjustScale = 0.25
+    obj.scale.x *= adjustScale 
+    obj.scale.y *= adjustScale 
+
+    # but then also have a global scale 
+    obj.scale *= PUrP.GlobalScale 
+    
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+
+    
+
+    ## array 1 und 2 
+    mod = obj.modifiers.new(name="PUrP_Array_1", type="ARRAY")
+    mod.use_merge_vertices = True
+    mod.count = LineLength
+    
+
+    mod = obj.modifiers.new(name="PUrP_Array_2", type="ARRAY")
+    mod.relative_offset_displace[0] = 0
+    mod.relative_offset_displace[1] = LineDistance
+    mod.count = LineCount
+    mod.use_merge_vertices = True
+    
+    ## Solidify
+    mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
+    mod.thickness = 0.3
+    
+    
+    ##boolean _diff at parent object
+    mod = obj.parent.modifiers.new(name=obj.name, type = "BOOLEAN")
+    mod.operation =  'DIFFERENCE'
+    mod.object = obj
+
+
 
 def appendCoupling(filename, objectname):
         
@@ -178,6 +273,7 @@ def appendCoupling(filename, objectname):
         for obj in data_to.objects:
             bpy.context.collection.objects.link(obj)
             obj.location = mathutils.Vector((0,0,0))
+            bpy.context.view_layer.objects.active = obj
 
 
 
@@ -263,7 +359,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         
         ####teste on which side a vertex of one object lays 
                 context.view_layer.objects.active = obj
-                bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)    #### apply rotation centerplane obj damit die vector rechnung funktioniert
+                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)    #### apply rotation centerplane obj damit die vector rechnung funktioniert
 
                 CouplingNormal = obj.data.vertices[0].normal
                 ctl = False
@@ -537,22 +633,4 @@ class AppendFromFileOperator(bpy.types.Operator):
 
         
 
-        # write selected objects and their data to a blend file
-        #data_blocks = set(bpy.context.selected_objects)
-        #bpy.data.libraries.write(filepath, data_blocks)
-
-
-
-        '''https://devtalk.blender.org/t/append-entire-scene-python-to-current-scene/280/8
-        FILEPATH = '/home/januz/tmp/appen_test.blend'
-        with bpy.data.libraries.load(FILEPATH) as (data_from, data_to):
-            data_to.objects = [name for name in data_from.objects]
-            print('These are the objs: ', data_to.objects)
-
-        # Objects have to be linked to show up in a scene
-        for obj in data_to.objects:
-            bpy.context.scene.objects.link(obj)'''
-
-        ##https://stackoverflow.com/questions/33447680/blender-open-and-parse-a-blend-file-from-python-script
-
-        #https://docs.blender.org/api/current/bpy.path.html    
+       
