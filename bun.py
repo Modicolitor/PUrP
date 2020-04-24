@@ -131,7 +131,6 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
         genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
         genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)          
     elif PUrP.SingleCouplingModes == "4":
-        print(f'CenterObj {CenterObj.name} vor genplanar. Active {bpy.context.object.name} ')
         genPlanar()
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
@@ -181,6 +180,7 @@ def genPlanar():
     LineCount = PUrP.LineCount
     LineDistance = PUrP.LineDistance
     CenterObj = PUrP.CenterObj
+    CutThickness = PUrP.CutThickness
     height = 3
     type = PUrP.PlanarCouplingTypes
 
@@ -190,7 +190,7 @@ def genPlanar():
         objectname = "Cubic"
     elif type == "2":      
         objectname = "Dovetail"
-    elif type == "1":      
+    elif type == "3":      
         objectname = "Puzzle"
     else: 
         objectname = "Cubic"
@@ -229,6 +229,7 @@ def genPlanar():
     # but then also have a global scale 
     obj.scale *= PUrP.GlobalScale 
     
+    obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
 
@@ -248,7 +249,9 @@ def genPlanar():
     
     ## Solidify
     mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
-    mod.thickness = 0.3
+    mod.thickness = PUrP.CutThickness
+    mod.use_even_offset = True
+
     
     
     ##boolean _diff at parent object
@@ -282,9 +285,9 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
     bl_label = "ExChangeCoupling"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         
-        return (context.object != None) and (context.scene.PUrP.PUrP_name in context.object.name)
+        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
 
 
     def execute(self, context):
@@ -292,7 +295,9 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         context = bpy.context 
         data = bpy.data
         CenterObj = context.scene.PUrP.CenterObj
-        PUrP_name = bpy.context.scene.PUrP.PUrP_name
+        PUrP = bpy.context.scene.PUrP
+        PUrP_name = PUrP.PUrP_name
+        CouplingModes = bpy.context.scene.PUrP.SingleCouplingModes 
         selected = context.selected_objects[:]
 
         for obj in selected: 
@@ -309,7 +314,18 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     bpy.ops.object.delete(use_global=False)
 
                 loc = mathutils.Vector((0,0,0))
-                coupModeDivision(CenterObj, obj.name, loc)
+                if CouplingModes == "4":     #  when planar
+                    loc = obj.location
+                    oldname = obj.name
+                    for ob in context.selected_objects:             ## deselte all
+                        ob.select_set(False)
+                    obj.select_set(True)                          ## 
+                    bpy.ops.object.delete(use_global=False)         ## delete the old planar coupling
+                    coupModeDivision(CenterObj, oldname, loc)
+                    
+                    context.object.location = loc                                                ##planarversion 
+                else:
+                    coupModeDivision(CenterObj, obj.name, loc)          
                 
         
         
@@ -319,6 +335,11 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label="ApplyCouplings"
     bl_idname="apl.coup"
     
+    @classmethod
+    def poll(cls, context):
+        
+        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
+
     def execute(self, context):
     #    applyCouplings()
     #def applyCouplings():
@@ -479,10 +500,10 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         
-        if (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name):
-            return True
-        else:
-            return False
+        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
+        #    return True
+        #else:
+        #    return False
 
 
     def execute(self, context):
@@ -493,7 +514,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
 
         for obj in selected:
-            if "SingleConnector" in obj.name:
+            if ("SingleConnector" in obj.name) or ("PlanarConnector" in obj.name):
                 ####clean selection array
                 for ob in context.selected_objects:
                     ob.select_set(False)
