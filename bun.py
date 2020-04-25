@@ -1,9 +1,12 @@
+
+       
 import bpy
 import mathutils
 from math import radians
 from bpy.types import Scene, Image, Object
 import random
 import os
+
 
 #from .properties import PUrPropertyGroup
 
@@ -111,6 +114,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         
     
 def coupModeDivision(CenterObj, newname_mainplane,loc):
+    data = bpy.data
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
     
@@ -180,7 +184,10 @@ def genPlanar():
     LineCount = PUrP.LineCount
     LineDistance = PUrP.LineDistance
     CenterObj = PUrP.CenterObj
+    GlobalScale = PUrP.GlobalScale 
     CutThickness = PUrP.CutThickness
+    OffsetRight = PUrP.OffsetRight
+    OffsetLeft = PUrP.OffsetLeft
     height = 3
     type = PUrP.PlanarCouplingTypes
 
@@ -212,10 +219,35 @@ def genPlanar():
     for ob in selected:
         ob.select_set(False)
     
-    bpy.ops.object.editmode_toggle()
+    import bmesh
+    ##planar side offset 
+    me = bpy.context.object.data
 
+    # Get a BMesh representation
+    bm = bmesh.new()   # create an empty BMesh
+    bm.from_mesh(me)   # fill it in from a Mesh
+
+    bm.verts.ensure_lookup_table()
+
+    # Modify the BMesh, can do anything here...
+    right = OffsetRight * GlobalScale
+    left = OffsetLeft * GlobalScale
+
+    bm.verts[0].co.x += right
+    bm.verts[1].co.x -= left
+
+    # Finish up, write the bmesh back to the mesh
+    bm.to_mesh(me)
+    bm.free()  # free 
+
+
+
+    #extrude
+    bpy.ops.object.editmode_toggle()
     bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"use_normal_flip":False, "mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, height)})
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.normals_make_consistent(inside=False)
     #"mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False, "use_accurate":False}
     bpy.ops.object.editmode_toggle()
 
@@ -227,7 +259,7 @@ def genPlanar():
     obj.scale.y *= adjustScale 
 
     # but then also have a global scale 
-    obj.scale *= PUrP.GlobalScale 
+    obj.scale *= GlobalScale 
     
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -258,7 +290,7 @@ def genPlanar():
     mod = obj.parent.modifiers.new(name=obj.name, type = "BOOLEAN")
     mod.operation =  'DIFFERENCE'
     mod.object = obj
-
+    print(f"Active after planar generation {context.object}, obj is {obj}")
 
 
 def appendCoupling(filename, objectname):
@@ -286,8 +318,11 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        
-        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else: 
+            return False
 
 
     def execute(self, context):
@@ -315,15 +350,16 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
                 loc = mathutils.Vector((0,0,0))
                 if CouplingModes == "4":     #  when planar
-                    loc = obj.location
+                    loc = obj.location.copy()
+                    trans = obj.matrix_world.copy()
                     oldname = obj.name
                     for ob in context.selected_objects:             ## deselte all
                         ob.select_set(False)
                     obj.select_set(True)                          ## 
                     bpy.ops.object.delete(use_global=False)         ## delete the old planar coupling
                     coupModeDivision(CenterObj, oldname, loc)
-                    
-                    context.object.location = loc                                                ##planarversion 
+                    context.object.matrix_world = trans
+                    #context.object.location = loc                                                ##planarversion 
                 else:
                     coupModeDivision(CenterObj, obj.name, loc)          
                 
@@ -337,12 +373,16 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else: 
+            return False
         
-        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
 
     def execute(self, context):
-    #    applyCouplings()
-    #def applyCouplings():
+        #    applyCouplings()
+        #def applyCouplings():
         context = bpy.context 
         data = bpy.data
         selected = context.selected_objects[:]
@@ -351,127 +391,61 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         
         #### start conditions: seperators selected 
         
-        for obj in selected: 
+        for obj in selected:
             if PUrP_name in obj.name:
-                
-                ###apply boolean to seperate Centralobj parts
-                context.view_layer.objects.active = CenterObj
-                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=obj.name)
-                
-        
-        ###seperate by loose parts 
-                bpy.ops.object.modifier_apply(apply_as='DATA', modifier="PUrP_SingleConnector")
-                bpy.ops.object.editmode_toggle()
-                bpy.ops.mesh.separate(type='LOOSE')
-                bpy.ops.object.editmode_toggle()
-                
-
-        
-        ####remember both objects 
-                CenterObjDaughters = context.selected_objects[:]
-                
-                DaughterOne = context.active_object
-                
-                for ob in CenterObjDaughters:           ###setze das ob für zweite Tochter 
-                    if ob != DaughterOne:
-                        DaughterTwo = ob
-                
-        
-        
-        ####teste on which side a vertex of one object lays 
-                context.view_layer.objects.active = obj
-                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)    #### apply rotation centerplane obj damit die vector rechnung funktioniert
-
-                CouplingNormal = obj.data.vertices[0].normal
-                ctl = False
-                n= 0
-                Daughtertwo_side = "NULL" 
-                while ctl == False:
-                    
-                    #geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
-                    geo = mathutils.geometry
-                    
-                    direction  = CouplingNormal.dot(DaughterOne.data.vertices[n].co) - CouplingNormal.dot(obj.data.vertices[0].co)
-                    print(f"that's the direction value {direction}")
-                    if direction == 0:   ####actual vector geometry part 
-                        n += 1
-                        print("vertice number" + str(n))
-                    
-                    elif direction < 0:
-                    
-                        ctl = True
-                        print('Object auf der Positiven Seite')
-                        DaughterOne_side = "POSITIV"
-                        DaughterTwo_side = "NEGATIV"
-                        self.applyRemoveCouplMods(context, DaughterOne, obj, DaughterOne_side)
-                    elif direction > 0: 
-                        ctl = True
-                        print('negativ seite')
-                        DaughterOne_side = "NEGATIV"
-                        DaughterTwo_side = "POSITIV" 
-                        self.applyRemoveCouplMods(context, DaughterOne, obj, DaughterOne_side)
-                               
-                    else:
-                        print('Probleme with side detection') 
-  
-                self.applyRemoveCouplMods(context, DaughterTwo, obj, DaughterTwo_side)
-                #deleConnector (later propably with checkbox)
-                context.view_layer.objects.active = obj   
-                self.removeCoupling(context, obj)
-        
-        
-        
-        #SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
-
+                applySingleCoup(obj, CenterObj)
         return{"FINISHED"} 
+       
+def applyRemoveCouplMods(daughter, connector, side):
+    print(f"daughter: {daughter} connector: {connector}, side : {side}")
+    context = bpy.context
+    active = context.view_layer.objects.active
+    active = daughter
+    daughtermods = daughter.modifiers[:]
+
     
-    def applyRemoveCouplMods(self, context, daughter, connector, side):
-        print(f"daughter: {daughter} connector: {connector}, side : {side}")
-        active = context.view_layer.objects.active
-        active = daughter
-        daughtermods = daughter.modifiers[:]
-        
-        if side == "NEGATIV":
-            for mod in daughtermods:
-                if str(connector.name) + '_stick_diff' == mod.name:
-                    print(f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
-                    context.view_layer.objects.active = daughter
-                    print(f"active: {active}")
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+    if side == "NEGATIV":
+        for mod in daughtermods:
+            if str(connector.name) + '_stick_diff' == mod.name:
+                print(f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
+                context.view_layer.objects.active = daughter
+                print(f"active: {active}")
+                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+            
                 
-                    
-                elif str(connector.name) + '_diff' == mod.name:
-                    print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
-                    context.view_layer.objects.active = daughter
-                    print(f"active: {active}")
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
-                elif str(connector.name) + '_union' == mod.name:
-                    print(f'I delete now  {mod.name} from Object {daughter.name}')
-                    daughter.modifiers.remove(mod)
-        elif side == "POSITIV":
-            print('Positive Seite')
-            for mod in daughtermods:
-                print(f"modifiert nam: {mod.name}")
-                if str(connector.name) + '_stick_diff' == mod.name:
-                    print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
-                    context.view_layer.objects.active = daughter
-                    print(f"active: {active}")
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+            elif str(connector.name) + '_diff' == mod.name:
+                print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
+                context.view_layer.objects.active = daughter
+                print(f"active: {active}")
+                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+            elif str(connector.name) + '_union' == mod.name:
+                print(f'I delete now  {mod.name} from Object {daughter.name}')
+                daughter.modifiers.remove(mod)
+    elif side == "POSITIV":
+        print('Positive Seite')
+        for mod in daughtermods:
+            print(f"modifiert nam: {mod.name}")
+            if str(connector.name) + '_stick_diff' == mod.name:
+                print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
+                context.view_layer.objects.active = daughter
+                print(f"active: {active}")
+                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
 
-                elif str(connector.name) + '_union' == mod.name:
-                    context.view_layer.objects.active = daughter
-                    print(f"active: {active}")
-                    print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
-                elif str(connector.name) + '_diff' == mod.name:
-                    print(f'I delete now  {mod.name} from Object {daughter.name}')
-                    daughter.modifiers.remove(mod)
-        else:
-            print("Somethings Wrong with side determin" )
-        #if context.scene.PUrP.PUrP_name not in daughter.name:
-        #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
+            elif str(connector.name) + '_union' == mod.name:
+                context.view_layer.objects.active = daughter
+                print(f"active: {active}")
+                print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
+                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+            elif str(connector.name) + '_diff' == mod.name:
+                print(f'I delete now  {mod.name} from Object {daughter.name}')
+                daughter.modifiers.remove(mod)
+    else:
+        print("Somethings Wrong with side determin" )
+    #if context.scene.PUrP.PUrP_name not in daughter.name:
+    #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
 
-    def removeCoupling(self, context, Coupl):
+def removeCoupling(Coupl):
+        context = bpy.context
         active = context.view_layer.objects.active
         Coupl_children = Coupl.children[:]
         for child in Coupl_children:
@@ -492,6 +466,105 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 child.hide_select = False
         Coupl.select_set(True)
         bpy.ops.object.delete(use_global=False)
+   
+def applyCenterObj(CenterObj):
+    PUrP = context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+    
+    
+    n = 0 
+    while test == True:
+        if CenterObj.modifiers[n] != None:
+            if PUrP_name in CenterObj.modifiers[n].name:
+                applySingleCoup(data[mod.name], CenterObj)
+            else:
+                n += 1
+        else:
+            test == False
+        #in reinfolge alle Modier des CenterObj durch schauen 
+        #wenn der Modifier zu mir gehört 
+        #nimm den Namen des modifiers 
+
+
+def applySingleCoup(Coup, CenterObj):    
+    context = bpy.context 
+    data = bpy.data
+    PUrP_name = bpy.context.scene.PUrP.PUrP_name
+    
+    obj = Coup
+    
+        
+    ###apply boolean to seperate Centralobj parts
+    context.view_layer.objects.active = CenterObj
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=obj.name)
+    
+
+    ###seperate by loose parts 
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier="PUrP_SingleConnector")
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.separate(type='LOOSE')
+    bpy.ops.object.editmode_toggle()
+    
+
+
+    ####remember both objects 
+    CenterObjDaughters = context.selected_objects[:]
+    
+    DaughterOne = context.active_object
+    
+    for ob in CenterObjDaughters:           ###setze das ob für zweite Tochter 
+        if ob != DaughterOne:
+            DaughterTwo = ob
+    
+
+
+    ####teste on which side a vertex of one object lays 
+    context.view_layer.objects.active = obj
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)    #### apply rotation centerplane obj damit die vector rechnung funktioniert
+
+    CouplingNormal = obj.data.vertices[0].normal
+    ctl = False
+    n= 0
+    Daughtertwo_side = "NULL" 
+    while ctl == False:
+        
+        #geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
+        geo = mathutils.geometry
+        
+        direction  = CouplingNormal.dot(DaughterOne.data.vertices[n].co) - CouplingNormal.dot(obj.data.vertices[0].co)
+        print(f"that's the direction value {direction}")
+        if direction == 0:   ####actual vector geometry part 
+            n += 1
+            print("vertice number" + str(n))
+        
+        elif direction < 0:
+        
+            ctl = True
+            print('Object auf der Positiven Seite')
+            DaughterOne_side = "POSITIV"
+            DaughterTwo_side = "NEGATIV"
+            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+        elif direction > 0: 
+            ctl = True
+            print('negativ seite')
+            DaughterOne_side = "NEGATIV"
+            DaughterTwo_side = "POSITIV" 
+            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+                    
+        else:
+            print('Probleme with side detection') 
+
+    applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
+    #deleConnector (later propably with checkbox)
+    context.view_layer.objects.active = obj   
+    removeCoupling(obj)
+
+    
+    
+    #SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
+
+    
+    
 
 class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_label="DeleteCouplings"
@@ -500,10 +573,11 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         
-        return (context.view_layer.objects.active != None) and ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name)
-        #    return True
-        #else:
-        #    return False
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
 
 
     def execute(self, context):
@@ -622,36 +696,59 @@ class PP_OT_OversizeOperator(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+class PP_OT_ApplyAllCouplings(bpy.types.Operator):
+    '''Applies all Couplings. If nothing is selected it applies the Couplings to all modified objects. If an Centerobject is selected, it only applies the all Coupling for this Object. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied'''
+    bl_idname = "apl.allcoup"
+    bl_label = "PP_OT_ApplyAllCouplings"
 
-class AppendFromFileOperator(bpy.types.Operator):
-    bl_idname = "object.appendfromfile"
-    bl_label = "appendFromFile"
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
 
     def execute(self, context):
+        PUrP = context.scene.PUrP
+        PUrP_name = PUrP.PUrP_name
+        data = bpy.data
         
-        self.appendCoupling("Cubic")
-        self.appendCoupling("Puzzle")
-        self.appendCoupling("Dovetail")
+        #wenn nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
+        if context.selected_objects == None:
+            print('Its None und nicht "None"')
+            for obj in data.objects:
+                for child in obj.child:         ###gibt es kinder Coupling in diesem Object
+                    if PUrP_name in child:
+                        CenterBool = True
+                        pass
+                if CenterBool:
+                    applyCenterObj(obj)
+        
+        elif context.selected_objects != None:
+        
+            selected = context.selected_objects[:]
+            for obj in selected: 
+                CenterBool = False
+                #wenn couplin type selected , finde Papa und sende es  
+                if PUrP_name in obj.name:
+                    print("I am a selected Connector such meinen Papa")
+                    applyCenterObj(obj.parent)
+                else:
+                    for child in obj.child:         ###gibt es kinder Coupling in diesem Object
+                        if PUrP_name in child:
+                            CenterBool = True
+                            pass
+                if CenterBool:
+                    print('I am a CenterObj')    
+                    applyCenterObj(obj)
+
+        #wenn coupling selected, apply für alle  
         
         
         return {'FINISHED'}
 
-    def appendCoupling(self, objectname):
-        
-        script_path = os.path.dirname(os.path.realpath(__file__))
-        subpath = "blend" + os.sep + "planar.blend"
-        cp = os.path.join(script_path, subpath)
-    
-        
-        #filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
-        with bpy.data.libraries.load(cp) as (data_from, data_to):
-            print('I am in')
-            data_to.objects = [name for name in data_from.objects if name == objectname]
-        
-        for obj in data_to.objects:
-            bpy.context.collection.objects.link(obj)
-            obj.location = mathutils.Vector((0,0,0))
 
-        
 
        

@@ -9,8 +9,9 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     CoupSize = bpy.props.FloatProperty(name="Size", default = 1.0)
     Oversize = bpy.props.FloatProperty(name="DynamicOversize", default = 1.0)
     zScale = bpy.props.FloatProperty(name="zScale", default = 1.0)
+    OffsetLeft = bpy.props.FloatProperty(name="OffsetLeft", default = 0.2)
+    OffsetRight = bpy.props.FloatProperty(name="OffsetRight", default = 0.2)
     GlobalScale = bpy.props.FloatProperty(name="Globalscale ", default = 1.0)
-
     LineDistance = bpy.props.FloatProperty(name="Linedistance", default = 5.0)
     LineCount = bpy.props.IntProperty(name="Linecount", default = 1)
     LineLength = bpy.props.IntProperty(name="Linelength", default = 5)

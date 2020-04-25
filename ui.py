@@ -57,15 +57,17 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 subcol.prop(context.scene.PUrP, "LineLength", text = 'LineLength')
                 subcol.prop(context.scene.PUrP, "LineCount", text = 'Linecount')
                 subcol.prop(context.scene.PUrP, "LineDistance", text = 'Linedistance')
-
+                subcol.prop(context.scene.PUrP, "OffsetRight", text = 'Right Offset')
+                subcol.prop(context.scene.PUrP, "OffsetLeft", text = 'Left Offset')
+                
             subcol.operator("object.exchangecoup", text="Apply New Settings")
             subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+
             
-            subcol = col.column()
-            subcol.label(text ='Test Button für Appends')
-            subcol.operator("object.appendfromfile")
+            
             
             
 
