@@ -6,6 +6,7 @@ from math import radians
 from bpy.types import Scene, Image, Object
 import random
 import os
+from .intersect import bmesh_check_intersect_objects
 
 
 #from .properties import PUrPropertyGroup
@@ -105,10 +106,13 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         if PUrP.SingleCouplingModes != "4":
             data.objects[newname_mainplane].location += cursorloc
+            data.objects[newname_mainplane].select_set(True)
         elif PUrP.SingleCouplingModes == "4":
             context.object.location += cursorloc
+            context.object.select_set(True)
 
         context.scene.cursor.location = cursorlocori  
+        context.object.select_set(True)
         
         return{"FINISHED"} 
         
@@ -386,13 +390,14 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         context = bpy.context 
         data = bpy.data
         selected = context.selected_objects[:]
-        CenterObj = context.scene.PUrP.CenterObj
+        #CenterObj = context.scene.PUrP.CenterObj
         PUrP_name = bpy.context.scene.PUrP.PUrP_name
         
         #### start conditions: seperators selected 
         
         for obj in selected:
             if PUrP_name in obj.name:
+                CenterObj = obj.parent
                 applySingleCoup(obj, CenterObj)
         return{"FINISHED"} 
        
@@ -445,46 +450,107 @@ def applyRemoveCouplMods(daughter, connector, side):
     #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
 
 def removeCoupling(Coupl):
-        context = bpy.context
-        active = context.view_layer.objects.active
-        Coupl_children = Coupl.children[:]
-        for child in Coupl_children:
-            if "fix" not in child.name:             ####alle normalen couplings die applied sind
-                child.hide_select = False
-               
-                for ob in context.selected_objects:
-                    ob.select_set(False)
-                child.select_set(True)
-                
-                bpy.ops.object.delete(use_global=False)
-            elif 'fix' in child.name:
-                child.display_type = 'SOLID'
-                child.location = mathutils.Vector((0,0,0))
+    data = bpy.data
+    context = bpy.context
+    active = context.view_layer.objects.active
+    Coupl_children = Coupl.children[:]
+    for child in Coupl_children:
+        if "fix" not in child.name:             ####alle normalen couplings die applied sind
+            child.hide_select = False
+            
+            for ob in context.selected_objects:
+                ob.select_set(False)
+            child.select_set(True)
+            
+            bpy.ops.object.delete(use_global=False)
+        elif 'fix' in child.name:
+            child.display_type = 'SOLID'
+            child.location = mathutils.Vector((0,0,0))
 
-                child.parent = context.scene.PUrP.CenterObj
-                child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
-                child.hide_select = False
-        Coupl.select_set(True)
-        bpy.ops.object.delete(use_global=False)
+            child.parent = context.scene.PUrP.CenterObj
+            child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
+            child.hide_select = False
+    
+    for ob in data.objects:
+        for mod in ob.modifiers: 
+            if Coupl.name in mod.name:
+                ob.modifiers.remove(mod)
+
+    Coupl.select_set(True)
+    bpy.ops.object.delete(use_global=False)
    
+Daughtercollection = []
+
+def CenterObjCollector():
+    data = bpy.data
+    global Daughtercollection
+    list(set(Daughtercollection))
+    PUrP = bpy.context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+
+    #if len(Daughtercollection) == 0:
+    test = False
+    print (f"DaughterCollection content {Daughtercollection}")
+    for Daughter in Daughtercollection:
+        for mod in Daughter.modifiers:
+            if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):                 
+                if bmesh_check_intersect_objects(data.objects[mod.name], Daughter):
+                    print(f"intersect in Collector True for {mod.name} and {Daughter}")
+                
+                    test = True
+                    continue
+                
+        if test:
+            print(f"Test is for {Daughter}")
+            applyCenterObj(Daughter)
+        else:
+            Daughtercollection.remove(Daughter)    
+    
+    
+    if len(Daughtercollection) != 0:
+        CenterObjCollector()
+
+
 def applyCenterObj(CenterObj):
+    global Daughtercollection
+    context = bpy.context
+    data = bpy.data
     PUrP = context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
     
+    print('frisch in appyl centerObj {CenterObj}')
     
-    n = 0 
-    while test == True:
-        if CenterObj.modifiers[n] != None:
-            if PUrP_name in CenterObj.modifiers[n].name:
-                applySingleCoup(data[mod.name], CenterObj)
-            else:
-                n += 1
-        else:
-            test == False
+    #n = 0
+    #test = True 
+    modifiers = CenterObj.modifiers[:] 
+
+    for mod in modifiers: 
+    #while test == True:
+        print(f'nächste Runde für mod {mod.name} in CenterObj {CenterObj}')
+        #if (len(CenterObj.modifiers) != 0) and (len(CenterObj.modifiers)-1 >= n):
+        if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):  
+            print('nächste Runde')
+            #try: 
+            #if PUrP_name in CenterObj.modifiers[n].name:
+            #mod_name = CenterObj.modifiers[n].name
+            if bmesh_check_intersect_objects(data.objects[mod.name], CenterObj):
+                print("Intersection test is positiv")
+                Daughters = applySingleCoup(data.objects[mod.name], CenterObj)
+                print(f"Daughters send to collection {Daughters}")
+                Daughtercollection.append(Daughters)
+            
+        
+    #CenterObjCollector()
+        #CenterObjCollector(Daughters)    
+        
         #in reinfolge alle Modier des CenterObj durch schauen 
         #wenn der Modifier zu mir gehört 
         #nimm den Namen des modifiers 
 
+'''test if the coupling plane intersects with the Obje'''
+#def intersectCoup(Coup, CenterObj)
+    
+#    return True
 
 def applySingleCoup(Coup, CenterObj):    
     context = bpy.context 
@@ -493,6 +559,8 @@ def applySingleCoup(Coup, CenterObj):
     
     obj = Coup
     
+    for sel in context.selected_objects:
+        sel.select_set(False)
         
     ###apply boolean to seperate Centralobj parts
     context.view_layer.objects.active = CenterObj
@@ -500,7 +568,7 @@ def applySingleCoup(Coup, CenterObj):
     
 
     ###seperate by loose parts 
-    bpy.ops.object.modifier_apply(apply_as='DATA', modifier="PUrP_SingleConnector")
+    
     bpy.ops.object.editmode_toggle()
     bpy.ops.mesh.separate(type='LOOSE')
     bpy.ops.object.editmode_toggle()
@@ -509,7 +577,7 @@ def applySingleCoup(Coup, CenterObj):
 
     ####remember both objects 
     CenterObjDaughters = context.selected_objects[:]
-    
+    print(f'CenterObjDaugters are {CenterObjDaughters}')
     DaughterOne = context.active_object
     
     for ob in CenterObjDaughters:           ###setze das ob für zweite Tochter 
@@ -558,10 +626,74 @@ def applySingleCoup(Coup, CenterObj):
     #deleConnector (later propably with checkbox)
     context.view_layer.objects.active = obj   
     removeCoupling(obj)
-
+    Daughters = (DaughterOne, DaughterTwo)
+    return Daughters
     
     
     #SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
+
+
+class PP_OT_ApplyAllCouplings(bpy.types.Operator):
+    '''Applies all Couplings. If nothing is selected it applies the Couplings to all modified objects. If an Centerobject is selected, it only applies the all Coupling for this Object. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied'''
+    bl_idname = "apl.allcoup"
+    bl_label = "PP_OT_ApplyAllCouplings"
+
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+            
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        PUrP_name = PUrP.PUrP_name
+        data = bpy.data
+        global Daughtercollection
+        
+        #wenn nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
+        if context.selected_objects == None:
+            print('Its None und nicht "None"')
+            for obj in data.objects:
+                for child in obj.child:         ###gibt es kinder Coupling in diesem Object
+                    if PUrP_name in child:
+                        CenterBool = True
+                        pass
+                if CenterBool:
+                    Daughtercollection = [] 
+                    Daughtercollection.append(obj)
+                    CenterObjCollector()
+        
+        elif context.selected_objects != None:
+        
+            selected = context.selected_objects[:]
+            for obj in selected: 
+                CenterBool = False
+                #wenn couplin type selected , finde Papa und sende es  
+                if PUrP_name in obj.name:
+                    print("I am a selected Connector such meinen Papa")
+                    #applyCenterObj(obj.parent)
+                    Daughtercollection = [] 
+                    Daughtercollection.append(obj.parent)
+                    CenterObjCollector()
+                else:
+                    for child in obj.child:         ###gibt es kinder Coupling in diesem Object
+                        if PUrP_name in child:
+                            CenterBool = True
+                            pass
+                if CenterBool:
+                    Daughtercollection = [] 
+                    Daughtercollection.append(obj)
+                    CenterObjCollector()
+                    #applyCenterObj(obj)
+
+        #wenn coupling selected, apply für alle  
+        
+        
+        return {'FINISHED'}
 
     
     
@@ -696,59 +828,7 @@ class PP_OT_OversizeOperator(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-class PP_OT_ApplyAllCouplings(bpy.types.Operator):
-    '''Applies all Couplings. If nothing is selected it applies the Couplings to all modified objects. If an Centerobject is selected, it only applies the all Coupling for this Object. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied'''
-    bl_idname = "apl.allcoup"
-    bl_label = "PP_OT_ApplyAllCouplings"
-
-    @classmethod
-    def poll(cls, context):
-        
-        if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
-        else:
-            return False
-
-    def execute(self, context):
-        PUrP = context.scene.PUrP
-        PUrP_name = PUrP.PUrP_name
-        data = bpy.data
-        
-        #wenn nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
-        if context.selected_objects == None:
-            print('Its None und nicht "None"')
-            for obj in data.objects:
-                for child in obj.child:         ###gibt es kinder Coupling in diesem Object
-                    if PUrP_name in child:
-                        CenterBool = True
-                        pass
-                if CenterBool:
-                    applyCenterObj(obj)
-        
-        elif context.selected_objects != None:
-        
-            selected = context.selected_objects[:]
-            for obj in selected: 
-                CenterBool = False
-                #wenn couplin type selected , finde Papa und sende es  
-                if PUrP_name in obj.name:
-                    print("I am a selected Connector such meinen Papa")
-                    applyCenterObj(obj.parent)
-                else:
-                    for child in obj.child:         ###gibt es kinder Coupling in diesem Object
-                        if PUrP_name in child:
-                            CenterBool = True
-                            pass
-                if CenterBool:
-                    print('I am a CenterObj')    
-                    applyCenterObj(obj)
-
-        #wenn coupling selected, apply für alle  
-        
-        
-        return {'FINISHED'}
-
+##
 
 
        

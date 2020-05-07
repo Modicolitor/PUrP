@@ -4,6 +4,7 @@ from bpy.types import Scene, Image, Object
 
 class PUrPropertyGroup(bpy.types.PropertyGroup):
     CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
+    
     PUrP_name = bpy.props.StringProperty(name="PUrPname", default="PUrP_")
     CutThickness = bpy.props.FloatProperty(name="Size", default = 0.1)
     CoupSize = bpy.props.FloatProperty(name="Size", default = 1.0)

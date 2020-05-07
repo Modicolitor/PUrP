@@ -64,7 +64,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
-            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("apl.allcoup", text='Apply All', icon="MOD_OCEAN") ### zeige button an
 
             
             
