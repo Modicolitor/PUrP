@@ -473,10 +473,13 @@ def removeCoupling(Coupl):
             child.hide_select = False
     
     for ob in data.objects:
+        ob.select_set(False) ## for deleting after this modifier removal
         for mod in ob.modifiers: 
             if Coupl.name in mod.name:
                 ob.modifiers.remove(mod)
 
+
+    
     Coupl.select_set(True)
     bpy.ops.object.delete(use_global=False)
    
@@ -597,13 +600,15 @@ def centerObjDecider(CenterObj):
                     for Cmod in Cobjmodslist:  ##### look through addon own modifier liste and 
                         print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
-                            if bmesh_check_intersect_objects(Objects[mod], Cobj): 
+
+                            print(f"Intersect test: Connector {Objects[mod]} and Center obj {Cobj} {bmesh_check_intersect_objects(Objects[mod], Cobj)}")
+                            if bmesh_check_intersect_objects(Objects[mod], Cobj):
                                 print(f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
                                 applySingleCoup(Objects[mod],Cobj)
                             else:
                                 print(f"centerObjdecider remove now mod {mod} of Cobj {Cobj}")
-                                mid = Cobj.modifiers[mod]
-                                Cobj.modifiers.remove(mid)
+                                #mid = Cobj.modifiers[mod]
+                                #Cobj.modifiers.remove(mid)
          
  
 
