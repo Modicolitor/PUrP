@@ -53,6 +53,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.prop(context.scene.PUrP, "CoupSize", text = 'Size')    
             subcol.prop(context.scene.PUrP, "zScale", text = 'z-scale')
             subcol.prop(context.scene.PUrP, "Oversize", text = 'oversize')
+            subcol.prop(context.scene.PUrP, "BevelOffset", text = 'Bevel Offset')
+            subcol.prop(context.scene.PUrP, "BevelSegments", text = 'Bevel Segments')
+
             if context.scene.PUrP.SingleCouplingModes == '4':
                 subcol.prop(context.scene.PUrP, "LineLength", text = 'LineLength')
                 subcol.prop(context.scene.PUrP, "LineCount", text = 'Linecount')

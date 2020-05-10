@@ -160,12 +160,21 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     elif PrimTypes == "3":
         bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
 
-        #### z-scale die sticks 
+        #### z-scale die sticks
+        #  
+    context.object.scale *= PUrP.GlobalScale
+    
+
     context.object.scale.z *= PUrP.zScale
     
     #### make name relative to the Couplingmainplain
     context.object.name = str(newname_mainplane)+ str(nameadd)
     context.object.parent = bpy.data.objects[newname_mainplane]
+
+    mod = context.object.modifiers.new(name = context.object.name + "Bevel" , type = "BEVEL")   ########bevelOption to the Subcoupling
+    mod.width = PUrP.BevelOffset
+    mod.segments = PUrP.BevelSegments
+    mod.limit_method = 'ANGLE'
     context.object.display_type = 'WIRE'    
     context.object.show_in_front = True
     context.object.hide_select = True
@@ -366,6 +375,9 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.object.matrix_world = trans
                     #context.object.location = loc                                                ##planarversion 
                 else:
+                    mod = CenterObj.modifiers.new(name = obj.name, type = "BOOLEAN")
+                    mod.object = obj
+                    mod.operation =  'DIFFERENCE'
                     coupModeDivision(CenterObj, obj.name, loc)          
                 
         
@@ -468,6 +480,12 @@ def removeCoupling(Coupl):
             bpy.ops.object.delete(use_global=False)
         elif 'fix' in child.name:
             child.hide_select = False
+            active = child
+            for mod in child.modifiers:
+                print(f"fix stick active {active} mod {mod.name}")
+                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+
+
             child.display_type = 'SOLID'
             #child.location = mathutils.Vector((0,0,0))
             globloc = Coupl.matrix_world

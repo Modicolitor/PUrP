@@ -1,6 +1,6 @@
 
 
-[] Apply All 
+[+] Apply All 
     when nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
     wenn CenterObj type selected , apply only for this one 
     wenn coupling selected, apply für alle  
@@ -9,6 +9,7 @@
 
 [] preview  
 
+[] Active Coupling to default
 
 [] move coupling up/down in modifier stack (boolean probleme lösen)
 
@@ -16,6 +17,13 @@
 
 
 werden die operator in reinfolge applied?
+
+
+
+#################feature ideen 
+
+[] Add by tastenkürzel 
+[] Stopper for planar
 
 
 

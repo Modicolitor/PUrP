@@ -16,7 +16,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     LineDistance = bpy.props.FloatProperty(name="Linedistance", default = 5.0)
     LineCount = bpy.props.IntProperty(name="Linecount", default = 1)
     LineLength = bpy.props.IntProperty(name="Linelength", default = 5)
-
+    BevelSegments = bpy.props.IntProperty(name="Bevelsegements", default = 1)
+    BevelOffset = bpy.props.FloatProperty(name="Beveloffset", default = 0.0)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
