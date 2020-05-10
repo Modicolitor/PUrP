@@ -410,14 +410,15 @@ def applyRemoveCouplMods(daughter, connector, side):
     daughtermods = daughter.modifiers[:]
 
     
+    
     if side == "NEGATIV":
         for mod in daughtermods:
-            if str(connector.name) + '_stick_diff' == mod.name:
+            if str(connector.name) + '_stick_diff' == mod.name:   
                 print(f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
                 bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
-            
+                
                 
             elif str(connector.name) + '_diff' == mod.name:
                 print(f"I apply now modifier: {mod.name} to Object {daughter.name}")
@@ -451,6 +452,7 @@ def applyRemoveCouplMods(daughter, connector, side):
     #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
 
 def removeCoupling(Coupl):
+    '''removes objects related to the coupling after apllying or when it is a fixed '''
     data = bpy.data
     context = bpy.context
     active = context.view_layer.objects.active
@@ -465,12 +467,18 @@ def removeCoupling(Coupl):
             
             bpy.ops.object.delete(use_global=False)
         elif 'fix' in child.name:
-            child.display_type = 'SOLID'
-            child.location = mathutils.Vector((0,0,0))
-
-            child.parent = context.scene.PUrP.CenterObj
-            child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
             child.hide_select = False
+            child.display_type = 'SOLID'
+            #child.location = mathutils.Vector((0,0,0))
+            globloc = Coupl.matrix_world
+            print(f" Matrix World  von Coupl {globloc}")
+            
+            
+            child.parent = None
+            child.matrix_world = globloc
+            #child.parent = context.scene.PUrP.CenterObj
+            #child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
+            
     
     for ob in data.objects:
         ob.select_set(False) ## for deleting after this modifier removal
