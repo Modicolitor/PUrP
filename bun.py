@@ -70,6 +70,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         ####apply scale 
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
         CenterObj_name = CenterObj.name
+        CenterObj.PUrPCobj = True
         Centerloc = CenterObj.location
         
         
@@ -546,11 +547,66 @@ def applyCenterObj(CenterObj):
         #in reinfolge alle Modier des CenterObj durch schauen 
         #wenn der Modifier zu mir gehört 
         #nimm den Namen des modifiers 
-
+    
 '''test if the coupling plane intersects with the Obje'''
 #def intersectCoup(Coup, CenterObj)
     
 #    return True
+
+def centerObjDecider(CenterObj):
+    PUrP = bpy.context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+    Objects = bpy.data.objects
+
+
+
+
+
+    CouplingsMods = CenterObj.modifiers[:]
+    ModList = []
+    for PriMod in CouplingsMods:   #################look through the modifers of the centerObj and make a list of the Couplings that need to be applied
+        if ("PUrP_" in PriMod.name) and ("diff" not in PriMod.name) and ("union" not in PriMod.name):
+            primodname = PriMod.name[:]
+            print(f"primodname {primodname}")
+            ModList.append(primodname)
+
+
+
+
+    for mod in ModList:
+        print(f"centerObjdecider mod name {mod}")
+        if PUrP_name in mod: 
+            if ("diff" not in mod) and ("union" not in mod): 
+
+                ####potential Cobj list (checking the Object bool),otherwise when I loo through all objects and delete objects during the round, the Objects change adress
+                Cobjlist = []
+                for pCobj in Objects: 
+                    if pCobj.PUrPCobj == True:
+                        Cobjlist.append(pCobj)                   
+
+                for Cobj in Cobjlist:
+                    print(f"centerObjdecider Cobj {Cobj}")
+
+                    Cobjmodslist = [] ### now collect all the modifiers that belong to a single coupling (not diff and union), and nothing from user
+                    for ele in Cobj.modifiers:
+                        if ("PUrP_" in ele.name) and ("diff" not in ele.name) and ("union" not in ele.name):
+                            Cobjmodslist.append(ele)
+
+                    
+                    
+                    for Cmod in Cobjmodslist:  ##### look through addon own modifier liste and 
+                        print(f"centerObjdecider Cmod name {Cmod.name}")
+                        if Cmod.name == mod:
+                            if bmesh_check_intersect_objects(Objects[mod], Cobj): 
+                                print(f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
+                                applySingleCoup(Objects[mod],Cobj)
+                            else:
+                                print(f"centerObjdecider remove now mod {mod} of Cobj {Cobj}")
+                                mid = Cobj.modifiers[mod]
+                                Cobj.modifiers.remove(mid)
+         
+ 
+
 
 def applySingleCoup(Coup, CenterObj):    
     context = bpy.context 
@@ -663,9 +719,11 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                         CenterBool = True
                         pass
                 if CenterBool:
-                    Daughtercollection = [] 
-                    Daughtercollection.append(obj)
-                    CenterObjCollector()
+                    #Daughtercollection = [] 
+                    #Daughtercollection.append(obj)
+                    centerObjDecider(obj)
+                    
+                    #CenterObjCollector()
         
         elif context.selected_objects != None:
         
@@ -676,18 +734,20 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                 if PUrP_name in obj.name:
                     print("I am a selected Connector such meinen Papa")
                     #applyCenterObj(obj.parent)
-                    Daughtercollection = [] 
-                    Daughtercollection.append(obj.parent)
-                    CenterObjCollector()
+                    #Daughtercollection = [] 
+                    #Daughtercollection.append(obj.parent)
+                    #CenterObjCollector()
+                    centerObjDecider(obj.parent)
                 else:
                     for child in obj.child:         ###gibt es kinder Coupling in diesem Object
                         if PUrP_name in child:
                             CenterBool = True
                             pass
                 if CenterBool:
-                    Daughtercollection = [] 
-                    Daughtercollection.append(obj)
-                    CenterObjCollector()
+                    #Daughtercollection = [] 
+                    #Daughtercollection.append(obj)
+                    #CenterObjCollector()
+                    centerObjDecider(obj)
                     #applyCenterObj(obj)
 
         #wenn coupling selected, apply für alle  
@@ -760,6 +820,11 @@ class PP_OT_Ini(bpy.types.Operator):
         #########
 
         bpy.types.Scene.PUrP = bpy.props.PointerProperty(type=PUrPropertyGroup)
+        bpy.types.Object.PUrPCobj = bpy.props.BoolProperty(
+            name="PUrPCenterObj",
+            description="True if obj was used as CenterObj for PUrP",
+            default=False, 
+        )
         #########
         MColName = "PuzzleUrPrint"
 
