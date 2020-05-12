@@ -883,45 +883,6 @@ class PP_OT_Ini(bpy.types.Operator):
         return{"FINISHED"} 
 
 
-class PP_OT_OversizeOperator(bpy.types.Operator):
-    bl_idname = "object.oversize"
-    bl_label = "oversize"
-    bl_options = {'REGISTER',"UNDO"}
-    def execute(self, context):
-        context.object.scale.x = self.value 
-        context.object.scale.y = self.value 
-        context.object.scale.z = self.value 
-        return {'FINISHED'}
-
-    def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':  # Apply
-            self.delta = event.mouse_x - self.init_value
-            self.value = self.init_scale_x + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
-            #print(f"MouspositionX: {self.value}")
-            self.execute(context)
-        elif event.type == 'LEFTMOUSE':  # Confirm
-            return {'FINISHED'}
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            context.object.location.x = self.init_scale_x
-            context.object.location.y = self.init_scale_y
-            context.object.location.z = self.init_scale_z
-            return {'CANCELLED'}
-
-        return {'RUNNING_MODAL'}
-
-    def invoke(self, context, event):
-       # self.window_width = context.window.width 
-        self.init_scale_x = context.object.scale.x 
-        self.init_scale_y = context.object.scale.y 
-        self.init_scale_z = context.object.scale.z
-        self.init_value = event.mouse_x
-
-        self.value = context.object.scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        
-        self.execute(context)
-
-        context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
 
 
 ##
