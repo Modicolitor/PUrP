@@ -75,15 +75,15 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.allcoup", text='Apply All', icon="MOD_OCEAN") ### zeige button an
+            
+            
+            
+            
+            
 
-            
-            
-            
-            
-
-            for ob in context.selected_objects:
-                if "Connector" in context.object.name: 
-                    subcol.prop(context.object, "rotation_euler", text = "Rotation")    
+          
+            subcol.label(text="Move Operators")
+            subcol.operator("pup.moddown", text = 'Move Modifiers Down')
 
         else: 
             col.operator("pup.init", icon="MOD_OCEAN")        

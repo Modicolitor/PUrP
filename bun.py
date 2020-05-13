@@ -910,6 +910,30 @@ class PP_OT_MoveModDown(bpy.types.Operator):
  
 '''      
 
+class PP_OT_MoveModDown(bpy.types.Operator):
+    bl_idname = "pup.moddown"
+    bl_label = "PP_OT_MoveModDown"
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
+
+    def execute(self, context):
+        obj = bpy.data.objects[context.object.name]
+
+
+        Mods = obj.parent.modifiers[:]
+        context.view_layer.objects.active = obj.parent
+        for mod in Mods:
+            if obj.name in mod.name:
+
+                bpy.ops.object.modifier_move_down(modifier = mod.name)
+        return {'FINISHED'}
+
 
 
 class PP_OT_Ini(bpy.types.Operator):
