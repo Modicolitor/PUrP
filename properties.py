@@ -6,9 +6,9 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
     
     PUrP_name = bpy.props.StringProperty(name="PUrPname", default="PUrP_")
-    CutThickness = bpy.props.FloatProperty(name="Size", default = 0.1)
+    CutThickness = bpy.props.FloatProperty(name="Size", default = 0.04)
     CoupSize = bpy.props.FloatProperty(name="Size", default = 1.0)
-    Oversize = bpy.props.FloatProperty(name="DynamicOversize", default = 1.0)
+    Oversize = bpy.props.FloatProperty(name="DynamicOversize", default = 0.04)
     zScale = bpy.props.FloatProperty(name="zScale", default = 1.0)
     OffsetLeft = bpy.props.FloatProperty(name="OffsetLeft", default = 0.2)
     OffsetRight = bpy.props.FloatProperty(name="OffsetRight", default = 0.2)
@@ -18,11 +18,13 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     LineLength = bpy.props.IntProperty(name="Linelength", default = 5)
     BevelSegments = bpy.props.IntProperty(name="Bevelsegements", default = 1)
     BevelOffset = bpy.props.FloatProperty(name="Beveloffset", default = 0.0)
+    StopperHeight = bpy.props.FloatProperty(name="Beveloffset", default = 0.5)
+    StopperBool = bpy.props.BoolProperty(name="Beveloffset", default = False)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
         description='Set the resolution of the cylic objects',
-        default=32,
+        default=16,
      )
 
 

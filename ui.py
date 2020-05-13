@@ -12,6 +12,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
     
     #schreibe auf den Bildschirm
     def draw(self, context):
+        
+
         data = bpy.data 
         
         layout = self.layout ;
@@ -26,43 +28,48 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
        
             
         if "PuzzleUrPrint" in data.collections: 
+            PUrP = context.scene.PUrP
             try:
-                col.template_ID(context.scene.PUrP, "CenterObj", filter='AVAILABLE')
+                col.template_ID(PUrP, "CenterObj", filter='AVAILABLE')
             except:
                 pass    
                     
             subcol = col.column()
             subcol.label(text="Coupling Mode")
-            subcol.prop(context.scene.PUrP, "SingleCouplingModes", expand=True)
+            subcol.prop(PUrP, "SingleCouplingModes", expand=True)
             if context.scene.PUrP.SingleCouplingModes != '4':
-                subcol.prop(context.scene.PUrP, "SingleCouplingTypes", text = 'Coupling Type')
+                subcol.prop(PUrP, "SingleCouplingTypes", text = 'Coupling Type')
             else:
-                subcol.prop(context.scene.PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
+                subcol.prop(PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
             subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
             
             
 
-            PUrP = context.scene.PUrP
+            
             subcol.label(text="AddingCouplings")
-            subcol.prop(context.scene.PUrP, "CutThickness", text = 'Cut Thickness')    
+            
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":
                 subcol.prop(context.scene.PUrP, "CylVert", text = 'Vertices')
             
-            subcol.prop(context.scene.PUrP, "GlobalScale", text = 'Globalscalefaktor')
-            subcol.prop(context.scene.PUrP, "CoupSize", text = 'Size')    
-            subcol.prop(context.scene.PUrP, "zScale", text = 'z-scale')
-            subcol.prop(context.scene.PUrP, "Oversize", text = 'oversize')
-            subcol.prop(context.scene.PUrP, "BevelOffset", text = 'Bevel Offset')
-            subcol.prop(context.scene.PUrP, "BevelSegments", text = 'Bevel Segments')
+            subcol.prop(PUrP, "GlobalScale", text = 'Globalscalefaktor')
+            subcol.prop(PUrP, "CoupSize", text = 'Coupling Size')    
+            subcol.prop(PUrP, "zScale", text = 'z-Scale')
+            subcol.prop(PUrP, "Oversize", text = 'Oversize')
+            subcol.prop(PUrP, "CutThickness", text = 'Cut Thickness')    
+            subcol.prop(PUrP, "BevelOffset", text = 'Bevel Offset')
+            subcol.prop(PUrP, "BevelSegments", text = 'Bevel Segments')
 
             if context.scene.PUrP.SingleCouplingModes == '4':
-                subcol.prop(context.scene.PUrP, "LineLength", text = 'LineLength')
-                subcol.prop(context.scene.PUrP, "LineCount", text = 'Linecount')
-                subcol.prop(context.scene.PUrP, "LineDistance", text = 'Linedistance')
-                subcol.prop(context.scene.PUrP, "OffsetRight", text = 'Right Offset')
-                subcol.prop(context.scene.PUrP, "OffsetLeft", text = 'Left Offset')
-                
+                subcol.prop(PUrP, "LineLength", text = 'LineLength')
+                subcol.prop(PUrP, "LineCount", text = 'Linecount')
+                subcol.prop(PUrP, "LineDistance", text = 'Linedistance')
+                subcol.prop(PUrP, "OffsetRight", text = 'Right Offset')
+                subcol.prop(PUrP, "OffsetLeft", text = 'Left Offset')
+                subcol.prop(PUrP, "StopperBool", text = 'Stopper')
+                if PUrP.StopperBool:
+                    subcol.prop(PUrP, "StopperHeight", text = 'Stopper Height')
+
             subcol.operator("object.exchangecoup", text="Apply New Settings")
             subcol = col.column()
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an

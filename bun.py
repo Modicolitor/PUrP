@@ -34,6 +34,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         PUrP = context.scene.PUrP
         CenterObj = PUrP.CenterObj
         PUrP_name  = PUrP.PUrP_name
+        CutThickness = PUrP.CutThickness
+        Oversize = PUrP.Oversize
         cursorloc = context.scene.cursor.location
         cursorlocori = context.scene.cursor.location
         #Prim = self.PrimTypes
@@ -65,7 +67,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.name = str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
             newname_mainplane = context.object.name  
             
-            bpy.ops.object.modifier_add(type='SOLIDIFY')
+            mod = context.object.modifiers.new(name="PUrP_Solidify", type = "SOLIDIFY")                                                          #bpy.ops.object.modifier_add(type='SOLIDIFY')
+            mod.thickness = CutThickness
             context.object.display_type = 'WIRE'
             #context.object.show_in_front = True
             
@@ -109,7 +112,9 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     data = bpy.data
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
-    
+    Oversize = PUrP.Oversize
+    zScale = PUrP.zScale
+    GlobalScale = PUrP.GlobalScale
     
     if PUrP.SingleCouplingModes == "3":                     # flatCut
         newMain =  data.objects[newname_mainplane]
@@ -117,16 +122,20 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     elif PUrP.SingleCouplingModes == "2": ####Male - female 
         #add negativ object 
         loc.z += 0.45
-        genPrimitive(CenterObj, newname_mainplane, '_diff', loc)
+        ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff', loc)
 
         #add positiv object 
-        genPrimitive(CenterObj, newname_mainplane, '_union', loc)
-        
+        ob1 = genPrimitive(CenterObj, newname_mainplane, '_union', loc)
+        oversizeToPrim(ob0, ob1)
         newMain =  data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":       #stick 
-        genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
-        genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)     
+        ob0 = genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
+        
+        ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)     
+        
+        oversizeToPrim(ob0, ob1)
+
         newMain =  data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "4":
@@ -139,7 +148,22 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     context.view_layer.objects.active = newMain
     newMain.select_set(True)
 
-        
+def oversizeToPrim(ob0, ob1):
+    PUrP = bpy.context.scene.PUrP
+    Oversize = PUrP.Oversize
+    zScale = PUrP.zScale
+
+    '''applies the oversize to the primitves ob0 is the bigger object (diff) ob1 the smaller'''
+    oversizeDim = (ob0.dimensions.x - 2 * Oversize)
+    print (f"ob0 {ob0} ob1 {ob1} dimension x {ob0.dimensions.x} oversize {Oversize} gleichung{(ob0.dimensions.x - 2 * Oversize)}")  ######should be ob1.dimensions but somehow don't work
+    ob1.scale.x = oversizeDim  
+    print(f"dimensions x {ob1.dimensions.x}")
+    ob1.scale.y = oversizeDim 
+    print(f"dimensions y {ob1.dimensions.y}")
+    ob1.scale.z = oversizeDim  
+    print(f"dimensions z {ob1.dimensions.z}")
+    ob1.scale *= zScale 
+
 def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
@@ -186,7 +210,8 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
             mod.operation = 'UNION'
     else:
         pass
-
+    
+    return context.object
 
 def genPlanar():
     context = bpy.context
@@ -195,6 +220,7 @@ def genPlanar():
     LineLength = PUrP.LineLength
     LineCount = PUrP.LineCount
     LineDistance = PUrP.LineDistance
+    Oversize = PUrP.Oversize
     CenterObj = PUrP.CenterObj
     GlobalScale = PUrP.GlobalScale 
     CutThickness = PUrP.CutThickness
@@ -293,7 +319,7 @@ def genPlanar():
     
     ## Solidify
     mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
-    mod.thickness = PUrP.CutThickness
+    mod.thickness = PUrP.Oversize
     mod.use_even_offset = True
 
     
@@ -345,6 +371,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         data = bpy.data
         CenterObj = context.scene.PUrP.CenterObj
         PUrP = bpy.context.scene.PUrP
+        CutThickness = PUrP.CutThickness
         PUrP_name = PUrP.PUrP_name
         CouplingModes = bpy.context.scene.PUrP.SingleCouplingModes 
         selected = context.selected_objects[:]
@@ -375,6 +402,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.object.matrix_world = trans
                     #context.object.location = loc                                                ##planarversion 
                 else:
+                    obj.modifiers["PUrP_Solidify"].thickness = CutThickness
                     mod = CenterObj.modifiers.new(name = obj.name, type = "BOOLEAN")
                     mod.object = obj
                     mod.operation =  'DIFFERENCE'
