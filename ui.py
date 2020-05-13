@@ -39,9 +39,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             else:
                 subcol.prop(context.scene.PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
-            props = subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
-            props.PrimTypes = context.scene.PUrP.SingleCouplingTypes
-            props.CylVert = context.scene.PUrP.CylVert
+            subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
+            
+            
 
             PUrP = context.scene.PUrP
             subcol.label(text="AddingCouplings")

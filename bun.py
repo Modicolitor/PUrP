@@ -17,22 +17,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
     bl_label="Add Single Couplings"
     bl_idname="add.coup"
     
-    CylVert: bpy.props.IntProperty(
-        name='Vertexcount',
-        description='Set the resolution of the cylic objects',
-        default=32,
-    )
-    PrimTypes: bpy.props.EnumProperty(
-        name='SingleCoupltypes',  
-        description='List of forms avaiable in single connector mode',
-        items=[ ('0', '', ''),
-                ('1','Cube',''),
-                ('2','Cylinder', ''),
-                ('3','Cone',''),
-                ]
-        #default= ''
-        )
-    
+      
     @classmethod 
     def poll(cls,context):
         PUrP = context.scene.PUrP
@@ -110,10 +95,12 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             data.objects[newname_mainplane].select_set(True)
         elif PUrP.SingleCouplingModes == "4":
             context.object.location += cursorloc
-            context.object.select_set(True)
+            #context.object.select_set(True)
 
         context.scene.cursor.location = cursorlocori  
-        context.object.select_set(True)
+        #for ob in context.selected_objects:
+        #    ob.select_set(False)
+        #context.object.select_set(True)
         
         return{"FINISHED"} 
         
@@ -125,7 +112,7 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     
     
     if PUrP.SingleCouplingModes == "3":                     # flatCut
-        active =  data.objects[newname_mainplane]
+        newMain =  data.objects[newname_mainplane]
             
     elif PUrP.SingleCouplingModes == "2": ####Male - female 
         #add negativ object 
@@ -135,13 +122,24 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
         #add positiv object 
         genPrimitive(CenterObj, newname_mainplane, '_union', loc)
         
+        newMain =  data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":       #stick 
         genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
-        genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)          
-    elif PUrP.SingleCouplingModes == "4":
-        genPlanar()
+        genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)     
+        newMain =  data.objects[newname_mainplane]
 
+    elif PUrP.SingleCouplingModes == "4":
+        newMain = genPlanar()
+
+    for ob in context.selected_objects:
+        ob.select_set(False)
+    
+
+    context.view_layer.objects.active = newMain
+    newMain.select_set(True)
+
+        
 def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
@@ -305,6 +303,8 @@ def genPlanar():
     mod.operation =  'DIFFERENCE'
     mod.object = obj
     print(f"Active after planar generation {context.object}, obj is {obj}")
+
+    return obj
 
 
 def appendCoupling(filename, objectname):
@@ -508,7 +508,8 @@ def removeCoupling(Coupl):
     
     Coupl.select_set(True)
     bpy.ops.object.delete(use_global=False)
-   
+
+'''
 Daughtercollection = []
 
 def CenterObjCollector():
@@ -569,18 +570,8 @@ def applyCenterObj(CenterObj):
                 print(f"Daughters send to collection {Daughters}")
                 Daughtercollection.append(Daughters)
             
-        
-    #CenterObjCollector()
-        #CenterObjCollector(Daughters)    
-        
-        #in reinfolge alle Modier des CenterObj durch schauen 
-        #wenn der Modifier zu mir gehört 
-        #nimm den Namen des modifiers 
-    
-'''test if the coupling plane intersects with the Obje'''
-#def intersectCoup(Coup, CenterObj)
-    
-#    return True
+ '''       
+
 
 def centerObjDecider(CenterObj):
     PUrP = bpy.context.scene.PUrP
