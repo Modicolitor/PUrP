@@ -72,9 +72,9 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
     def execute(self, context):
         
-        context.object.children[1].scale.x = self.value 
-        context.object.children[1].scale.y = self.value 
-        context.object.children[1].scale.z = self.value 
+        context.object.children[1].scale.x = self.value - (context.object.children[0].scale.x - context.object.children[1].scale.x )
+        context.object.children[1].scale.y = self.value - (context.object.children[0].scale.y - context.object.children[1].scale.y )
+        context.object.children[1].scale.z = self.value - (context.object.children[0].scale.z - context.object.children[1].scale.z )
         context.object.children[0].scale.x = self.value 
         context.object.children[0].scale.y = self.value 
         context.object.children[0].scale.z = self.value 
@@ -105,13 +105,13 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
        # self.window_width = context.window.width 
-        self.init_scale_x = context.object.children[1].scale.x 
-        self.init_scale_y = context.object.children[1].scale.y 
-        self.init_scale_z = context.object.children[1].scale.z
+        self.init_scale_x = context.object.children[0].scale.x 
+        self.init_scale_y = context.object.children[0].scale.y 
+        self.init_scale_z = context.object.children[0].scale.z
         
         self.init_value = event.mouse_x
 
-        self.value = context.object.children[1].scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = context.object.children[0].scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         
         self.execute(context)
 
