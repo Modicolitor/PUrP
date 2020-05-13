@@ -5,7 +5,7 @@ import bpy
 class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
     bl_space_type="VIEW_3D"
     bl_region_type="UI"
-    bl_label="PuzzleUrPrint"
+    bl_label="New Coupling"
     bl_category="PuzzleUrPrint"
     
     
@@ -16,7 +16,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 
         data = bpy.data 
         
-        layout = self.layout ;
+        layout = self.layout 
         
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
@@ -88,8 +88,33 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
         else: 
             col.operator("pup.init", icon="MOD_OCEAN")        
 
-from bpy.types import (
-    GizmoGroup,
-)
 
+'''
+class PP_PT_PuzzlePrintActive(bpy.types.Panel):
+    bl_space_type="VIEW_3D"
+    bl_region_type="UI"
+    bl_label="Active Coupling"
+    bl_category="PuzzleUrPrint"
+    
+    
+    
+    #schreibe auf den Bildschirm
+    def draw(self, context):
+        
 
+        data = bpy.data 
+        
+        layout = self.layout ;
+        
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0, even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+        
+
+        col.operator("pup.modup", text = 'Move Modifiers Up')
+        col.operator("pup.moddown", text = 'Move Modifiers Down')
+
+'''

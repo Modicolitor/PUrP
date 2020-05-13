@@ -854,7 +854,64 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
             context.view_layer.objects.active = context.scene.PUrP.CenterObj 
            
         return{"FINISHED"} 
-     
+
+
+'''
+class PP_OT_MoveModUp(bpy.types.Operator):
+    l_label="Initialize PuzzleUrPrint"
+    bl_idname="pup.modup"
+    
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
+
+    def execute(self, context):
+        
+        obj = context.object
+
+        for mod in ob.parent.modifiers:
+            if ob.name in mod.name:
+                bpy.ops.object.modifier_move_up(mod)
+
+
+        return{"FINISHED"} 
+
+
+##
+class PP_OT_MoveModDown(bpy.types.Operator):
+    l_label="Initialize PuzzleUrPrint"
+    bl_idname="pup.moddown"
+    
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
+
+    def execute(self, context):
+        
+        obj = context.object
+
+        for mod in ob.parent.modifiers:
+            if ob.name in mod.name:
+                bpy.ops.object.modifier_move_down(mod)
+
+
+        return{"FINISHED"} 
+
+ 
+'''      
+
+
+
 class PP_OT_Ini(bpy.types.Operator):
 
     bl_label="Initialize PuzzleUrPrint"
@@ -901,10 +958,3 @@ class PP_OT_Ini(bpy.types.Operator):
 
         return{"FINISHED"} 
 
-
-
-
-##
-
-
-       

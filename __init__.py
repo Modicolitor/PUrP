@@ -31,11 +31,14 @@ bl_info = {   ###für export als addon
 
 from bpy.types import Scene, Image, Object
 from .ui import PP_PT_PuzzlePrintMenu 
+#from .ui import PP_PT_PuzzlePrintActive
 from .bun import PP_OT_AddSingleCoupling
 from .bun import PP_OT_ExChangeCoup
 from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_DeleteCoupling
 from .bun import PP_OT_Ini
+#from .bun import PP_OT_MoveModDown
+#from .bun import PP_OT_MoveModUp
 from .gizmos import PP_OT_OversizeGizmo
 from.gizmos import PUrP_OversizeGizmo
 from.gizmos import PP_OT_CouplSizeGizmo
@@ -56,7 +59,20 @@ from .properties import PUrPropertyGroup
 
 
     
-classes = (PP_PT_PuzzlePrintMenu,PP_OT_AddSingleCoupling,PP_OT_ExChangeCoup,PP_OT_ApplyCoupling,PP_OT_DeleteCoupling, PP_OT_Ini, PP_OT_OversizeGizmo, PUrP_OversizeGizmo, PP_OT_CouplSizeGizmo, PP_OT_ApplyAllCouplings, PUrPropertyGroup) 
+classes = (PP_PT_PuzzlePrintMenu, 
+            PP_OT_AddSingleCoupling,
+            PP_OT_ExChangeCoup, 
+            PP_OT_ApplyCoupling, 
+            PP_OT_DeleteCoupling,
+            PP_OT_Ini, 
+            #PP_OT_MoveModDown, 
+           # PP_OT_MoveModUp, 
+            PP_OT_OversizeGizmo, 
+            PUrP_OversizeGizmo, 
+            PP_OT_CouplSizeGizmo, 
+            PP_OT_ApplyAllCouplings, 
+            PUrPropertyGroup
+            ) 
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
         

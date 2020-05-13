@@ -11,7 +11,10 @@
 
 [] Active Coupling to default
 
+special menu for active Coupling 
+
 [] move coupling up/down in modifier stack (boolean probleme lösen)
+[] toggle viewport visibility of coupling (speedup workflow)
 
 
 
@@ -27,6 +30,8 @@ werden die operator in reinfolge applied?
 
 
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
+
+
 
 
 
