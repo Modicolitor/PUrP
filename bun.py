@@ -855,60 +855,72 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
            
         return{"FINISHED"} 
 
+def moveModdown(Coup,CenterObj):
+    Coupchildcount = howManyModsCoup(Coup.name, CenterObj)
 
-'''
-class PP_OT_MoveModUp(bpy.types.Operator):
-    l_label="Initialize PuzzleUrPrint"
-    bl_idname="pup.modup"
-    
-    @classmethod
-    def poll(cls, context):
-        
-        if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
-        else:
-            return False
+    PUrP_Modsnames = listPUrPMods(CenterObj) ### list of coupling names connected to the centerobj 
 
-    def execute(self, context):
-        
-        obj = context.object
-
-        for mod in ob.parent.modifiers:
-            if ob.name in mod.name:
-                bpy.ops.object.modifier_move_up(mod)
+    for ele in PUrP_Modsnames: 
+        print(f"all  element  {ele} with index {PUrP_Modsnames.index(ele)}")
+        if ele == Coup.name:
+            coupindex = PUrP_Modsnames.index(ele)   ########### index of Coup name in own list in the list
 
 
-        return{"FINISHED"} 
+    if len(PUrP_Modsnames) <= (coupindex + Coupchildcount-1): ###when its already lowest:index lowest modifier index lowestCou mod 
+        print ('It is already the lowest modifier')
+        return {'FINISHED'}
+    else:
+        LowerCoup_name = PUrP_Modsnames[coupindex + 1]
+        LowerCoupcount = howManyModsCoup(LowerCoup_name, CenterObj)
+        indexLowestLowerCoup = modindex(CenterObj.modifiers[LowerCoup_name], CenterObj.modifiers) + LowerCoupcount - 1
+        nameLowestLowerCoup = CenterObj.modifiers[indexLowestLowerCoup].name
+        #print(f"nameLowestLowerCoup {nameLowestLowerCoup}")
+        ### now move the modifiers starting with the lowest of the coup children for as often as we have modifiers of LowerCoup 
+        realcoupindex = modindex(CenterObj.modifiers[PUrP_Modsnames[coupindex]], CenterObj.modifiers)
+        indexLowestToMove = realcoupindex + Coupchildcount -1  
+        moveIndex = indexLowestToMove 
+        bpy.context.view_layer.objects.active = CenterObj 
+
+        while moveIndex >= realcoupindex:  #### to move coups from bottom to top
+            
+            modifier = CenterObj.modifiers[moveIndex]
+            
+            print (f"modifier to move  {modindex(modifier, CenterObj.modifiers)}")
+            
+            #indexToMove = 
+            
+            while modindex(modifier, CenterObj.modifiers) < indexLowestLowerCoup:  #### runter so oft bis es unter dem letzten modifiers des lowerCoups ist
+                print(f'one down for {modifier.name} index {modindex(modifier, CenterObj.modifiers)} index lowest {indexLowestLowerCoup}')
+                modifiername = modifier.name
+                bpy.ops.object.modifier_move_down(modifier=modifiername)
+            moveIndex -= 1
+            indexLowestLowerCoup -= 1 
+
+        bpy.context.view_layer.objects.active = Coup
+
+def howManyModsCoup(Coup_name, CenterObj): ###takes a coupling name and the CenterObj and returns how modifiers beelong to the coupling
+    count = 0
+    for mod in CenterObj.modifiers: 
+        if Coup_name in mod.name: 
+            count += 1
+    return count 
+
+def listPUrPMods(CenterObj): #####returns list of mod names
+    list = []
+    for mod in CenterObj.modifiers:
+        if ("PUrP" in mod.name) and ("diff" not in  mod.name) and ("union" not in  mod.name):
+            list.append(mod.name)
+    return list
 
 
-##
-class PP_OT_MoveModDown(bpy.types.Operator):
-    l_label="Initialize PuzzleUrPrint"
-    bl_idname="pup.moddown"
-    
-    @classmethod
-    def poll(cls, context):
-        
-        if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
-        else:
-            return False
-
-    def execute(self, context):
-        
-        obj = context.object
-
-        for mod in ob.parent.modifiers:
-            if ob.name in mod.name:
-                bpy.ops.object.modifier_move_down(mod)
-
-
-        return{"FINISHED"} 
-
- 
-'''      
+def modindex(modifier, modifiers): 
+    count = 0 
+    for mod in modifiers:
+        if mod.name == modifier.name:
+            return count
+        else:    
+            count += 1
+    return -1    
 
 class PP_OT_MoveModDown(bpy.types.Operator):
     bl_idname = "pup.moddown"
@@ -923,16 +935,50 @@ class PP_OT_MoveModDown(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        obj = bpy.data.objects[context.object.name]
+        
+        Coup = bpy.data.objects[context.object.name]
+        CenterObj  = Coup.parent
+
+        moveModdown(Coup,CenterObj)
 
 
-        Mods = obj.parent.modifiers[:]
-        context.view_layer.objects.active = obj.parent
-        for mod in Mods:
-            if obj.name in mod.name:
 
-                bpy.ops.object.modifier_move_down(modifier = mod.name)
-        return {'FINISHED'}
+        
+        return {'FINISHED'} 
+
+class PP_OT_MoveModUp(bpy.types.Operator):
+    bl_idname = "pup.modup"
+    bl_label = "PP_OT_MoveModup"
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else:
+            return False
+
+    def execute(self, context):
+        Coup = bpy.data.objects[context.object.name]
+        CenterObj  = Coup.parent
+        PUrP_Modsnames = listPUrPMods(CenterObj) 
+
+        for ele in PUrP_Modsnames: 
+            print(f"all  element  {ele} with index {PUrP_Modsnames.index(ele)}")
+            if ele == Coup.name:
+                coupindex = PUrP_Modsnames.index(ele)   ########### index of Coup name in own list in the list
+
+        #####up is the same as the upper one down 
+        if coupindex == 0: 
+            print("It already the top modifier")
+        else:
+            coupindex -= 1
+            Coup = bpy.data.objects[PUrP_Modsnames[coupindex]]
+
+
+        moveModdown(Coup,CenterObj)
+        
+        return {'FINISHED'} 
 
 
 

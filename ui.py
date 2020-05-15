@@ -75,14 +75,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.allcoup", text='Apply All', icon="MOD_OCEAN") ### zeige button an
-            
-            
-            
-            
-            
-
-          
             subcol.label(text="Move Operators")
+            subcol.operator("pup.modup", text = 'Move Modifiers Up')
             subcol.operator("pup.moddown", text = 'Move Modifiers Down')
 
         else: 
