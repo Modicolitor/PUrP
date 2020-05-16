@@ -39,6 +39,7 @@ from .bun import PP_OT_DeleteCoupling
 from .bun import PP_OT_Ini
 from .bun import PP_OT_MoveModDown
 from .bun import PP_OT_MoveModUp
+from .bun import PP_OT_ToggleCoupVisibilityOperator
 from .gizmos import PP_OT_OversizeGizmo
 from.gizmos import PUrP_OversizeGizmo
 from.gizmos import PP_OT_CouplSizeGizmo
@@ -67,7 +68,8 @@ classes = (PP_PT_PuzzlePrintMenu,
             PP_OT_DeleteCoupling,
             PP_OT_Ini, 
             PP_OT_MoveModDown, 
-            PP_OT_MoveModUp, 
+            PP_OT_MoveModUp,
+            PP_OT_ToggleCoupVisibilityOperator,
             PP_OT_OversizeGizmo, 
             PUrP_OversizeGizmo,
             PP_OT_CouplSizeGizmo, 

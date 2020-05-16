@@ -78,6 +78,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.label(text="Move Operators")
             subcol.operator("pup.modup", text = 'Move Modifiers Up')
             subcol.operator("pup.moddown", text = 'Move Modifiers Down')
+            subcol.label(text="Modifier Visibility")
+            subcol.operator("object.togglecoupvisibility", text = 'Toggle Modifier Visibility')
 
         else: 
             col.operator("pup.init", icon="MOD_OCEAN")        

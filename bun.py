@@ -290,7 +290,7 @@ def genPlanar():
     bpy.ops.object.editmode_toggle()
 
 
-    obj = context.object
+    obj = bpy.data.objects[context.object.name]
     ###scale it a bit smaller than in the file 
     adjustScale = 0.25
     obj.scale.x *= adjustScale 
@@ -302,8 +302,55 @@ def genPlanar():
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
+    #####################Stopper###
+    PUrP = context.scene.PUrP
+    StopperHeight = PUrP.StopperHeight
+    StopperBool = PUrP.StopperBool
+    Oversize = PUrP.Oversize
 
-    
+    if StopperBool:    
+        bpy.ops.mesh.primitive_cube_add(size=StopperHeight,location=obj.location)
+        stop = context.object
+        
+        stop.parent = obj 
+
+
+
+        #bpy.ops.object.editmode_toggle()
+        me = bpy.context.object.data
+
+        # Get a BMesh representation
+        bm = bmesh.new()   # create an empty BMesh
+        bm.from_mesh(me)   # fill it in from a Mesh
+
+        bm.verts.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
+
+        for vert in bm.verts:               ###move cube into the right position
+            vert.co.y += Oversize +0.0001
+            vert.co.z += StopperHeight/2 -0.0001
+
+        # faces 1 in -y face 2 in y 
+
+        for v in bm.faces[0].verts:
+            v.co.x -= 0.05
+        for v in bm.faces[2].verts:
+            v.co.x += 0.05
+
+        # Finish up, write the bmesh back to the mesh
+        bm.to_mesh(me)
+        bm.free()  # free 
+        
+        
+
+        trans = 0  #- StopperHeight #+height
+        #bpy.ops.transform.translate(value=(-0, OverSize, trans), orient_type='LOCAL')
+        #bpy.ops.object.editmode_toggle()
+
+        mod = obj.modifiers.new(name=obj.name, type = "BOOLEAN") ### boolean auf planar coupling
+        mod.operation =  'DIFFERENCE'
+        mod.object = stop
+
 
     ## array 1 und 2 
     mod = obj.modifiers.new(name="PUrP_Array_1", type="ARRAY")
@@ -1027,4 +1074,24 @@ class PP_OT_Ini(bpy.types.Operator):
         
 
         return{"FINISHED"} 
+
+
+class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
+    bl_idname = "object.togglecoupvisibility"
+    bl_label = "PP_OT_ToggleCoupVisibility"
+
+    def execute(self, context):
+        ownModslist= []
+        for ele in context.selected_objects:
+            if "PUrP" in ele.name:                                             ### #for selected coupling of PUrP 
+                CenterObj = ele.parent
+                for mod in CenterObj.modifiers:
+                    if ele.name in mod.name:
+                        if CenterObj.modifiers[mod.name].show_viewport == True:
+                            CenterObj.modifiers[mod.name].show_viewport = False
+                        elif CenterObj.modifiers[mod.name].show_viewport == False:
+                            CenterObj.modifiers[mod.name].show_viewport = True
+                        else: 
+                            print('Something Wrong in Visibility Toggle')
+        return {'FINISHED'}
 
