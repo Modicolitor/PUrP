@@ -207,13 +207,16 @@ class PUrP_OversizeGizmo(GizmoGroup):
     def setup(self, context):
         # Run an operator using the dial gizmo
         ob = context.object
+
+        #matrixWorld = context.object[:]
         mpr = self.gizmos.new("GIZMO_GT_dial_3d")
         props = mpr.target_set_operator("object.oversize")
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
-
+        print(f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpr.matrix_basis = ob.matrix_world.normalized()
+
         mpr.line_width = 3
 
         mpr.color = 0.8, 0.2, 0.8
@@ -225,38 +228,45 @@ class PUrP_OversizeGizmo(GizmoGroup):
         self.roll_widget = mpr
         
         #########################second gizmo
-        mpr = self.gizmos.new("GIZMO_GT_dial_3d")
-        props = mpr.target_set_operator("object.couplesize")
+        mpa = self.gizmos.new("GIZMO_GT_dial_3d")
+        props = mpa.target_set_operator("object.couplesize")
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
+        print(f"Size matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        mpa.matrix_basis = ob.matrix_world.normalized()
+        mpa.line_width = 3
 
-        mpr.matrix_basis = ob.matrix_world.normalized()
-        mpr.line_width = 3
+        mpa.color = 0.2, 0.2, 0.8
+        mpa.alpha = 0.5
 
-        mpr.color = 0.2, 0.2, 0.8
-        mpr.alpha = 0.5
+        mpa.color_highlight = 0.3, 0.5, 1.0
+        mpa.alpha_highlight = 1.0
+        mpa.scale_basis = 2
+        self.roll_widge = mpa
 
-        mpr.color_highlight = 0.3, 0.5, 1.0
-        mpr.alpha_highlight = 1.0
-        mpr.scale_basis = 2
-        self.roll_widget = mpr
+        mph = self.gizmos.new("GIZMO_GT_arrow_3d")
+        mph.target_set_operator("object.zscale")
+        print(f"ZScale matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        mph.matrix_basis = ob.matrix_world.normalized()
+        mph.draw_style = 'BOX'
 
-        mpr = self.gizmos.new("GIZMO_GT_arrow_3d")
-        mpr.target_set_operator("object.zscale")
-        mpr.matrix_basis = ob.matrix_world.normalized()
-        mpr.draw_style = 'BOX'
-
-        mpr.color = 1.0, 0.5, 0.0
-        mpr.alpha = 0.5
-
-        mpr.color_highlight = 1.0, 0.5, 1.0
-        mpr.alpha_highlight = 0.5
+        mph.color = 1.0, 0.5, 0.0
+        mph.alpha = 0.5
+        mph.color_highlight = 1.0, 0.5, 1.0
+        mph.alpha_highlight = 0.5
+        self.roll_widg = mph
 
     def refresh(self, context):
         ob = context.object
+        
         mpr = self.roll_widget
-        mpr.matrix_basis = ob.matrix_world.normalized()     
-    
+        mpa = self.roll_widge
+        mph = self.roll_widg
+        
+        mpa.matrix_basis = ob.matrix_world.normalized() 
+        mph.matrix_basis = ob.matrix_world.normalized() 
+        mpr.matrix_basis = ob.matrix_world.normalized() 
+        
 
 
