@@ -42,6 +42,7 @@ from .bun import PP_OT_MoveModUp
 from .gizmos import PP_OT_OversizeGizmo
 from.gizmos import PUrP_OversizeGizmo
 from.gizmos import PP_OT_CouplSizeGizmo
+from.gizmos import PP_OT_zScaleGizmo
 #from.gizmos import PUrP_CouplSizeGizmo
 
 from .bun import PP_OT_ApplyAllCouplings
@@ -68,8 +69,9 @@ classes = (PP_PT_PuzzlePrintMenu,
             PP_OT_MoveModDown, 
             PP_OT_MoveModUp, 
             PP_OT_OversizeGizmo, 
-            PUrP_OversizeGizmo, 
+            PUrP_OversizeGizmo,
             PP_OT_CouplSizeGizmo, 
+            PP_OT_zScaleGizmo, 
             PP_OT_ApplyAllCouplings, 
             PUrPropertyGroup
             ) 
