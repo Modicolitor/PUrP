@@ -35,13 +35,14 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         CenterObj = PUrP.CenterObj
         PUrP_name  = PUrP.PUrP_name
         CutThickness = PUrP.CutThickness
-        Oversize = PUrP.Oversize
+        #Oversize = PUrP.Oversize
+        GlobalScale = PUrP.GlobalScale
         cursorloc = context.scene.cursor.location
         cursorlocori = context.scene.cursor.location
         #Prim = self.PrimTypes
        
 
-        
+        #####handling CenterObj
         if active != None:
 
             if active.type == "MESH":
@@ -54,7 +55,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             active = context.scene.PUrP.CenterObj
             active.select_set(True) 
 
-        ####apply scale 
+        ####apply scale to CenterObj
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
         CenterObj_name = CenterObj.name
         CenterObj.PUrPCobj = True
@@ -69,9 +70,12 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             
             mod = context.object.modifiers.new(name="PUrP_Solidify", type = "SOLIDIFY")                                                          #bpy.ops.object.modifier_add(type='SOLIDIFY')
             mod.thickness = CutThickness
+            mod.offset = 1.0
             context.object.display_type = 'WIRE'
             #context.object.show_in_front = True
             
+
+
             context.object.parent = data.objects[CenterObj_name]
 
             
@@ -79,15 +83,17 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             mod = data.objects[CenterObj_name].modifiers.new(name = context.object.name, type = "BOOLEAN")
             mod.object = data.objects[newname_mainplane]
             mod.operation = 'DIFFERENCE'
+
+
         else:
             newname_mainplane = "Null"   ### for planar
 
 
-        loc = mathutils.Vector((0,0,0))
-        print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
-        coupModeDivision(CenterObj, newname_mainplane, loc)
+        #loc = mathutils.Vector((0,0,0))
+        #print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
+        coupModeDivision(CenterObj, newname_mainplane)
 
-    
+        #CenterObj.scale *= GlobalScale
         cursorloc.x -= CenterObj.location.x  
         cursorloc.y -= CenterObj.location.y
         cursorloc.z -= CenterObj.location.z
@@ -108,31 +114,34 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         return{"FINISHED"} 
         
     
-def coupModeDivision(CenterObj, newname_mainplane,loc):
+def coupModeDivision(CenterObj, newname_mainplane):
     data = bpy.data
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
-    Oversize = PUrP.Oversize
-    zScale = PUrP.zScale
+    #Oversize = PUrP.Oversize
+    #zScale = PUrP.zScale
     GlobalScale = PUrP.GlobalScale
+
+
+    bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1,1,1))
     
     if PUrP.SingleCouplingModes == "3":                     # flatCut
         newMain =  data.objects[newname_mainplane]
             
     elif PUrP.SingleCouplingModes == "2": ####Male - female 
         #add negativ object 
-        loc.z += 0.45
-        ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff', loc)
+        #loc.z += 0.45
+        ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff')
 
         #add positiv object 
-        ob1 = genPrimitive(CenterObj, newname_mainplane, '_union', loc)
+        ob1 = genPrimitive(CenterObj, newname_mainplane, '_union')
         oversizeToPrim(ob0, ob1)
         newMain =  data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":       #stick 
-        ob0 = genPrimitive(CenterObj, newname_mainplane, '_stick_diff', loc )
+        ob0 = genPrimitive(CenterObj, newname_mainplane, '_stick_diff')
         
-        ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix', loc)     
+        ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix')     
         
         oversizeToPrim(ob0, ob1)
 
@@ -140,6 +149,10 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
 
     elif PUrP.SingleCouplingModes == "4":
         newMain = genPlanar()
+
+
+    ##############Adjustment for globalscale
+    newMain.scale = mathutils.Vector((GlobalScale,GlobalScale,GlobalScale))
 
     for ob in context.selected_objects:
         ob.select_set(False)
@@ -149,31 +162,50 @@ def coupModeDivision(CenterObj, newname_mainplane,loc):
     newMain.select_set(True)
 
 def oversizeToPrim(ob0, ob1):
+    '''applies the oversize to the primitves ob0 is the bigger object (diff) ob1 the smaller'''
     PUrP = bpy.context.scene.PUrP
     Oversize = PUrP.Oversize
     zScale = PUrP.zScale
+    size = PUrP.CoupSize 
 
-    '''applies the oversize to the primitves ob0 is the bigger object (diff) ob1 the smaller'''
-    oversizeDim = (ob0.dimensions.x - 2 * Oversize)
+    ob0.scale = mathutils.Vector((size,size,size))
+    ob1.scale = mathutils.Vector((size,size,size))
+    
+    
+    #ob1.scale.z *= zScale  
+    ob0.scale.z *= zScale
+    
+    print(f"ob0 {ob0.name} dimensions z {ob0.dimensions.z}")
+    
+    oversizeDim = (ob0.scale.x - 2 * Oversize)
+    if "fix" in ob0.name or "fix" in ob1.name:
+        oversizeDimz = (ob0.scale.z -2* Oversize) ##mf 
+    else: 
+        oversizeDimz = (ob0.scale.z - Oversize) ##stick 
+
+    print (f"ob0 {ob0} ob1 {ob1} dimension z {ob0.dimensions.z} oversize {Oversize} gleichung{(ob0.dimensions.z - 2 * Oversize)}")  ######should be ob1.dimensions but somehow don't work
+
+
     print (f"ob0 {ob0} ob1 {ob1} dimension x {ob0.dimensions.x} oversize {Oversize} gleichung{(ob0.dimensions.x - 2 * Oversize)}")  ######should be ob1.dimensions but somehow don't work
+    
     ob1.scale.x = oversizeDim  
-    print(f"dimensions x {ob1.dimensions.x}")
+    print(f"dimensions x {ob1.scale.x}")
     ob1.scale.y = oversizeDim 
-    print(f"dimensions y {ob1.dimensions.y}")
-    ob1.scale.z = oversizeDim  
-    print(f"dimensions z {ob1.dimensions.z}")
-    ob1.scale *= zScale 
+    print(f"dimensions y {ob1.scale.y}")
+    ob1.scale.z = oversizeDimz  
+    print(f"dimensions z {ob1.scale.z}")
+    #ob1.scale.z *= zScale  
+    #ob0.scale.z *= zScale - oversizeDim
 
-def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
+def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
-    size = PUrP.CoupSize
+    size = 1 #PUrP.CoupSize
     PrimTypes = context.scene.PUrP.SingleCouplingTypes
     CylVert = PUrP.CylVert
 
-    if nameadd == "_diff":
-        size *= PUrP.Oversize
-
+    
+    loc = mathutils.Vector((0,0,0))
     if PrimTypes == "1":
         bpy.ops.mesh.primitive_cube_add(size=size,location=loc)
     elif PrimTypes == "2":
@@ -182,16 +214,46 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, loc):
     elif PrimTypes == "3":
         bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
 
-        #### z-scale die sticks
-        #  
-    context.object.scale *= PUrP.GlobalScale
-    
 
-    context.object.scale.z *= PUrP.zScale
+    ##correct geometry location for Male Female
+    if PUrP.SingleCouplingModes == "2": ####Male - female 
+        import bmesh
+
+        # Get the active mesh
+        me = bpy.context.object.data
+
+        # Get a BMesh representation
+        bm = bmesh.new()   # create an empty BMesh
+        bm.from_mesh(me)   # fill it in from a Mesh
+
+        # Modify the BMesh, can do anything here...
+        
+        for v in bm.verts:
+            if nameadd == "_diff":
+                v.co.z += 0.4999999
+            elif nameadd == "_union":
+                v.co.z += 0.4999
+
+        # Finish up, write the bmesh back to the mesh
+        bm.to_mesh(me)
+        bm.free()  # free and prevent further access
+          
+    if nameadd == "_diff":
+        context.object.scale.x += PUrP.Oversize
+        context.object.scale.y += PUrP.Oversize
+        context.object.scale.z += PUrP.Oversize
+
+    
+    
+    
     
     #### make name relative to the Couplingmainplain
     context.object.name = str(newname_mainplane)+ str(nameadd)
     context.object.parent = bpy.data.objects[newname_mainplane]
+
+    #print(f"zscale should affect obj {context.object.name}")
+    #context.object.scale.z *= PUrP.zScale
+
 
     mod = context.object.modifiers.new(name = context.object.name + "Bevel" , type = "BEVEL")   ########bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset
@@ -272,11 +334,6 @@ def genPlanar():
     
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-
-
-  
-
-
 
     import bmesh
     ##planar side offset 
@@ -421,107 +478,7 @@ def genPlanar():
     bm.to_mesh(me)
     bm.free()  # free 
 
-
- 
-
     
-    #####################Stopper###
-    
-    """
-    if StopperBool:    
-
-        ######making and setting union object of stopper (dont called)
-        bpy.ops.mesh.primitive_cube_add(size=StopperHeight,location=obj.location)
-        stop = context.object
-        stop.name = obj.name + "_union" 
-        stop.parent = obj 
-
-        me = bpy.context.object.data
-        # Get a BMesh representation
-        bm = bmesh.new()   # create an empty BMesh
-        bm.from_mesh(me)   # fill it in from a Mesh
-
-        bm.verts.ensure_lookup_table()
-        bm.faces.ensure_lookup_table()
-
-        for vert in bm.verts:               ###move cube into the right position
-            #vert.co.y += Oversize +0.0001
-            vert.co.z += StopperHeight/2 +0.0001
-
-        # faces 1 in -y face 2 in y 
-        
-        #width
-        for v in bm.faces[0].verts:
-            v.co.x -= 0.02
-        for v in bm.faces[2].verts:
-            v.co.x += 0.02
-        #deep
-        for v in bm.faces[1].verts:
-            v.co.y += 0.02
-        #front overlapp (boolean hack)
-        for v in bm.faces[3].verts:
-            v.co.y += 0.0001
-
-
-        # Finish up, write the bmesh back to the mesh
-        bm.to_mesh(me)
-        bm.free()  # free
-
-        #select and visibility
-        stop.hide_select = True
-        stop.hide_viewport = True
-
-
-        #modifer on parent for union
-        mod = obj.modifiers.new(name=obj.name, type = "BOOLEAN") ### boolean auf planar coupling
-        mod.operation =  'UNION'
-        mod.object = stop
-
-
-        ######making and setting diff object of stopper
-        bpy.ops.mesh.primitive_cube_add(size=StopperHeight,location=obj.location)
-        stop = context.object
-        stop.name = obj.name + "_diff" 
-        stop.parent = obj 
-
-
-
-        #bpy.ops.object.editmode_toggle()
-        me = bpy.context.object.data
-
-        # Get a BMesh representation
-        bm = bmesh.new()   # create an empty BMesh
-        bm.from_mesh(me)   # fill it in from a Mesh
-
-        bm.verts.ensure_lookup_table()
-        bm.faces.ensure_lookup_table()
-
-        for vert in bm.verts:               ###move cube into the right position
-            vert.co.y += Oversize +0.0001
-            vert.co.z += StopperHeight/2 -0.0001
-
-        # faces 1 in -y face 2 in y 
-
-        for v in bm.faces[0].verts:
-            v.co.x -= 0.05
-        for v in bm.faces[2].verts:
-            v.co.x += 0.05
-
-        # Finish up, write the bmesh back to the mesh
-        bm.to_mesh(me)
-        bm.free()  # free 
-
-        #select and visibility
-        stop.hide_select = True
-        stop.hide_viewport = True
-
-        mod = obj.modifiers.new(name=obj.name, type = "BOOLEAN") ### boolean auf planar coupling
-        mod.operation =  'DIFFERENCE'
-        mod.object = stop
-"""
-        
-
-
     ## array 1 und 2 
     mod = obj.modifiers.new(name="PUrP_Array_1", type="ARRAY")
     mod.use_merge_vertices = True
@@ -534,7 +491,7 @@ def genPlanar():
     mod.count = LineCount
     mod.use_merge_vertices = True
     
-      ## Solidify
+    ## Solidify
     mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
     mod.thickness = Oversize
     mod.offset = 1.0
@@ -572,6 +529,7 @@ def appendCoupling(filename, objectname):
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
+    '''Exchange selected couplings'''
     bl_idname = "object.exchangecoup"
     bl_label = "ExChangeCoupling"
 
@@ -591,6 +549,8 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         CenterObj = context.scene.PUrP.CenterObj
         PUrP = bpy.context.scene.PUrP
         CutThickness = PUrP.CutThickness
+        GlobalScale = PUrP.GlobalScale 
+        zScale = PUrP.zScale 
         PUrP_name = PUrP.PUrP_name
         CouplingModes = bpy.context.scene.PUrP.SingleCouplingModes 
         selected = context.selected_objects[:]
@@ -613,11 +573,14 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     loc = obj.location.copy()
                     trans = obj.matrix_world.copy()
                     oldname = obj.name
+                    
+                    
+
                     for ob in context.selected_objects:             ## deselte all
                         ob.select_set(False)
                     obj.select_set(True)                          ## 
                     bpy.ops.object.delete(use_global=False)         ## delete the old planar coupling
-                    coupModeDivision(CenterObj, oldname, loc)
+                    coupModeDivision(CenterObj, oldname)
                     context.object.matrix_world = trans
                     #context.object.location = loc                                                ##planarversion 
                 else:
@@ -625,7 +588,12 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     mod = CenterObj.modifiers.new(name = obj.name, type = "BOOLEAN")
                     mod.object = obj
                     mod.operation =  'DIFFERENCE'
-                    coupModeDivision(CenterObj, obj.name, loc)          
+                    obj.scale = mathutils.Vector((1,1,1))
+                    coupModeDivision(CenterObj, obj.name)
+                    #print(f"obj at rescale {obj}")
+                    obj.scale.x = GlobalScale 
+                    obj.scale.y = GlobalScale 
+                    obj.scale.z = GlobalScale
                 
         
         
