@@ -226,9 +226,12 @@ def genPlanar():
     CutThickness = PUrP.CutThickness
     OffsetRight = PUrP.OffsetRight
     OffsetLeft = PUrP.OffsetLeft
-    height = 3
+    StopperHeight = PUrP.StopperHeight
+    StopperBool = PUrP.StopperBool
+    Oversize = PUrP.Oversize
+    height = PUrP.zScale
     type = PUrP.PlanarCouplingTypes
-
+    
     
     ### I don't know how to get the name from the enum property might be simpler 
     if type == "1":      
@@ -257,38 +260,6 @@ def genPlanar():
     for ob in selected:
         ob.select_set(False)
     
-    import bmesh
-    ##planar side offset 
-    me = bpy.context.object.data
-
-    # Get a BMesh representation
-    bm = bmesh.new()   # create an empty BMesh
-    bm.from_mesh(me)   # fill it in from a Mesh
-
-    bm.verts.ensure_lookup_table()
-
-    # Modify the BMesh, can do anything here...
-    right = OffsetRight * GlobalScale
-    left = OffsetLeft * GlobalScale
-
-    bm.verts[0].co.x += right
-    bm.verts[1].co.x -= left
-
-    # Finish up, write the bmesh back to the mesh
-    bm.to_mesh(me)
-    bm.free()  # free 
-
-
-
-    #extrude
-    bpy.ops.object.editmode_toggle()
-    bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"use_normal_flip":False, "mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, height)})
-    bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.mesh.normals_make_consistent(inside=False)
-    #"mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False, "use_accurate":False}
-    bpy.ops.object.editmode_toggle()
-
 
     obj = bpy.data.objects[context.object.name]
     ###scale it a bit smaller than in the file 
@@ -302,16 +273,215 @@ def genPlanar():
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
-    #####################Stopper###
-    PUrP = context.scene.PUrP
-    StopperHeight = PUrP.StopperHeight
-    StopperBool = PUrP.StopperBool
-    Oversize = PUrP.Oversize
 
+  
+
+
+
+    import bmesh
+    ##planar side offset 
+    me = bpy.context.object.data
+
+    # Get a BMesh representation
+    bm = bmesh.new()   # create an empty BMesh
+    bm.from_mesh(me)   # fill it in from a Mesh
+
+    bm.verts.ensure_lookup_table()
+    #bm.edges.ensure_lookup_table()
+    # Modify the BMesh, can do anything here...
+    right = OffsetRight * GlobalScale
+    left = OffsetLeft * GlobalScale
+
+    bm.verts[0].co.x += right
+    bm.verts[1].co.x -= left
+
+    Oriy = bm.verts[0].co.y
+    mergecoright = bm.verts[3].co.x    #####check if its true for all models
+    mergecoleft = bm.verts[2].co.x
+    
+    if StopperBool != True:
+        ret = bmesh.ops.extrude_edge_only(
+        bm,
+        edges=bm.edges)
+
+        geom_extrude_mid = ret['geom']
+        
+        verts_extrude_a = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMVert)]
+        
+        edges_extrude_a = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+
+        bmesh.ops.translate(
+        bm,
+        verts=verts_extrude_a,
+        vec=(0.0, 0.0, -height))
+    else:
+        ####extrude
+        #lowestverts = bm.verts[:]
+        ret = bmesh.ops.extrude_edge_only(
+        bm,
+        edges=bm.edges)
+
+        geom_extrude_mid = ret['geom']
+        
+        verts_extrude_a = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMVert)]
+        
+        edges_extrude_a = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+
+        bmesh.ops.translate(
+        bm,
+        verts=verts_extrude_a,
+        vec=(0.0, 0.0, -height)) ###correct for stopperheight
+
+
+        # second extrude with scale to cut plane    
+        #lowestverts = bm.verts[:]
+        ret = bmesh.ops.extrude_edge_only(
+        bm,
+        edges=edges_extrude_a)
+
+        geom_extrude_mid = ret['geom']
+        
+        verts_extrude_b = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMVert)]
+
+        edges_extrude_b = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]                   
+        
+
+        rightedge = 0.0
+        leftedge = 0.0
+        rightvert = None
+        leftvert = None
+
+
+        ###### move all verts in y to original and figure out the outside "edges"/actually verts
+        for vert in verts_extrude_b:
+            vert.co.y = Oriy         #### puts the verts at cut position
+            print(f'vert {vert} co x {vert.co.x}')
+            if vert.co.x > rightedge:
+                print(f"right edge true for vert {vert} {vert.co.x}")
+                rightvert = vert
+                rightedge = vert.co.x
+            if vert.co.x < leftedge:
+                print(f"left edge true for vert {vert} {vert.co.x}")
+                leftvert = vert
+                leftedge = vert.co.x
+        
+        
+        print(f"right edge position {rightedge}")
+        print(f"left edge position {leftedge}")
+
+        for vert in verts_extrude_b:  ### looks for the right edge 
+            if rightedge != None: 
+                if vert != rightvert:
+                    if vert.co.x >= 0.0: 
+                        print(f"vert is right {vert} {vert.co.x}")
+                        vert.co.x = mergecoright 
+            if leftedge != None: 
+                if vert != leftvert: 
+                    if vert.co.x <= 0.0: 
+                        print(f"vert is left {vert} {vert.co.x}")
+                        vert.co.x = mergecoleft 
+        
+
+        
+
+
+
+        ####third extrude for the stopperheight
+
+        ret = bmesh.ops.extrude_edge_only(
+        bm,
+        edges=edges_extrude_b)
+
+        geom_extrude_mid = ret['geom']
+        
+        verts_extrude_c = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMVert)]
+
+        edges_extrude_c = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]   
+        
+        bmesh.ops.translate(
+        bm,
+        verts=verts_extrude_c,
+        vec=(0.0, 0.0, -StopperHeight))
+
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+
+        # bmesh.ops.weld_verts(bm, bm.verts)
+        
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist = 0.0001)
+
+    # Finish up, write the bmesh back to the mesh
+    bm.to_mesh(me)
+    bm.free()  # free 
+
+
+ 
+
+    
+    #####################Stopper###
+    
+    """
     if StopperBool:    
+
+        ######making and setting union object of stopper (dont called)
         bpy.ops.mesh.primitive_cube_add(size=StopperHeight,location=obj.location)
         stop = context.object
+        stop.name = obj.name + "_union" 
+        stop.parent = obj 
+
+        me = bpy.context.object.data
+        # Get a BMesh representation
+        bm = bmesh.new()   # create an empty BMesh
+        bm.from_mesh(me)   # fill it in from a Mesh
+
+        bm.verts.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
+
+        for vert in bm.verts:               ###move cube into the right position
+            #vert.co.y += Oversize +0.0001
+            vert.co.z += StopperHeight/2 +0.0001
+
+        # faces 1 in -y face 2 in y 
         
+        #width
+        for v in bm.faces[0].verts:
+            v.co.x -= 0.02
+        for v in bm.faces[2].verts:
+            v.co.x += 0.02
+        #deep
+        for v in bm.faces[1].verts:
+            v.co.y += 0.02
+        #front overlapp (boolean hack)
+        for v in bm.faces[3].verts:
+            v.co.y += 0.0001
+
+
+        # Finish up, write the bmesh back to the mesh
+        bm.to_mesh(me)
+        bm.free()  # free
+
+        #select and visibility
+        stop.hide_select = True
+        stop.hide_viewport = True
+
+
+        #modifer on parent for union
+        mod = obj.modifiers.new(name=obj.name, type = "BOOLEAN") ### boolean auf planar coupling
+        mod.operation =  'UNION'
+        mod.object = stop
+
+
+        ######making and setting diff object of stopper
+        bpy.ops.mesh.primitive_cube_add(size=StopperHeight,location=obj.location)
+        stop = context.object
+        stop.name = obj.name + "_diff" 
         stop.parent = obj 
 
 
@@ -340,16 +510,16 @@ def genPlanar():
         # Finish up, write the bmesh back to the mesh
         bm.to_mesh(me)
         bm.free()  # free 
-        
-        
 
-        trans = 0  #- StopperHeight #+height
-        #bpy.ops.transform.translate(value=(-0, OverSize, trans), orient_type='LOCAL')
-        #bpy.ops.object.editmode_toggle()
+        #select and visibility
+        stop.hide_select = True
+        stop.hide_viewport = True
 
         mod = obj.modifiers.new(name=obj.name, type = "BOOLEAN") ### boolean auf planar coupling
         mod.operation =  'DIFFERENCE'
         mod.object = stop
+"""
+        
 
 
     ## array 1 und 2 
@@ -364,10 +534,12 @@ def genPlanar():
     mod.count = LineCount
     mod.use_merge_vertices = True
     
-    ## Solidify
+      ## Solidify
     mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
-    mod.thickness = PUrP.Oversize
-    mod.use_even_offset = True
+    mod.thickness = Oversize
+    mod.offset = 1.0
+    mod.use_even_offset = False
+    mod.use_rim = True
 
     
     
