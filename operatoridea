@@ -41,21 +41,13 @@ Object typen
 [] Add by tastenkürzel 
 [] Stopper for planar
 
-
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 
-
-
 ###############################################################
-
-
-
-
-
 bugs:
-exchange Singleconnector to planar
-recalc normal auch ohne stopper
-
+[] exchange Singleconnector to planar
+[] bevel bei MF nur oberefläche
+[] 
 DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
 
 

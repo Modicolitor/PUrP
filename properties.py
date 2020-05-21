@@ -44,7 +44,25 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         default='1',
         items=[ ('1','Cubic',' '),
                 ('2','Dovetail', ''),
-                ('3','Puzzle',''),
+                ('3','Puzzle1',''),
+                ('4','Puzzle2',''),
+                ('5','Puzzle3',''),
+                ('6','Puzzle4',''),
+                ('7','Puzzle5',''),
+                ('8','Arrow1',''),
+                ('9','Arrow2',''),
+                ('10','Arrow3',''),
+                ('11','Pentagon',''),
+                ('12','Hexagon',''),
+                ('13','T-RoundedAll',''),
+                ('14','T-RoundedTop',''),
+                ('15','T-Straight',''),
+
+
+
+
+
+
                 ]
         )
     

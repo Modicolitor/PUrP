@@ -304,7 +304,31 @@ def genPlanar():
     elif type == "2":      
         objectname = "Dovetail"
     elif type == "3":      
-        objectname = "Puzzle"
+        objectname = "Puzzle1"
+    elif type == "4":      
+        objectname = "Puzzle2"
+    elif type == "5":      
+        objectname = "Puzzle3"    
+    elif type == "6":      
+        objectname = "Puzzle4"
+    elif type == "7":      
+        objectname = "Puzzle5"
+    elif type == "8":      
+        objectname = "Arrow1"
+    elif type == "9":      
+        objectname = "Arrow2"
+    elif type == "10":      
+        objectname = "Arrow3"
+    elif type == "11":      
+        objectname = "Pentagon"
+    elif type == "12":      
+        objectname = "Hexagon"
+    elif type == "13":      
+        objectname = "T-RoundedAll"
+    elif type == "14":      
+        objectname = "T-RoundedTop"
+    elif type == "15":      
+        objectname = "T-Straight"
     else: 
         objectname = "Cubic"
     
@@ -376,6 +400,7 @@ def genPlanar():
         bm,
         verts=verts_extrude_a,
         vec=(0.0, 0.0, -height))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     else:
         ####extrude
         #lowestverts = bm.verts[:]
@@ -489,15 +514,17 @@ def genPlanar():
     
 
     mod = obj.modifiers.new(name="PUrP_Array_2", type="ARRAY")
+    
     mod.relative_offset_displace[0] = 0
     mod.relative_offset_displace[1] = LineDistance
     mod.count = LineCount
     mod.use_merge_vertices = True
     
     ## Solidify
-    mod = obj.modifiers.new(name="Thickness", type="SOLIDIFY")
+    mod = obj.modifiers.new(name="PUrP_Thickness", type="SOLIDIFY")
+    
     mod.thickness = Oversize
-    mod.offset = 1.0
+    mod.offset = -1.0
     mod.use_even_offset = False
     mod.use_rim = True
 
@@ -1258,40 +1285,98 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             elif "Cone" in obj.data.name:
                 PUrP.SingleCouplingTypes = '3'
 
-            PUrP.CutThickness = 1
-            PUrP.CoupSize = 1
-            PUrP.Oversize = 1
-            PUrP.zScale = 11
-
-
-
-        elif "PlanarConnector" in obj.name:
-
-            PUrP.CutThickness = 1
-            PUrP.CoupSize = 1
-            PUrP.Oversize = 1
-            PUrP.zScale = 11
-            PUrP.OffsetLeft = 1
-            PUrP.OffsetRight = 1
-            PUrP.GlobalScale = 1
-            PUrP.LineDistance = 1
-            PUrP.LineCount = 1
-            PUrP.LineLength = 1
-            PUrP.BevelSegments = 1 
-            PUrP.BevelOffset = 1
-            PUrP.StopperHeight =1
-            PUrP.StopperBool = 1
-
-            PUrP.CylVert = 16
-
-            #PUrP.SingleCouplingTypes = 1####cube cylinder ....
-                
+            if "Cube" in obj.data.name:
+                PUrP.SingleCouplingTypes = "1"
+            elif "Cylinder" in obj.data.name:
+                PUrP.SingleCouplingTypes = "2"
+                CylVert = len(obj.data.vertices)/2
+            elif "Cone" in obj.data.name:
+                PUrP.SingleCouplingTypes = "3"
+                CylVert = len(obj.data.vertices) - 1 
             
-            PUrP.PlanarCouplingTypes = 1 ###
-            PUrP.SingleCouplingModes = 1### 
+            
+            PUrP.CutThickness = obj.modifier['PUrP_Solidify'].thickness
+            for child in obj.children:
+                if "diff" in child.name:
+                    PUrP.CoupSize = child.scale.x 
+                    PUrP.zScale = child.scale.z
+                    PUrP.BevelSegments = child.modifier[obj.name + "Bevel"].segments ###double check
+                    PUrP.BevelOffset = child.modifier[obj.name + "Bevel"].offset
+                    diffchild = child
+                elif "fix" in child.name or "union" in child.name :
+                    PUrP.Oversize = (diffchild.scale - child.scale)/2 ####double check
+
+            if len(obj.children) == 0:
+                PUrP.SingleCouplingModes = "3"### 
+            elif zSym(obj.child[0]):
+                PUrP.SingleCouplingModes = "1"
+            else:
+                PUrP.SingleCouplingModes = "2"
             '''('1','Stick',''),
                 ('2','Male-Female', ''),
-                ('3','FlatCut',''),
-                ('4','Planar',''),'''
+            #    ('3','FlatCut',''),
+            #    ('4','Planar',''),'''
+ 
+
+        elif "PlanarConnector" in obj.name:
+            PUrP.SingleCouplingModes = "4" 
+            if "Cubic" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "1"
+            elif "Dovetail" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "2"
+            elif "Puzzle1" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "3"
+            elif "Puzzle2" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "4"
+            elif "Puzzle3" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "5"
+            elif "Puzzle4" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "6"
+            elif "Puzzle5" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "7"
+            elif "Arrow1" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "8"
+            elif "Arrow2" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "9"
+            elif "Arrow3" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "10"
+            elif "Pentagon" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "11"
+            elif "Hexagon" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "12"
+            elif "T-RoundedAll" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "13"
+            elif "T-RoundedTop" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "14"
+            elif "T-Straight" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "15"
+
+            
+            PUrP.Oversize = obj.modifier["PUrP_Thickness"].thickness
+            PUrP.LineDistance = obj.modifier["PUrP_Array_2"].relative_offset_displace[1]
+            PUrP.LineCount = obj.modifier["PUrP_Array_2"].count
+            PUrP.LineLength = obj.modifier["PUrP_Array_1"].count
+
+
+            PUrP.OffsetRight = obj.data.vertices[0].co.x ### double checl
+            PUrP.OffsetLeft = -obj.data.vertices[1].co.x ### double checl
+            
+            
+            #PUrP.StopperHeight =1
+            #PUrP.StopperBool = 1
+            
+
+            #PUrP.zScale = -obj.data.vertices[1].co.z ### double checl
 
         return {'FINISHED'}
+
+def zSym(obj): 
+    '''Test whether the obj is sysmmetrical relative to the object origin'''
+    
+    z = obj.data.vertices[0].co.z
+
+    for v in obj.data.vertices:
+        if v.co.z == -z 
+            return True
+    
+    return False
