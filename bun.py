@@ -123,12 +123,14 @@ def coupModeDivision(CenterObj, newname_mainplane):
     GlobalScale = PUrP.GlobalScale
 
 
-    bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1,1,1))
+    
     
     if PUrP.SingleCouplingModes == "3":                     # flatCut
+        bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1,1,1))
         newMain =  data.objects[newname_mainplane]
             
     elif PUrP.SingleCouplingModes == "2": ####Male - female 
+        bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1,1,1))
         #add negativ object 
         #loc.z += 0.45
         ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff')
@@ -139,6 +141,7 @@ def coupModeDivision(CenterObj, newname_mainplane):
         newMain =  data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":       #stick 
+        bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1,1,1))
         ob0 = genPrimitive(CenterObj, newname_mainplane, '_stick_diff')
         
         ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix')     
@@ -1235,3 +1238,60 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
                             print('Something Wrong in Visibility Toggle')
         return {'FINISHED'}
 
+
+class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
+    '''Use the settings of the active coupling as Default values. Helps to transfer settings from Connector to Connector or duplicate a Connector.'''
+    
+    bl_idname = "object.activecoupdefault"
+    bl_label = "PP_OT_ActiveCoupDefault"
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        obj = context.object
+
+        if "SingleConnector" in obj.name:
+
+            if "Cube" in obj.data.name:
+                PUrP.SingleCouplingTypes = '1'
+            elif "Cylinder" in obj.data.name:
+                PUrP.SingleCouplingTypes = '2'
+            elif "Cone" in obj.data.name:
+                PUrP.SingleCouplingTypes = '3'
+
+            PUrP.CutThickness = 1
+            PUrP.CoupSize = 1
+            PUrP.Oversize = 1
+            PUrP.zScale = 11
+
+
+
+        elif "PlanarConnector" in obj.name:
+
+            PUrP.CutThickness = 1
+            PUrP.CoupSize = 1
+            PUrP.Oversize = 1
+            PUrP.zScale = 11
+            PUrP.OffsetLeft = 1
+            PUrP.OffsetRight = 1
+            PUrP.GlobalScale = 1
+            PUrP.LineDistance = 1
+            PUrP.LineCount = 1
+            PUrP.LineLength = 1
+            PUrP.BevelSegments = 1 
+            PUrP.BevelOffset = 1
+            PUrP.StopperHeight =1
+            PUrP.StopperBool = 1
+
+            PUrP.CylVert = 16
+
+            #PUrP.SingleCouplingTypes = 1####cube cylinder ....
+                
+            
+            PUrP.PlanarCouplingTypes = 1 ###
+            PUrP.SingleCouplingModes = 1### 
+            '''('1','Stick',''),
+                ('2','Male-Female', ''),
+                ('3','FlatCut',''),
+                ('4','Planar',''),'''
+
+        return {'FINISHED'}

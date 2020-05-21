@@ -1,11 +1,9 @@
 
 
-[+] Apply All 
-    when nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
-    wenn CenterObj type selected , apply only for this one 
-    wenn coupling selected, apply für alle  
-
-    prerequ
+[-] Apply All 
+   optimieren. warum findet intersect oft objekte nicht? Bounding Box vergleich
+    poll 
+    
 
 [] preview  
 
@@ -13,13 +11,28 @@
 
 special menu for active Coupling 
 
-[x] move coupling up/down in modifier stack (boolean probleme lösen)
-[x] toggle viewport visibility of coupling (speedup workflow)
 
 
+Object typen
+[] SchraubenTyp
+[] mehr puzzle 
+    Arrow1
+    Arrow2
+    Arrow3
+    Cubic
+    Dovetail
+    Hexagon
+    Pentagon
+    Puzzle1
+    Puzzle2
+    Puzzle3
+    Puzzle4
+    Puzzle5
+    T-RoundedAll
+    T-RoundedTop
+    T-Straight  
 
 
-werden die operator in reinfolge applied?
 
 
 
@@ -32,6 +45,28 @@ werden die operator in reinfolge applied?
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 
 
+
 ###############################################################
 
+
+
+
+
+bugs:
+exchange Singleconnector to planar
+recalc normal auch ohne stopper
+
 DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
+
+
+Publishing: 
+[] Small Website inkl. Documentation
+[] Exampels:
+    [] Wappenhand
+    [] 3d Kontur Puzzle viereckig
+    [] WallTiles
+    [] Puzzle dreieckig
+    [] Lifesize Run protagonist 
+    [] Bewegliche Actionfigure
+    #[] Architecture --> Shorty fragen ob der was designed
+    #[] Landscape
