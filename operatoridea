@@ -43,15 +43,25 @@ Object typen
 []
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 
+[] BuildRoom 
+
 ###############################################################
 bugs:
 [] exchange Singleconnector to planar
+[] coupsize planar
 [] bevel bei MF nur oberefläche
 [] postion of cone MF
-[] when there are no two pieces
+[] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
+[] apply coupling auf eines beschränken oder multiapply auf anpassen
+[] prup mod list doesn't respect planar
 
+[] Order löschen, order entfernen bei exchange, 
+[] order ändern bei move up or down 
+
+Tests
 [] test linux, Mag
-DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
+[] Active settings with for global scale influence
+
 
 
 Publishing: 

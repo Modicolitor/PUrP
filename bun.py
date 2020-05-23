@@ -1272,6 +1272,14 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
     bl_idname = "object.activecoupdefault"
     bl_label = "PP_OT_ActiveCoupDefault"
 
+    @classmethod
+    def poll(cls, context):
+        if (context.view_layer.objects.active != None):
+            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                return True
+        else: 
+            return False
+
     def execute(self, context):
         PUrP = context.scene.PUrP
         obj = context.object
@@ -1416,3 +1424,49 @@ def zSym(obj):
             return True
     
     return False
+
+
+
+class PP_OT_CouplingOrder(bpy.types.Operator):
+    bl_idname = "pup.couplingorder"
+    bl_label = "PP_OT_CouplingOrder"
+
+    
+    def execute(self, context):
+        
+        data = bpy.data
+        PUrP = context.scene.PUrP
+
+        PUrP.CenterObj = context.object
+        CenterObj = PUrP.CenterObj
+        
+
+
+        #####garbage run 
+        for ob in data.objects: 
+            ob.select_set(False)
+            ob.hide_select = False
+            if "PUrP" in ob.name:
+                if "_Order" in ob.name: 
+                    ob.select_set(True)
+        bpy.ops.object.delete(use_global=False)
+
+
+        ###new numbers
+        PUrPlist = listPUrPMods(CenterObj)
+        for modname in PUrPlist:
+            matrixWorld = data.objects[modname].matrix_world  
+            bpy.ops.object.text_add(enter_editmode=False, location=(0,0,0) )
+            obj = context.object
+            obj.name = modname + "_Order"
+            
+            obj.location.z += 0.5 * PUrP.GlobalScale
+            obj.data.body = str(int((modindex(CenterObj.modifiers[modname], CenterObj.modifiers)+2)/2))   ####too hacky
+            obj.data.extrude = 0.05
+            obj.show_in_front = True
+            obj.display_type = 'WIRE'
+            obj.hide_select = True
+            obj.parent = data.objects[modname]
+            obj.matrix_world = matrixWorld
+            obj.rotation_euler.x = 1.5708
+        return {'FINISHED'}

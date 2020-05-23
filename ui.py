@@ -35,33 +35,44 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 pass    
                     
             subcol = col.column()
-            subcol.label(text="Coupling Mode")
+            #subcol.label(text="Coupling Mode")
+            #subcol.label(text="AddingCouplings")
+
+            subcol.operator("add.coup", text="Add Coupling", icon="PLUS") ### zeige button an
+            subcol.label(text="Adjust")
+            subcol.operator("object.exchangecoup", text="Exchange", icon="FILE_REFRESH")
+            subcol.operator("object.activecoupdefault", text ='Active to Settings', icon ="EXPORT") ### zeige button an
+
             subcol.prop(PUrP, "SingleCouplingModes", expand=True)
             if context.scene.PUrP.SingleCouplingModes != '4':
                 subcol.prop(PUrP, "SingleCouplingTypes", text = 'Coupling Type')
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
-            subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
-            subcol.operator("object.exchangecoup", text="Exchange")
-            subcol.operator("object.activecoupdefault", text ='Active to Settings') ### zeige button an
-            subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
+            
+            
 
             
-            subcol.label(text="AddingCouplings")
+            
             
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":
                 subcol.prop(context.scene.PUrP, "CylVert", text = 'Vertices')
             
             subcol.prop(PUrP, "GlobalScale", text = 'Globalscalefaktor')
-            subcol.prop(PUrP, "CoupSize", text = 'Coupling Size')    
-            subcol.prop(PUrP, "zScale", text = 'z-Scale')
-            subcol.prop(PUrP, "Oversize", text = 'Oversize')
-            subcol.prop(PUrP, "CutThickness", text = 'Cut Thickness')    
-            subcol.prop(PUrP, "BevelOffset", text = 'Bevel Offset')
-            subcol.prop(PUrP, "BevelSegments", text = 'Bevel Segments')
+            
+            if context.scene.PUrP.SingleCouplingModes == '1' or context.scene.PUrP.SingleCouplingModes == '2' or context.scene.PUrP.SingleCouplingModes == '3':
+                subcol.prop(PUrP, "Oversize", text = 'Oversize')
+                subcol.prop(PUrP, "CoupSize", text = 'Coupling Size')    
+                subcol.prop(PUrP, "zScale", text = 'z-Scale')
+                subcol.prop(PUrP, "CutThickness", text = 'Cut Thickness')    
+                subcol.prop(PUrP, "BevelOffset", text = 'Bevel Offset')
+                subcol.prop(PUrP, "BevelSegments", text = 'Bevel Segments')
+
+
 
             if context.scene.PUrP.SingleCouplingModes == '4':
+                subcol.prop(PUrP, "Oversize", text = 'Oversize')
+                subcol.prop(PUrP, "zScale", text = 'z-Scale')
                 subcol.prop(PUrP, "LineLength", text = 'LineLength')
                 subcol.prop(PUrP, "LineCount", text = 'Linecount')
                 subcol.prop(PUrP, "LineDistance", text = 'Linedistance')
@@ -73,17 +84,19 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 
             
             subcol = col.column()
-            
-            subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
-            subcol.operator("apl.allcoup", text='Apply All', icon="MOD_OCEAN") ### zeige button an
+            subcol.operator("rem.coup", text="Delete Coupling", icon="CANCEL") ### zeige button an
+            subcol.operator("apl.coup", text ="Apply Coupling", icon="MOD_DYNAMICPAINT") ### zeige button an
+            subcol.operator("apl.allcoup", text='Apply All', icon="EXPERIMENTAL") ### zeige button an
+
             subcol.label(text="Move Operators")
-            subcol.operator("pup.modup", text = 'Move Modifiers Up')
-            subcol.operator("pup.moddown", text = 'Move Modifiers Down')
+            subcol.operator("pup.couplingorder", text = 'Up in Couplingorder ', icon = "TRIA_UP")
+            subcol.operator("pup.modup", text = 'Up in Couplingorder ', icon = "TRIA_UP")
+            subcol.operator("pup.moddown", text = 'Down in Couplingorder', icon = "TRIA_DOWN")
             subcol.label(text="Modifier Visibility")
-            subcol.operator("object.togglecoupvisibility", text = 'Toggle Modifier Visibility')
+            subcol.operator("object.togglecoupvisibility", text = 'Toggle Modifier Visibility', icon = "HIDE_OFF")
 
         else: 
-            col.operator("pup.init", icon="MOD_OCEAN")        
+            col.operator("pup.init", icon="SHADERFX")        
 
 
 '''
