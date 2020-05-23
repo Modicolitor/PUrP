@@ -43,8 +43,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 subcol.prop(PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
             subcol.operator("add.coup", icon="MOD_OCEAN") ### zeige button an
-            
-            
+            subcol.operator("object.exchangecoup", text="Exchange")
+            subcol.operator("object.activecoupdefault", text ='Active to Settings') ### zeige button an
+            subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
 
             
             subcol.label(text="AddingCouplings")
@@ -70,9 +71,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 if PUrP.StopperBool:
                     subcol.prop(PUrP, "StopperHeight", text = 'Stopper Height')
 
-            subcol.operator("object.exchangecoup", text="Apply New Settings")
+            
             subcol = col.column()
-            subcol.operator("rem.coup", icon="MOD_OCEAN") ### zeige button an
+            
             subcol.operator("apl.coup", icon="MOD_OCEAN") ### zeige button an
             subcol.operator("apl.allcoup", text='Apply All', icon="MOD_OCEAN") ### zeige button an
             subcol.label(text="Move Operators")

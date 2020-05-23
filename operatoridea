@@ -15,7 +15,7 @@ special menu for active Coupling
 
 Object typen
 [] SchraubenTyp
-[] mehr puzzle 
+[+] mehr puzzle 
     Arrow1
     Arrow2
     Arrow3
@@ -40,14 +40,17 @@ Object typen
 
 [] Add by tastenkürzel 
 [] Stopper for planar
-
+[]
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 
 ###############################################################
 bugs:
 [] exchange Singleconnector to planar
 [] bevel bei MF nur oberefläche
-[] 
+[] postion of cone MF
+[] when there are no two pieces
+
+[] test linux, Mag
 DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
 
 

@@ -1277,46 +1277,46 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         obj = context.object
 
         if "SingleConnector" in obj.name:
-
-            if "Cube" in obj.data.name:
-                PUrP.SingleCouplingTypes = '1'
-            elif "Cylinder" in obj.data.name:
-                PUrP.SingleCouplingTypes = '2'
-            elif "Cone" in obj.data.name:
-                PUrP.SingleCouplingTypes = '3'
-
-            if "Cube" in obj.data.name:
-                PUrP.SingleCouplingTypes = "1"
-            elif "Cylinder" in obj.data.name:
-                PUrP.SingleCouplingTypes = "2"
-                CylVert = len(obj.data.vertices)/2
-            elif "Cone" in obj.data.name:
-                PUrP.SingleCouplingTypes = "3"
-                CylVert = len(obj.data.vertices) - 1 
-            
-            
-            PUrP.CutThickness = obj.modifier['PUrP_Solidify'].thickness
-            for child in obj.children:
-                if "diff" in child.name:
-                    PUrP.CoupSize = child.scale.x 
-                    PUrP.zScale = child.scale.z
-                    PUrP.BevelSegments = child.modifier[obj.name + "Bevel"].segments ###double check
-                    PUrP.BevelOffset = child.modifier[obj.name + "Bevel"].offset
-                    diffchild = child
-                elif "fix" in child.name or "union" in child.name :
-                    PUrP.Oversize = (diffchild.scale - child.scale)/2 ####double check
+            PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
 
             if len(obj.children) == 0:
                 PUrP.SingleCouplingModes = "3"### 
-            elif zSym(obj.child[0]):
+            elif zSym(obj.children[0]):
                 PUrP.SingleCouplingModes = "1"
             else:
                 PUrP.SingleCouplingModes = "2"
-            '''('1','Stick',''),
-                ('2','Male-Female', ''),
-            #    ('3','FlatCut',''),
-            #    ('4','Planar',''),'''
- 
+
+            if len(obj.children) != 0:
+                #print(f"meshadata name {obj.data.name}")
+                if "Cube" in obj.children[0].data.name:
+                    PUrP.SingleCouplingTypes = '1'
+                elif "Cylinder" in obj.children[0].data.name:
+                    PUrP.SingleCouplingTypes = '2'
+                    PUrP.CylVert = len(obj.data.vertices)/2
+                elif "Cone" in obj.children[0].data.name:
+                    PUrP.SingleCouplingTypes = '3'
+                    PUrP.CylVert = len(obj.data.vertices) - 1 
+                
+                
+                             
+                
+                
+                for child in obj.children:
+                    if "diff" in child.name:
+                        PUrP.CoupSize = child.scale.x 
+                        PUrP.zScale = child.scale.z
+                        PUrP.BevelSegments = child.modifiers[0].segments ###double check
+                        PUrP.BevelOffset = child.modifiers[0].width
+                        diffchild = child
+                    elif "fix" in child.name or "union" in child.name :
+                        PUrP.Oversize = (diffchild.scale.x - child.scale.x)/2 ####double check
+
+                
+                '''('1','Stick',''),
+                    ('2','Male-Female', ''),
+                #    ('3','FlatCut',''),
+                #    ('4','Planar',''),'''
+    
 
         elif "PlanarConnector" in obj.name:
             PUrP.SingleCouplingModes = "4" 
@@ -1351,22 +1351,58 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             elif "T-Straight" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "15"
 
+            PUrP.CoupSize = obj.scale.x/PUrP.GlobalScale
+
+            bpy.ops.object.transform_apply(location=False, rotation=False, scale=True) ###Apply scale e.g. zscale determination
             
-            PUrP.Oversize = obj.modifier["PUrP_Thickness"].thickness
-            PUrP.LineDistance = obj.modifier["PUrP_Array_2"].relative_offset_displace[1]
-            PUrP.LineCount = obj.modifier["PUrP_Array_2"].count
-            PUrP.LineLength = obj.modifier["PUrP_Array_1"].count
+            PUrP.Oversize = obj.modifiers["PUrP_Thickness"].thickness
+            PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+            PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
+            PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
 
 
-            PUrP.OffsetRight = obj.data.vertices[0].co.x ### double checl
-            PUrP.OffsetLeft = -obj.data.vertices[1].co.x ### double checl
+            PUrP.OffsetRight = obj.data.vertices[0].co.x - 0.375  ### double checl
+            PUrP.OffsetLeft = -obj.data.vertices[1].co.x - 0.375         ### double checl
             
             
-            #PUrP.StopperHeight =1
-            #PUrP.StopperBool = 1
+            #
             
+            
+            #Stopperbool test  
+            lowestvert =  0
+            for vert in obj.data.vertices: ###find lowest z coordinate
+                if vert.co.z <= lowestvert:
+                    lowestvert = vert.co.z
+            
+            lowestlist = []
+            lowestexample = obj.data.vertices[0]
+            for vert in obj.data.vertices:  #### collect all verts with lowest co.z values
+                if vert.co.z == lowestvert:
+                    lowestlist.append(vert.co.z)
+                    lowestexample = vert                ### example for stopperheight evaluation
+            
+            PUrP.StopperBool = False
+            if len(lowestlist) == 4: ### with 4 verts its a stopper 
+                PUrP.StopperBool = True
 
-            #PUrP.zScale = -obj.data.vertices[1].co.z ### double checl
+            # for stopper height such den kürzesten abstand bei gleichen  
+            smallestdistance = 50 
+            distance = []
+            for vert in obj.data.vertices:
+                if vert.co.x == lowestexample.co.x:
+                    if vert.co.y == lowestexample.co.y:
+                        if vert.co.z != lowestexample.co.z:
+                            distance.append(vert.co.z - lowestexample.co.z) ##collect distances to vert 
+                            print(f"distance {vert.co.z - lowestexample.co.z}")
+            distance.sort()
+            PUrP.StopperHeight = distance[0] 
+
+            ####zscale top vert at co.z = 0 
+            
+            PUrP.zScale = - lowestexample.co.z - distance[0]
+
+
+            
 
         return {'FINISHED'}
 
@@ -1376,7 +1412,7 @@ def zSym(obj):
     z = obj.data.vertices[0].co.z
 
     for v in obj.data.vertices:
-        if v.co.z == -z 
+        if v.co.z == -z: 
             return True
     
     return False
