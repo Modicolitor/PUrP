@@ -89,8 +89,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("apl.allcoup", text='Apply All', icon="EXPERIMENTAL") ### zeige button an
 
             subcol.label(text="Move Operators")
-            subcol.operator("pup.couplingorder", text = 'Up in Couplingorder ', icon = "TRIA_UP")
-            subcol.operator("pup.modup", text = 'Up in Couplingorder ', icon = "TRIA_UP")
+            subcol.operator("pup.couplingorder", text = 'Toggle Order', icon = "LINENUMBERS_ON")
+            subcol.operator("pup.modup", text = 'Up in Order ', icon = "TRIA_UP")
             subcol.operator("pup.moddown", text = 'Down in Couplingorder', icon = "TRIA_DOWN")
             subcol.label(text="Modifier Visibility")
             subcol.operator("object.togglecoupvisibility", text = 'Toggle Modifier Visibility', icon = "HIDE_OFF")
