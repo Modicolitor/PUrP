@@ -45,6 +45,8 @@ Object typen
 [] planar gizmot
 [] BuildRoom 
 
+[] Planar connector anwinkeln für leichteren druck und wrench effekt 
+
 ###############################################################
 bugs:
 [] exchange Singleconnector to planar
@@ -58,7 +60,7 @@ bugs:
 [] move up toggles when its applied to top Coupling
 [] move down without lower limit
 
-
+[] all poll: forbid operators in all other than object mode
 
 Tests
 [] test linux, Mag

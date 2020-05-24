@@ -355,6 +355,7 @@ def genPlanar():
     context.object.display_type = 'WIRE'    
     context.object.show_in_front = True
     
+    ##deselect all
     selected = context.selected_objects[:]
     for ob in selected:
         ob.select_set(False)
@@ -369,6 +370,7 @@ def genPlanar():
     # but then also have a global scale 
     obj.scale *= GlobalScale 
     
+    ###apply scale to get scale to one #####################################might need coupsize, too? 
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
@@ -382,17 +384,26 @@ def genPlanar():
 
     bm.verts.ensure_lookup_table()
     #bm.edges.ensure_lookup_table()
-    # Modify the BMesh, can do anything here...
+    
+    #prepare values for  offsets 
     right = OffsetRight * GlobalScale
     left = OffsetLeft * GlobalScale
 
     bm.verts[0].co.x += right
     bm.verts[1].co.x -= left
 
+    ### collect data for later
     Oriy = bm.verts[0].co.y
-    mergecoright = bm.verts[3].co.x    #####check if its true for all models
+    
+    mergecoright = bm.verts[3].co.x    #####check if its true for all models  #############may delete later 
     mergecoleft = bm.verts[2].co.x
     
+    middlerightcox = bm.verts[3].co.x    #####check if its true for all models  #############may delete later 
+    middleleftcox = bm.verts[2].co.x
+
+    
+
+
     if StopperBool != True:
         ret = bmesh.ops.extrude_edge_only(
         bm,
@@ -414,103 +425,130 @@ def genPlanar():
     else:
         ####extrude
         #lowestverts = bm.verts[:]
-        ret = bmesh.ops.extrude_edge_only(
+        ret = bmesh.ops.extrude_edge_only(                                                                      #######first extrude 
         bm,
         edges=bm.edges)
 
-        geom_extrude_mid = ret['geom']
+        geom_extrude_start = ret['geom']  
         
-        verts_extrude_a = [ele for ele in geom_extrude_mid
+        verts_extrude_a = [ele for ele in geom_extrude_start
                     if isinstance(ele, bmesh.types.BMVert)]
         
-        edges_extrude_a = [ele for ele in geom_extrude_mid
-                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+        
 
-        bmesh.ops.translate(
+        bmesh.ops.translate(                                                                                        ####first translate
         bm,
         verts=verts_extrude_a,
-        vec=(0.0, 0.0, -height)) ###correct for stopperheight
+        vec=(0.0, 0.0, -height)) ###zScale as height for the couple part
 
 
-        # second extrude with scale to cut plane    
+        # second extrude    
         #lowestverts = bm.verts[:]
-        ret = bmesh.ops.extrude_edge_only(
+        edges_extrude_a = [ele for ele in geom_extrude_start                      ####collectect edges on cut
+                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy] 
+
+        ret = bmesh.ops.extrude_edge_only(                                          #extrude only the edges on cut
         bm,
         edges=edges_extrude_a)
 
         geom_extrude_mid = ret['geom']
         
+
+
         verts_extrude_b = [ele for ele in geom_extrude_mid
                     if isinstance(ele, bmesh.types.BMVert)]
 
-        edges_extrude_b = [ele for ele in geom_extrude_mid
-                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]                   
-        
-
-        rightedge = 0.0
-        leftedge = 0.0
-        rightvert = None
-        leftvert = None
-
-
-        ###### move all verts in y to original and figure out the outside "edges"/actually verts
-        for vert in verts_extrude_b:
-            vert.co.y = Oriy         #### puts the verts at cut position
-            print(f'vert {vert} co x {vert.co.x}')
-            if vert.co.x > rightedge:
-                print(f"right edge true for vert {vert} {vert.co.x}")
-                rightvert = vert
-                rightedge = vert.co.x
-            if vert.co.x < leftedge:
-                print(f"left edge true for vert {vert} {vert.co.x}")
-                leftvert = vert
-                leftedge = vert.co.x
-        
-        
-        print(f"right edge position {rightedge}")
-        print(f"left edge position {leftedge}")
-
-        for vert in verts_extrude_b:  ### looks for the right edge 
-            if rightedge != None: 
-                if vert != rightvert:
-                    if vert.co.x >= 0.0: 
-                        print(f"vert is right {vert} {vert.co.x}")
-                        vert.co.x = mergecoright 
-            if leftedge != None: 
-                if vert != leftvert: 
-                    if vert.co.x <= 0.0: 
-                        print(f"vert is left {vert} {vert.co.x}")
-                        vert.co.x = mergecoleft 
-        
-
-        
-
-
-
-        ####third extrude for the stopperheight
-
-        ret = bmesh.ops.extrude_edge_only(
-        bm,
-        edges=edges_extrude_b)
-
-        geom_extrude_mid = ret['geom']
-        
-        verts_extrude_c = [ele for ele in geom_extrude_mid
-                    if isinstance(ele, bmesh.types.BMVert)]
-
-        edges_extrude_c = [ele for ele in geom_extrude_mid
-                    if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]   
-        
+        #edges_extrude_b = [ele for ele in geom_extrude_mid
+        #            if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]                   
+                                                                                    #translate to stopper height
         bmesh.ops.translate(
         bm,
-        verts=verts_extrude_c,
+        verts=verts_extrude_b,
         vec=(0.0, 0.0, -StopperHeight))
 
-        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
+        ## make missing faces 
+        #### Cutfaces 
+        Cutfaceverts_start = [ele for ele in geom_extrude_start
+            if isinstance(ele, bmesh.types.BMVert) and ele.co.y == Oriy
+                if ele.co.x == middlerightcox or ele.co.x == middleleftcox]
+
+
+        Cutfaceverts_mid = [ele for ele in geom_extrude_mid
+                    if isinstance(ele, bmesh.types.BMVert) and ele.co.y == Oriy
+                        if ele.co.x == middlerightcox or ele.co.x == middleleftcox]
+        
+        Cutfaceverts = Cutfaceverts_start + Cutfaceverts_mid
+
+        ###test content of list 
+        for ele in Cutfaceverts:
+            print(f"Cutfaceverts co x {ele.co.x} co y {ele.co.y} ")
+
+        edges_frontface = bmesh.ops.contextual_create(
+            bm, 
+            geom=Cutfaceverts, 
+            #mat_nr,
+            #use_smooth
+            )
+        
+
+        
+        #vertversion 
+        Sitfaceverts_start = [ele for ele in geom_extrude_start
+            if isinstance(ele, bmesh.types.BMVert) and ele.co.y != Oriy]
+        
+        Sitfaceverts = Cutfaceverts_start + Sitfaceverts_start
+        
+        ####
+        Sitfaceedges = [ele for ele in bm.edges
+            if ele.verts[0] in Sitfaceverts and ele.verts[1] in Sitfaceverts]
+        
+        
+        #####alternative with edges 
+        """### z case 
+        Sitfaceedges_sit = [ele for ele in geom_extrude_start
+            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y != Oriy and ele.verts[1].co.y != Oriy]
+        
+        print(f" Sitface edges sit {Sitfaceedges_sit}")
+        ###the edge on top of cut
+
+        print(f"edges fronface{edges_frontface}")
+        Sitfaceedges_front = [ele for ele in edges_frontface
+            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
+                if (ele.verts[0].co.x == middleleftcox and ele.verts[1].co.x == middlerightcox) or  (ele.verts[1].co.x == middleleftcox and ele.verts[0].co.x == middlerightcox)] 
+
+        print(f" Sitface edges sit {Sitfaceedges_front} oriy {Oriy} middlerightcox {middlerightcox} middleleftcox {middleleftcox}")"""
+
+        ''' Sitfaceedges_front = [ele for ele in geom_extrude_start
+            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
+                if (ele.verts[0].co.x == middleleftcox and ele.verts[1].co.x == middlerightcox) ]
+        
+        
+        
+        Sitfaceedges_frontalt = [ele for ele in geom_extrude_start
+            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
+                if (ele.verts[1].co.x == middleleftcox and ele.verts[0].co.x == middlerightcox)]
+        print(f" Sitface edges sit {Sitfaceedges_frontalt}")'''
+
+        #Sitfaceedges = Sitfaceedges_sit + Sitfaceedges_front #+ Sitfaceedges_frontalt
+        #Sitfaceedges =  Cutfaceverts_start + Sitfaceverts_start ###actually verts     
+
+        #test sitedges 
+        print(f" Sit edges all {Sitfaceedges}")
+
+
+
+        bmesh.ops.contextual_create(
+            bm, 
+            geom=Sitfaceedges, 
+            #mat_nr,
+            #use_smooth
+            )
+        
         # bmesh.ops.weld_verts(bm, bm.verts)
         
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist = 0.0001)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     # Finish up, write the bmesh back to the mesh
     bm.to_mesh(me)
