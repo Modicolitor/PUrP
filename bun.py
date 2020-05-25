@@ -7,6 +7,7 @@ from bpy.types import Scene, Image, Object
 import random
 import os
 from .intersect import bmesh_check_intersect_objects
+from .warning import noCutthroughWarn
 
 
 #from .properties import PUrPropertyGroup
@@ -116,7 +117,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         data = bpy.data
         Orderbool = False
         for ob in data.objects:
-            if "PUrP" in ob.name and "_Order":
+            if "PUrP" in ob.name and "_Order" in ob.name:
                 Orderbool = True
                 bpy.ops.pup.couplingorder()
                 bpy.ops.pup.couplingorder()
@@ -718,7 +719,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         data = bpy.data
         Orderbool = False
         for ob in data.objects:
-            if "PUrP" in ob.name and "_Order":
+            if "PUrP" in ob.name and "_Order" in ob.name:
                 Orderbool = True
                 bpy.ops.pup.couplingorder()
                 bpy.ops.pup.couplingorder()
@@ -968,7 +969,7 @@ def applySingleCoup(Coup, CenterObj):
     CenterObjDaughters = context.selected_objects[:]
     print(f'CenterObjDaugters are {CenterObjDaughters}')
     DaughterOne = context.active_object
-    
+    DaughterTwo = None 
     for ob in CenterObjDaughters:           ###setze das ob für zweite Tochter 
         if ob != DaughterOne:
             DaughterTwo = ob
@@ -1010,8 +1011,10 @@ def applySingleCoup(Coup, CenterObj):
                     
         else:
             print('Probleme with side detection') 
-
-    applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
+    if DaughterTwo == None: 
+        bpy.context.window_manager.popup_menu(noCutthroughWarn, title="Error", icon='ERROR') ####raise error message
+    else:
+        applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
     #deleConnector (later propably with checkbox)
     context.view_layer.objects.active = obj   
     removeCoupling(obj)

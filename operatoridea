@@ -53,7 +53,7 @@ bugs:
 [] coupsize planar
 [] bevel bei MF nur oberefläche
 [] postion of cone MF
-[] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
+[+] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
 [] apply coupling auf eines beschränken oder multiapply auf anpassen
 [+] prup mod list doesn't respect planar
 [] planar in move up and down fail
