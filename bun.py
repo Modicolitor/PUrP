@@ -21,8 +21,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
     @classmethod 
     def poll(cls,context):
         PUrP = context.scene.PUrP
-        if (context.view_layer.objects.active != None) or (PUrP.CenterObj != None):                 #context.area.type == 'VIEW_3D':
-            return True 
+        if (context.view_layer.objects.active != None) or (PUrP.CenterObj != None): 
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                return True 
         return False
         
     def execute(self, context):
@@ -613,7 +614,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if (context.view_layer.objects.active != None):
+        if (context.view_layer.objects.active != None) and context.mode == 'OBJECT':
             if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
                 return True
         else: 
@@ -690,9 +691,10 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+        if (context.view_layer.objects.active != None) and context.mode == 'OBJECT':
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
         else: 
             return False
         
@@ -1029,8 +1031,9 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
     def poll(cls, context):
         
         if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                   return True
             
         else:
             return False
@@ -1097,8 +1100,9 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     def poll(cls, context):
         
         if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
         else:
             return False
 
@@ -1235,8 +1239,9 @@ class PP_OT_MoveModDown(bpy.types.Operator):
     def poll(cls, context):
         
         if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
         else:
             return False
 
@@ -1266,8 +1271,9 @@ class PP_OT_MoveModUp(bpy.types.Operator):
     def poll(cls, context):
         
         if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
         else:
             return False
 
@@ -1315,7 +1321,15 @@ class PP_OT_Ini(bpy.types.Operator):
 
     bl_label="Initialize PuzzleUrPrint"
     bl_idname="pup.init"
-    
+    @classmethod
+    def poll(cls, context):
+        
+       
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            return True
+        else:
+            return False
+
     def execute(self, context):
         from bpy.types import Scene, Image, Object
         from .properties import PUrPropertyGroup
@@ -1362,8 +1376,18 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
     bl_idname = "object.togglecoupvisibility"
     bl_label = "PP_OT_ToggleCoupVisibility"
 
+    @classmethod
+    def poll(cls, context):
+        
+        if (context.view_layer.objects.active != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
+        else:
+            return False
+
     def execute(self, context):
-        ownModslist= []
+        
         for ele in context.selected_objects:
             if "PUrP" in ele.name:                                             ### #for selected coupling of PUrP 
                 CenterObj = ele.parent
@@ -1387,8 +1411,9 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if (context.view_layer.objects.active != None):
-            if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
-                return True
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name): 
+                    return True
         else: 
             return False
 
@@ -1545,16 +1570,17 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if (context.object != None):
-            #print(f"context.object != None {context.object != None}")
-            if context.object.PUrPCobj: 
-                return True
-            elif context.object.parent != None:
-                if context.object.parent.PUrPCobj:
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                #print(f"context.object != None {context.object != None}")
+                if context.object.PUrPCobj: 
                     return True
+                elif context.object.parent != None:
+                    if context.object.parent.PUrPCobj:
+                        return True
+                    else: 
+                        return False
                 else: 
                     return False
-            else: 
-                return False
         else: 
             return False
 
