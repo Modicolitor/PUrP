@@ -43,14 +43,19 @@ Object typen
 []
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 [] planar gizmot
+    [] Coupsize --> scale all (z is definition problem)
+    [] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
 [] BuildRoom 
+
+
+
 
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
 ###############################################################
 bugs:
 [] exchange Singleconnector to planar
-[] coupsize planar
+[+] coupsize planar
 [] bevel bei MF nur oberefläche
 [] postion of cone MF
 [+] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
@@ -59,6 +64,8 @@ bugs:
 [] planar in move up and down fail
 [] move up toggles when its applied to top Coupling
 [] move down without lower limit
+[] ActiveToSettings: zscale to 0 when no stopper
+
 
 [] all poll: forbid operators in all other than object mode
 

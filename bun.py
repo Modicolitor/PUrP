@@ -300,6 +300,7 @@ def genPlanar():
     Oversize = PUrP.Oversize
     CenterObj = PUrP.CenterObj
     GlobalScale = PUrP.GlobalScale 
+    CoupSize = PUrP.CoupSize
     CutThickness = PUrP.CutThickness
     OffsetRight = PUrP.OffsetRight
     OffsetLeft = PUrP.OffsetLeft
@@ -369,13 +370,16 @@ def genPlanar():
     obj.scale.x *= adjustScale 
     obj.scale.y *= adjustScale 
 
-    # but then also have a global scale 
+    '''# but then also have a global scale 
     obj.scale *= GlobalScale 
     
     ###apply scale to get scale to one #####################################might need coupsize, too? 
     obj.select_set(True)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    #bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
+    obj.scale *=  CoupSize
+    print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
+    '''
     import bmesh
     ##planar side offset 
     me = bpy.context.object.data
@@ -507,30 +511,7 @@ def genPlanar():
         
         
         #####alternative with edges 
-        """### z case 
-        Sitfaceedges_sit = [ele for ele in geom_extrude_start
-            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y != Oriy and ele.verts[1].co.y != Oriy]
         
-        print(f" Sitface edges sit {Sitfaceedges_sit}")
-        ###the edge on top of cut
-
-        print(f"edges fronface{edges_frontface}")
-        Sitfaceedges_front = [ele for ele in edges_frontface
-            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
-                if (ele.verts[0].co.x == middleleftcox and ele.verts[1].co.x == middlerightcox) or  (ele.verts[1].co.x == middleleftcox and ele.verts[0].co.x == middlerightcox)] 
-
-        print(f" Sitface edges sit {Sitfaceedges_front} oriy {Oriy} middlerightcox {middlerightcox} middleleftcox {middleleftcox}")"""
-
-        ''' Sitfaceedges_front = [ele for ele in geom_extrude_start
-            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
-                if (ele.verts[0].co.x == middleleftcox and ele.verts[1].co.x == middlerightcox) ]
-        
-        
-        
-        Sitfaceedges_frontalt = [ele for ele in geom_extrude_start
-            if isinstance(ele, bmesh.types.BMEdge) and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy
-                if (ele.verts[1].co.x == middleleftcox and ele.verts[0].co.x == middlerightcox)]
-        print(f" Sitface edges sit {Sitfaceedges_frontalt}")'''
 
         #Sitfaceedges = Sitfaceedges_sit + Sitfaceedges_front #+ Sitfaceedges_frontalt
         #Sitfaceedges =  Cutfaceverts_start + Sitfaceverts_start ###actually verts     
@@ -556,6 +537,15 @@ def genPlanar():
     bm.to_mesh(me)
     bm.free()  # free 
 
+    # but then also have a global scale 
+    obj.scale *= GlobalScale 
+    
+    ###apply scale to get scale to one #####################################might need coupsize, too? 
+    obj.select_set(True)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+    obj.scale *=  CoupSize
+    print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
     
     ## array 1 und 2 
     mod = obj.modifiers.new(name="PUrP_Array_1", type="ARRAY")
@@ -1499,7 +1489,9 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             elif "T-Straight" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "15"
 
-            PUrP.CoupSize = obj.scale.x/PUrP.GlobalScale
+            PUrP.CoupSize = obj.scale.x
+
+
 
             bpy.ops.object.transform_apply(location=False, rotation=False, scale=True) ###Apply scale e.g. zscale determination
             
