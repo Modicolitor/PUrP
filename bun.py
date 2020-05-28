@@ -223,11 +223,27 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     loc = mathutils.Vector((0,0,0))
     if PrimTypes == "1":
         bpy.ops.mesh.primitive_cube_add(size=size,location=loc)
+        if PUrP.SingleCouplingModes == "2":
+            for edge in context.object.data.faces[0].edges:
+                edge.bevel_weight = 1 
+        if PUrP.SingleCouplingModes == "1": ### 
+           for edge in context.object.data.edges:
+               edge.bevel_weight = 1 
+       
     elif PrimTypes == "2":
         bpy.ops.mesh.primitive_cylinder_add(vertices=CylVert, radius=size, depth=1, enter_editmode=False, location=loc)
-
-    elif PrimTypes == "3":
-        bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
+        if PUrP.SingleCouplingModes == "2": ### M-F case
+            for edge in context.object.data.edges:
+                if edge.vertices[0].co.z == 1 and edge.vertices[1].co.z == 1: ###only the top edges get beveled
+                   edge.bevel_weight = 1 
+        if PUrP.SingleCouplingModes == "1": ### Stick case
+            for edge in context.object.data.edges:        
+                if edge.vertices[0].co.z == 1 and edge.vertices[1].co.z == 1:
+                     edge.bevel_weight = 1 
+                elif edge.vertices[0].co.z == -1 and edge.vertices[1].co.z == -1:
+                     edge.bevel_weight = 1 
+        elif PrimTypes == "3":
+            bpy.ops.mesh.primitive_cone_add(vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
 
 
     ##correct geometry location for Male Female
@@ -252,6 +268,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
         # Finish up, write the bmesh back to the mesh
         bm.to_mesh(me)
         bm.free()  # free and prevent further access
+
           
     if nameadd == "_diff":
         context.object.scale.x += PUrP.Oversize
@@ -273,7 +290,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     mod = context.object.modifiers.new(name = context.object.name + "Bevel" , type = "BEVEL")   ########bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset
     mod.segments = PUrP.BevelSegments
-    mod.limit_method = 'ANGLE'
+    mod.limit_method = 'Weight'
     context.object.display_type = 'WIRE'    
     context.object.show_in_front = True
     context.object.hide_select = True
