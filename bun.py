@@ -214,6 +214,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     size = 1  # PUrP.CoupSize
     PrimTypes = context.scene.PUrP.SingleCouplingTypes
     CylVert = PUrP.CylVert
+    bRadius = PUrP.bRadius
     data = bpy.data
 
     loc = mathutils.Vector((0, 0, 0))
@@ -226,7 +227,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
 
     elif PrimTypes == "3":
         bpy.ops.mesh.primitive_cone_add(
-            vertices=CylVert, radius1=size, radius2=0, depth=2, enter_editmode=False, location=loc)
+            vertices=CylVert, radius1=size, radius2=bRadius, depth=2, enter_editmode=False, location=loc)
         if PUrP.SingleCouplingModes == "1":
             bpy.context.window_manager.popup_menu(
                 coneTrouble, title="Warning", icon='ERROR')  # raise error message

@@ -50,6 +50,9 @@ Object typen
     [] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
 [] BuildRoom 
 [] cone radius 2 
+    [+] initial implementation in code, and ui
+    [] active to settings needs adjustment
+
 
 
 
@@ -71,6 +74,7 @@ bugs:
 [] ActiveToSettings: zscale to 0 when no stopper, 
     [] Coupsize scale is applied --> no reproduction by active to setting 
 [] line 24 bun error poll before initialie
+[] active to setting for new cone radius b option, as well as cylvert  rechnung
 
 [+] all poll: forbid operators in all other than object mode
 
