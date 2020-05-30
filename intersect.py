@@ -1,6 +1,7 @@
 import bpy
 import bmesh
 
+
 def bmesh_copy_from_object(obj, transform=True, triangulate=True, apply_modifiers=False):
     """
     Returns a transformed, triangulated copy of the mesh
@@ -9,7 +10,8 @@ def bmesh_copy_from_object(obj, transform=True, triangulate=True, apply_modifier
     assert(obj.type == 'MESH')
 
     if apply_modifiers and obj.modifiers:
-        me = obj.to_mesh(bpy.context.scene, True, 'PREVIEW', calc_tessface=False)
+        me = obj.to_mesh(bpy.context.scene, True,
+                         'PREVIEW', calc_tessface=False)
         bm = bmesh.new()
         bm.from_mesh(me)
         bpy.data.meshes.remove(me)
@@ -38,6 +40,7 @@ def bmesh_copy_from_object(obj, transform=True, triangulate=True, apply_modifier
 
     return bm
 
+
 def bmesh_check_intersect_objects(obj, obj2):
     """
     Check if any faces intersect with the other object
@@ -62,7 +65,7 @@ def bmesh_check_intersect_objects(obj, obj2):
     bm2.free()
     obj_tmp = bpy.data.objects.new(name=me_tmp.name, object_data=me_tmp)
     scene.collection.objects.link(obj_tmp)
-    #scene.update()
+    # scene.update()
     ray_cast = obj_tmp.ray_cast
 
     intersect = False
@@ -70,7 +73,7 @@ def bmesh_check_intersect_objects(obj, obj2):
     EPS_NORMAL = 0.000001
     EPS_CENTER = 0.01  # should always be bigger
 
-    #for ed in me_tmp.edges:
+    # for ed in me_tmp.edges:
     for ed in bm.edges:
         v1, v2 = ed.verts
 
@@ -91,11 +94,9 @@ def bmesh_check_intersect_objects(obj, obj2):
     bpy.data.objects.remove(obj_tmp)
     bpy.data.meshes.remove(me_tmp)
 
-    
-
     return intersect
 
 
 #obj = bpy.context.object
 #obj2 = (ob for ob in bpy.context.selected_objects if ob != obj).__next__()
-#intersect = bmesh_check_intersect_objects(obj, obj2)   ### returns True if...
+# intersect = bmesh_check_intersect_objects(obj, obj2)   ### returns True if...

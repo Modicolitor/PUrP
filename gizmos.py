@@ -4,11 +4,12 @@ from bpy.types import (
     GizmoGroup,
 )
 
+
 class PP_OT_OversizeGizmo(bpy.types.Operator):
     '''Change the Oversize of the coupling'''
     bl_idname = "object.oversize"
     bl_label = "oversize"
-    bl_options = {'REGISTER',"UNDO"}
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -18,23 +19,24 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        
-        context.object.children[1].scale.x = self.valuex 
-        context.object.children[1].scale.y = self.valuey 
-        context.object.children[1].scale.z = self.valuez 
+
+        context.object.children[1].scale.x = self.valuex
+        context.object.children[1].scale.y = self.valuey
+        context.object.children[1].scale.z = self.valuez
         return {'FINISHED'}
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-            #if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
+            # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
             self.delta = event.mouse_x - self.init_value
-            #else:
+            # else:
             #    self.delta =  self.init_value
-            
-            self.valuex = self.init_scale_x + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
+
+            self.valuex = self.init_scale_x + self.delta / \
+                1000  # - self.window_width/2 #(HD Screen 800)
             self.valuey = self.init_scale_y + self.delta/1000
             self.valuez = self.init_scale_z + self.delta/1000
-            
+
             #print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -48,13 +50,14 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-       # self.window_width = context.window.width 
-        self.init_scale_x = context.object.children[1].scale.x 
-        self.init_scale_y = context.object.children[1].scale.y 
+       # self.window_width = context.window.width
+        self.init_scale_x = context.object.children[1].scale.x
+        self.init_scale_y = context.object.children[1].scale.y
         self.init_scale_z = context.object.children[1].scale.z
         self.init_value = event.mouse_x
 
-        self.valuex = context.object.children[1].scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.valuex = context.object.children[1].scale.x
         self.valuey = context.object.children[1].scale.y
         self.valuez = context.object.children[1].scale.z
 
@@ -68,7 +71,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
     '''Change the scale of the coupling'''
     bl_idname = "object.couplesize"
     bl_label = "couplsize"
-    bl_options = {'REGISTER',"UNDO"}
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -78,27 +81,32 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        
-        context.object.children[1].scale.x = self.valuex1 #- (context.object.children[0].scale.x - context.object.children[1].scale.x )
-        context.object.children[1].scale.y = self.valuey1 #- (context.object.children[0].scale.y - context.object.children[1].scale.y )
-        context.object.children[1].scale.z = self.valuez1 #- (context.object.children[0].scale.z - context.object.children[1].scale.z )
-        context.object.children[0].scale.x = self.valuex0 
-        context.object.children[0].scale.y = self.valuey0 
-        context.object.children[0].scale.z = self.valuez0 
+
+        # - (context.object.children[0].scale.x - context.object.children[1].scale.x )
+        context.object.children[1].scale.x = self.valuex1
+        # - (context.object.children[0].scale.y - context.object.children[1].scale.y )
+        context.object.children[1].scale.y = self.valuey1
+        # - (context.object.children[0].scale.z - context.object.children[1].scale.z )
+        context.object.children[1].scale.z = self.valuez1
+        context.object.children[0].scale.x = self.valuex0
+        context.object.children[0].scale.y = self.valuey0
+        context.object.children[0].scale.z = self.valuez0
         return {'FINISHED'}
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-            #if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
+            # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
             self.delta = event.mouse_x - self.init_value
-            #else:
+            # else:
             #    self.delta =  self.init_value
-            
-            self.valuex1 = self.init_scale_x1 + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
+
+            self.valuex1 = self.init_scale_x1 + self.delta / \
+                1000  # - self.window_width/2 #(HD Screen 800)
             self.valuey1 = self.init_scale_y1 + self.delta/1000
             self.valuez1 = self.init_scale_z1 + self.delta/1000
 
-            self.valuex0 = self.init_scale_x0 + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
+            self.valuex0 = self.init_scale_x0 + self.delta / \
+                1000  # - self.window_width/2 #(HD Screen 800)
             self.valuey0 = self.init_scale_y0 + self.delta/1000
             self.valuez0 = self.init_scale_z0 + self.delta/1000
 
@@ -117,23 +125,24 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-       # self.window_width = context.window.width 
-        self.init_scale_x0 = context.object.children[0].scale.x 
-        self.init_scale_y0 = context.object.children[0].scale.y 
+       # self.window_width = context.window.width
+        self.init_scale_x0 = context.object.children[0].scale.x
+        self.init_scale_y0 = context.object.children[0].scale.y
         self.init_scale_z0 = context.object.children[0].scale.z
-        self.init_scale_y1 = context.object.children[1].scale.y 
+        self.init_scale_y1 = context.object.children[1].scale.y
         self.init_scale_z1 = context.object.children[1].scale.z
-        self.init_scale_x1 = context.object.children[1].scale.x 
+        self.init_scale_x1 = context.object.children[1].scale.x
 
         self.init_value = event.mouse_x
 
-        self.valuex1 = context.object.children[1].scale.x           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.valuey1 = context.object.children[1].scale.y 
-        self.valuez1 = context.object.children[1].scale.z 
-        self.valuex0 = context.object.children[0].scale.x 
-        self.valuey0 = context.object.children[0].scale.y 
-        self.valuez0 = context.object.children[0].scale.z 
-        
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.valuex1 = context.object.children[1].scale.x
+        self.valuey1 = context.object.children[1].scale.y
+        self.valuez1 = context.object.children[1].scale.z
+        self.valuex0 = context.object.children[0].scale.x
+        self.valuey0 = context.object.children[0].scale.y
+        self.valuez0 = context.object.children[0].scale.z
+
         self.execute(context)
 
         context.window_manager.modal_handler_add(self)
@@ -144,7 +153,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
     '''Change the z-scale of the coupling'''
     bl_idname = "object.zscale"
     bl_label = "couplsize"
-    bl_options = {'REGISTER',"UNDO"}
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -154,19 +163,21 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        context.object.children[1].scale.z = self.value - (context.object.children[0].scale.z - context.object.children[1].scale.z )
-        context.object.children[0].scale.z = self.value 
+        context.object.children[1].scale.z = self.value - (
+            context.object.children[0].scale.z - context.object.children[1].scale.z)
+        context.object.children[0].scale.z = self.value
 
         return {'FINISHED'}
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-            #if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
+            # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
             self.delta = event.mouse_y - self.init_value
-            #else:
+            # else:
             #    self.delta =  self.init_value
-            
-            self.value = self.init_scale_z + self.delta/1000  #- self.window_width/2 #(HD Screen 800)
+
+            self.value = self.init_scale_z + self.delta / \
+                1000  # - self.window_width/2 #(HD Screen 800)
             #print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -180,16 +191,16 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.init_scale_z = context.object.children[0].scale.z
-   
+
         self.init_value = event.mouse_y
 
-        self.value = context.object.children[0].scale.z           ##event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = context.object.children[0].scale.z
+
         self.execute(context)
 
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
-
 
 
 class PUrP_OversizeGizmo(GizmoGroup):
@@ -214,7 +225,8 @@ class PUrP_OversizeGizmo(GizmoGroup):
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
-        print(f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        print(
+            f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpr.matrix_basis = ob.matrix_world.normalized()
 
         mpr.line_width = 3
@@ -226,14 +238,15 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpr.alpha_highlight = 1.0
 
         self.roll_widget = mpr
-        
-        #########################second gizmo
+
+        # second gizmo
         mpa = self.gizmos.new("GIZMO_GT_dial_3d")
         props = mpa.target_set_operator("object.couplesize")
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
-        print(f"Size matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        print(
+            f"Size matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpa.matrix_basis = ob.matrix_world.normalized()
         mpa.line_width = 3
 
@@ -247,7 +260,8 @@ class PUrP_OversizeGizmo(GizmoGroup):
 
         mph = self.gizmos.new("GIZMO_GT_arrow_3d")
         mph.target_set_operator("object.zscale")
-        print(f"ZScale matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        print(
+            f"ZScale matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mph.matrix_basis = ob.matrix_world.normalized()
         mph.draw_style = 'BOX'
 
@@ -259,14 +273,11 @@ class PUrP_OversizeGizmo(GizmoGroup):
 
     def refresh(self, context):
         ob = context.object
-        
+
         mpr = self.roll_widget
         mpa = self.roll_widge
         mph = self.roll_widg
-        
-        mpa.matrix_basis = ob.matrix_world.normalized() 
-        mph.matrix_basis = ob.matrix_world.normalized() 
-        mpr.matrix_basis = ob.matrix_world.normalized() 
-        
 
-
+        mpa.matrix_basis = ob.matrix_world.normalized()
+        mph.matrix_basis = ob.matrix_world.normalized()
+        mpr.matrix_basis = ob.matrix_world.normalized()
