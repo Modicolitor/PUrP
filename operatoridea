@@ -42,10 +42,14 @@ Object typen
 [] Stopper for planar
 []
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
+[] single coupling gizmot
+    []  bevel options 
+    
 [] planar gizmot
     [] Coupsize --> scale all (z is definition problem)
     [] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
 [] BuildRoom 
+[] cone radius 2 
 
 
 
@@ -64,10 +68,11 @@ bugs:
 [] planar in move up and down fail
 [] move up toggles when its applied to top Coupling
 [] move down without lower limit
-[] ActiveToSettings: zscale to 0 when no stopper
+[] ActiveToSettings: zscale to 0 when no stopper, 
+    [] Coupsize scale is applied --> no reproduction by active to setting 
+[] line 24 bun error poll before initialie
 
-
-[] all poll: forbid operators in all other than object mode
+[+] all poll: forbid operators in all other than object mode
 
 Tests
 [] test linux, Mag

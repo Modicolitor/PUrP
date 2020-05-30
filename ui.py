@@ -49,10 +49,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text = 'Coupling Type')
 
-            
-            
-
-            
+        
             
             
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":
