@@ -5,23 +5,40 @@ from bpy.types import Scene, Image, Object
 class PUrPropertyGroup(bpy.types.PropertyGroup):
     CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
 
-    PUrP_name = bpy.props.StringProperty(name="PUrPname", default="PUrP_")
-    CutThickness = bpy.props.FloatProperty(name="Size", default=0.04)
-    CoupSize = bpy.props.FloatProperty(name="Size", default=1.0)
-    Oversize = bpy.props.FloatProperty(name="DynamicOversize", default=0.04)
-    zScale = bpy.props.FloatProperty(name="zScale", default=1.0)
-    aRadius = bpy.props.FloatProperty(name="Radius 1", default=1.0)
-    bRadius = bpy.props.FloatProperty(name="Radius 2", default=0.0)
-    OffsetLeft = bpy.props.FloatProperty(name="OffsetLeft", default=1.0)
-    OffsetRight = bpy.props.FloatProperty(name="OffsetRight", default=1.0)
-    GlobalScale = bpy.props.FloatProperty(name="Globalscale ", default=1.0)
-    LineDistance = bpy.props.FloatProperty(name="Linedistance", default=5.0)
-    LineCount = bpy.props.IntProperty(name="Linecount", default=1)
-    LineLength = bpy.props.IntProperty(name="Linelength", default=5)
-    BevelSegments = bpy.props.IntProperty(name="Bevelsegements", default=1)
-    BevelOffset = bpy.props.FloatProperty(name="Beveloffset", default=0.0)
-    StopperHeight = bpy.props.FloatProperty(name="Beveloffset", default=0.2)
-    StopperBool = bpy.props.BoolProperty(name="Beveloffset", default=False)
+    PUrP_name = bpy.props.StringProperty(
+        name="PUrPname", default="PUrP_")
+    CutThickness = bpy.props.FloatProperty(
+        name="Size", default=0.04, min=0.0)
+    CoupSize = bpy.props.FloatProperty(
+        name="Size", default=1.0, min=0.0)
+    Oversize = bpy.props.FloatProperty(
+        name="DynamicOversize", default=0.04)
+    zScale = bpy.props.FloatProperty(
+        name="zScale", default=1.0, min=0.0001)
+    aRadius = bpy.props.FloatProperty(
+        name="Radius 1", default=1.0, max=1.0, min=0.0)
+    bRadius = bpy.props.FloatProperty(
+        name="Radius 2", default=0.0, max=1.0, min=0.0)
+    OffsetLeft = bpy.props.FloatProperty(
+        name="OffsetLeft", default=1.0, min=0.0)
+    OffsetRight = bpy.props.FloatProperty(
+        name="OffsetRight", default=1.0, min=0.0)
+    GlobalScale = bpy.props.FloatProperty(
+        name="Globalscale ", default=1.0, min=0.0)
+    LineDistance = bpy.props.FloatProperty(
+        name="Linedistance", default=5.0, min=0.0)
+    LineCount = bpy.props.IntProperty(
+        name="Linecount", default=1, min=0)
+    LineLength = bpy.props.IntProperty(
+        name="Linelength", default=5, min=0)
+    BevelSegments = bpy.props.IntProperty(
+        name="Bevelsegements", default=1, min=0)
+    BevelOffset = bpy.props.FloatProperty(
+        name="Beveloffset", default=0.0, min=0.0)
+    StopperHeight = bpy.props.FloatProperty(
+        name="Beveloffset", default=0.2, min=0.0)
+    StopperBool = bpy.props.BoolProperty(
+        name="Beveloffset", default=False)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
