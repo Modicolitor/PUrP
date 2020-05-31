@@ -16,9 +16,9 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     zScale = bpy.props.FloatProperty(
         name="zScale", default=1.0, min=0.0001)
     aRadius = bpy.props.FloatProperty(
-        name="Radius 1", default=1.0, max=1.0, min=0.0)
+        name="Radius 1", default=1.0, min=0.0)
     bRadius = bpy.props.FloatProperty(
-        name="Radius 2", default=0.0, max=1.0, min=0.0)
+        name="Radius 2", default=0.0, min=0.0)
     OffsetLeft = bpy.props.FloatProperty(
         name="OffsetLeft", default=1.0, min=0.0)
     OffsetRight = bpy.props.FloatProperty(

@@ -214,6 +214,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     size = 1  # PUrP.CoupSize
     PrimTypes = context.scene.PUrP.SingleCouplingTypes
     CylVert = PUrP.CylVert
+    aRadius = PUrP.aRadius
     bRadius = PUrP.bRadius
     data = bpy.data
 
@@ -223,12 +224,15 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
 
     elif PrimTypes == "2":
         bpy.ops.mesh.primitive_cylinder_add(
-            vertices=CylVert, radius=size, depth=1, enter_editmode=False, location=loc)
+            vertices=CylVert, radius=aRadius, depth=1, enter_editmode=False, location=loc)
 
     elif PrimTypes == "3":
         bpy.ops.mesh.primitive_cone_add(
-            vertices=CylVert, radius1=size, radius2=bRadius, depth=2, enter_editmode=False, location=loc)
+            vertices=CylVert, radius1=aRadius, radius2=bRadius, depth=2, enter_editmode=False, location=loc)
         if PUrP.SingleCouplingModes == "1":
+            bpy.context.window_manager.popup_menu(
+                coneTrouble, title="Warning", icon='ERROR')  # raise error message
+        elif PUrP.SingleCouplingModes == "2" and aRadius < bRadius:
             bpy.context.window_manager.popup_menu(
                 coneTrouble, title="Warning", icon='ERROR')  # raise error message
 
@@ -1439,11 +1443,14 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     PUrP.SingleCouplingTypes = '1'
                 elif "Cylinder" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '2'
-                    PUrP.CylVert = len(obj.data.vertices)/2
+                    #PUrP.CylVert = len(obj.data.vertices)/2
+                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(  # cylinder is a special case of cone
+                        context, obj.children[0])
                 elif "Cone" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '3'
-                    PUrP.CylVert = len(obj.data.vertices) - 1
-
+                    #PUrP.CylVert = len(obj.data.vertices) - 1
+                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+                        context, obj.children[0])
                 for child in obj.children:
                     if "diff" in child.name:
                         PUrP.CoupSize = child.scale.x
@@ -1545,9 +1552,44 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.zScale = - lowestexample.co.z - distance[0]
         return {'FINISHED'}
 
+    def coneanalysizer(self, context, obj):
+        # Cyclvert, and the radius are extrakted; Coupling types
+
+        upperverts = []
+        lowerverts = []
+        for vert in obj.data.vertices:
+
+            if vert.co.z > 0:
+                upperverts.append(vert)
+            elif vert.co.z <= 0:
+                lowerverts.append(vert)
+        # upperverts information
+        if len(upperverts) == 1:  # hard tip
+            bRadius = 0.0
+        else:  # soft tip
+            for v in upperverts:
+                # vert on an axis has the radius as co.axis
+                if v.co.x == 0:
+                    bRadius = v.co.y
+                    break
+                if v.co.y == 0:
+                    bRadius = v.co.x
+                    break
+        # lower radius
+        Cyclvert = len(upperverts)
+        for v in lowerverts:
+            if v.co.x == 0:
+                aRadius = v.co.y
+                break
+            if v.co.y == 0:
+                aRadius = v.co.x
+                break
+
+        return Cyclvert, aRadius, bRadius
+
 
 def zSym(obj):
-    '''Test whether the obj is sysmmetrical relative to the object origin'''
+    '''Test whether the obj is symmetrical relative to the object origin'''
 
     z = obj.data.vertices[0].co.z
 

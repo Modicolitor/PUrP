@@ -52,9 +52,10 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":  # cylinder cone
                 subcol.prop(context.scene.PUrP, "CylVert", text='Vertices')
+                subcol.prop(context.scene.PUrP, "aRadius", text='Radius')
                 #subcol.prop(PUrP, "aRadius", text='Radius 1')
                 if PUrP.SingleCouplingTypes == "3":
-                    subcol.prop(PUrP, "bRadius", text='Radius 2')
+                    subcol.prop(PUrP, "bRadius", text='Radius Top')
 
             subcol.prop(PUrP, "GlobalScale", text='Globalscalefaktor')
             # for stick, mf, planecut
