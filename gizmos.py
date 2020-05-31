@@ -3,6 +3,7 @@ from bpy.types import (
     Operator,
     GizmoGroup,
 )
+import mathutils
 
 
 class PP_OT_OversizeGizmo(bpy.types.Operator):
@@ -91,6 +92,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         context.object.children[0].scale.x = self.valuex0
         context.object.children[0].scale.y = self.valuey0
         context.object.children[0].scale.z = self.valuez0
+        context.scene.PUrP.CoupSize = self.valuex0
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -166,7 +168,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
         context.object.children[1].scale.z = self.value - (
             context.object.children[0].scale.z - context.object.children[1].scale.z)
         context.object.children[0].scale.z = self.value
-
+        context.scene.PUrP.zScale = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -196,6 +198,113 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = context.object.children[0].scale.z
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.bevoffset"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+
+        children = context.object.children
+        children[1].modifiers[0].width = self.value
+        children[0].modifiers[0].width = self.value
+        context.scene.PUrP.BevelOffset = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        children = context.object.children
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.init_width + self.delta / 1000
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            children[0].modifiers[0].width = self.init_width
+            children[1].modifiers[0].width = self.init_width
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        children = context.object.children
+        self.init_width = children[0].modifiers[0].width
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = children[0].modifiers[0].width
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.bevseggiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+
+        children = context.object.children
+        children[1].modifiers[0].segments = int(self.value)
+        children[0].modifiers[0].segments = int(self.value)
+        context.scene.PUrP.BevelSegments = int(self.value)
+        # print(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        children = context.object.children
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.init_segments + self.delta / 10
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            children[0].modifiers[0].segments = self.init_segments
+            children[1].modifiers[0].segments = self.init_segments
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        children = context.object.children
+        self.init_segments = children[0].modifiers[0].segments
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = children[0].modifiers[0].segments
 
         self.execute(context)
 
@@ -239,7 +348,7 @@ class PUrP_OversizeGizmo(GizmoGroup):
 
         self.roll_widget = mpr
 
-        # second gizmo
+        # couple size gizmot
         mpa = self.gizmos.new("GIZMO_GT_dial_3d")
         props = mpa.target_set_operator("object.couplesize")
         #props.constraint_axis = True, True, True
@@ -258,10 +367,10 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpa.scale_basis = 2
         self.roll_widge = mpa
 
+        # zscale gizmot
         mph = self.gizmos.new("GIZMO_GT_arrow_3d")
         mph.target_set_operator("object.zscale")
-        print(
-            f"ZScale matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+
         mph.matrix_basis = ob.matrix_world.normalized()
         mph.draw_style = 'BOX'
 
@@ -271,13 +380,57 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mph.alpha_highlight = 0.5
         self.roll_widg = mph
 
+        # Bevel offset gizmot
+        mpo = self.gizmos.new("GIZMO_GT_dial_3d")
+        mpo.target_set_operator("purp.bevoffset")
+
+        mpo.matrix_basis = ob.matrix_world.normalized()
+        mpo.matrix_basis[2][3] += 1
+        mpo.line_width = 3
+
+        mpo.color = 0.2, 0.2, 0.8
+        mpo.alpha = 0.5
+
+        mpo.color_highlight = 0.0, 0.5, 0.3
+        mpo.alpha_highlight = 1.0
+        mpo.scale_basis = 2
+
+        mpo.use_draw_value
+
+        self.roll_wid = mpo
+
+        # Bevel segments gizmot
+        mps = self.gizmos.new("GIZMO_GT_dial_3d")
+        mps.target_set_operator("purp.bevseggiz")
+
+        mps.matrix_basis = ob.matrix_world.normalized()
+        mps.matrix_basis[2][3] += 1
+        mps.line_width = 3
+
+        mps.color = 0.2, 0.2, 0.8
+        mps.alpha = 0.5
+
+        mps.color_highlight = 0.0, 0.5, 0.3
+        mps.alpha_highlight = 1.0
+        mps.scale_basis = 1
+        mps.use_draw_value
+
+        self.roll_wi = mps
+
     def refresh(self, context):
         ob = context.object
 
         mpr = self.roll_widget
         mpa = self.roll_widge
         mph = self.roll_widg
+        mpo = self.roll_wid
+        mps = self.roll_wi
 
         mpa.matrix_basis = ob.matrix_world.normalized()
         mph.matrix_basis = ob.matrix_world.normalized()
         mpr.matrix_basis = ob.matrix_world.normalized()
+
+        mpo.matrix_basis = ob.matrix_world.normalized()
+        mpo.matrix_basis[2][3] += 1
+        mps.matrix_basis = ob.matrix_world.normalized()
+        mps.matrix_basis[2][3] += 1

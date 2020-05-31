@@ -63,8 +63,8 @@ Object typen
 bugs:
 [] exchange Singleconnector to planar
 [+] coupsize planar
-[] bevel bei MF nur oberefläche
-[] postion of cone MF
+[+] bevel bei MF nur oberefläche
+[+] postion of cone MF
 [+] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
 [] apply coupling auf eines beschränken oder multiapply auf anpassen
 [+] prup mod list doesn't respect planar
@@ -74,9 +74,12 @@ bugs:
 [] ActiveToSettings: zscale to 0 when no stopper, 
     [] Coupsize scale is applied --> no reproduction by active to setting 
 [] line 24 bun error poll before initialie
-[] active to setting for new cone radius b option, as well as cylvert  rechnung
+[+] active to setting for new cone radius b option, as well as cylvert  rechnung
 
 [+] all poll: forbid operators in all other than object mode
+
+[] gizmos should change values in the PUrP settings
+
 
 Tests
 [] test linux, Mag
