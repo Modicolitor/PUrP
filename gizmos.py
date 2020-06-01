@@ -20,10 +20,12 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-
+        children = context.object.children
         context.object.children[1].scale.x = self.valuex
         context.object.children[1].scale.y = self.valuey
         context.object.children[1].scale.z = self.valuez
+        context.scene.PUrP.Oversize = (
+            children[0].scale.x - children[1].scale.x)/2
         return {'FINISHED'}
 
     def modal(self, context, event):
