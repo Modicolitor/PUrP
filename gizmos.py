@@ -324,7 +324,13 @@ class PUrP_OversizeGizmo(GizmoGroup):
     @classmethod
     def poll(cls, context):
         ob = context.object
-        return (ob and ob.type == 'MESH' and "SingleConnector" in context.view_layer.objects.active.name)
+        if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
+            if len(ob.children) > 1:  # flatcut has zero or
+                # 1 (order) child... excluded from gizmos
+                # if len(ob.children) != 1 and isnt_order(ob):
+                #print(f"isnt {isnt_order(ob)}")
+                return True
+        return False
 
     def setup(self, context):
         # Run an operator using the dial gizmo
@@ -436,3 +442,11 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpo.matrix_basis[2][3] += 1
         mps.matrix_basis = ob.matrix_world.normalized()
         mps.matrix_basis[2][3] += 1
+
+
+"""
+def isnt_order(ob):
+    for ch in ob.children:
+        if "Order" in ch.name:
+            return False
+    return True"""
