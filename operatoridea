@@ -61,31 +61,43 @@ Object typen
 
 ###############################################################
 bugs:
-[] exchange Singleconnector to planar
-
+general operator bug:
 [] apply coupling auf eines beschränken oder multiapply auf anpassen
 
-[] planar in move up and down fail
 [] move up toggles when its applied to top Coupling
 [] move down without lower limit
+
+
+planar stuff 
+[] planar fails partially for stopper puzzle last etrude
+[] exchange Singleconnector to planar
+[+] planar in move up and down fail
 [] ActiveToSettings: zscale to 0 when no stopper, 
     [] Coupsize scale is applied --> no reproduction by active to setting 
-[] line 24 bun error poll before initialie
-[+] active to setting for new cone radius b option, as well as cylvert  rechnung
-[+] all poll: forbid operators in all other than object mode
-[+] gizmos should change values in the PUrP settings#
-[] bevel gizmos shape
+[] planar gizmos
 
+    
+[] line 24 bun error poll before initialie
+
+gizmos
+[] bevel gizmos shape
+[] remove gizmos for flatcut
+[] planar gizmos
 resolved bug:
 [+] coupsize planar
 [+] bevel bei MF nur oberefläche
 [+] postion of cone MF
 [+] when there are no two pieces DaughterTwo used before assign ---> Raise error for User "Its not cutting through!!! Please correct position or loudly damn the Boolean modifier" 
 [+] prup mod list doesn't respect planar
+[+] active to setting for new cone radius b option, as well as cylvert  rechnung
+[+] all poll: forbid operators in all other than object mode
+[+] gizmos should change values in the PUrP settings#
+
 Tests
 [] test linux, Mag
 [] Active settings with for global scale influence
-
+[] using globalsize
+[] move up and down with fremde modifiers 
 
 
 Publishing: 

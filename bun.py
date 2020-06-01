@@ -1149,20 +1149,30 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
 
 def moveModdown(Coup, CenterObj):
-    Coupchildcount = howManyModsCoup(Coup.name, CenterObj)
+    CoupModcount = howManyModsCoup(Coup.name, CenterObj)
 
     # list of coupling names connected to the centerobj
     PUrP_Modsnames = listPUrPMods(CenterObj)
+    CoupList = couplingList(CenterObj)
 
+    #####
     for ele in PUrP_Modsnames:
         print(f"all  element  {ele} with index {PUrP_Modsnames.index(ele)}")
         if ele == Coup.name:
-            # index of Coup name in own list in the list
+            # index of Coup name in list of all PUrP Mods (inkl.)
             coupindex = PUrP_Modsnames.index(ele)
+    for ele in CoupList:
+        print(f"all  element  {ele} with index {PUrP_Modsnames.index(ele)}")
+        if ele == Coup.name:
+            # index of Coup name in list of all PUrP Mods (inkl.)
+            orderindex = CoupList.index(ele)
 
     # when its already lowest:index lowest modifier index lowestCou mod
-    if len(PUrP_Modsnames) <= (coupindex + Coupchildcount-1):
-        print('It is already the lowest modifier')
+    # wenn couplist index + 1 >= lenCouplist
+    if orderindex+1 >= len(CoupList):
+        print(
+            'It is already the lowest modifier, orderindex {orderindex}, len(Couplist){len(Couplist)}')
+
         return {'FINISHED'}
     else:
         LowerCoup_name = PUrP_Modsnames[coupindex + 1]
@@ -1174,7 +1184,7 @@ def moveModdown(Coup, CenterObj):
         # now move the modifiers starting with the lowest of the coup children for as often as we have modifiers of LowerCoup
         realcoupindex = modindex(
             CenterObj.modifiers[PUrP_Modsnames[coupindex]], CenterObj.modifiers)
-        indexLowestToMove = realcoupindex + Coupchildcount - 1
+        indexLowestToMove = realcoupindex + CoupModcount - 1
         moveIndex = indexLowestToMove
         bpy.context.view_layer.objects.active = CenterObj
 
@@ -1302,13 +1312,15 @@ class PP_OT_MoveModUp(bpy.types.Operator):
                 # index of Coup name in own list in the list
                 coupindex = PUrP_Modsnames.index(ele)
 
+        print(f"Couindex for move up {coupindex}")
         # up is the same as the upper one down
         if coupindex == 0:
             print("It already the top modifier")
         else:
             coupindex -= 1
             Coup = bpy.data.objects[PUrP_Modsnames[coupindex]]
-        moveModdown(Coup, CenterObj)
+
+            moveModdown(Coup, CenterObj)
 
         data = bpy.data
         Orderbool = False
