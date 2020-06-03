@@ -616,6 +616,36 @@ def appendCoupling(filename, objectname):
         bpy.context.view_layer.objects.active = obj
 
 
+def newmainPlane(context, CenterObj):
+    data = bpy.data
+    PUrP = context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+    CutThickness = PUrP.CutThickness
+
+    bpy.ops.mesh.primitive_plane_add(
+        size=6, enter_editmode=False, location=(0, 0, 0))
+    context.object.name = str(
+        PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+    newname_mainplane = context.object.name
+
+    # bpy.ops.object.modifier_add(type='SOLIDIFY')
+    mod = context.object.modifiers.new(
+        name="PUrP_Solidify", type="SOLIDIFY")
+    mod.thickness = CutThickness
+    mod.offset = 1.0
+    context.object.display_type = 'WIRE'
+    #context.object.show_in_front = True
+
+    context.object.parent = CenterObj
+
+    # set boolean for the slice plane
+    mod = data.objects[CenterObj.name].modifiers.new(
+        name=context.object.name, type="BOOLEAN")
+    mod.object = data.objects[newname_mainplane]
+    mod.operation = 'DIFFERENCE'
+    return newname_mainplane
+
+
 class PP_OT_ExChangeCoup(bpy.types.Operator):
     '''Exchange selected couplings'''
     bl_idname = "object.exchangecoup"
@@ -679,25 +709,26 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
-                        oldname = obj.name
+                        #oldname = obj.name
+                        parentname = obj.parent.name[:]
 
                         for ob in context.selected_objects:  # deselte all
                             ob.select_set(False)
                         obj.select_set(True)
                         # delete the old planar coupling
                         bpy.ops.object.delete(use_global=False)
-
-                        # generate new planar
-                        coupModeDivision(CenterObj, oldname)
-                        context.object.matrix_world = trans
+                        # name for
+                        newname = newmainPlane(
+                            context, data.objects[parentname])
+                        obj = context.object
 
                     obj.modifiers["PUrP_Solidify"].thickness = CutThickness
 
-                    mod = CenterObj.modifiers.new(
+                    '''mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
                     mod.object = obj
                     mod.operation = 'DIFFERENCE'
-                    obj.scale = mathutils.Vector((1, 1, 1))
+                    obj.scale = mathutils.Vector((1, 1, 1))'''
                     coupModeDivision(CenterObj, obj.name)
                     #print(f"obj at rescale {obj}")
                     obj.scale.x = GlobalScale
