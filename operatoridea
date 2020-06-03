@@ -62,27 +62,24 @@ Object typen
 ###############################################################
 bugs:
 general operator bug:
-[] apply coupling auf eines beschränken oder multiapply auf anpassen
-[] check for "Chidren == None" für flatcut, stimmt nicht mehr durch Order
-
-
-
+*[] apply coupling auf eines beschränken oder multiapply auf anpassen
+****[] apply all fails try triangulate plane
 
 planar stuff 
-[] planar fails partially for stopper puzzle last etrude
-[] exchange Singleconnector to planar
-[+] planar in move up and down fail
-[] ActiveToSettings: zscale to 0 when no stopper, 
-    [] Coupsize scale is applied --> no reproduction by active to setting 
-[] planar gizmos
-
+** [] planar fails partially for stopper puzzle last etrude 
+****[] exchange Singleconnector to planar
+**[] ActiveToSettings: zscale to 0 when no stopper, 
+  *  [] Coupsize scale is applied --> no reproduction by active to setting 
     
 [] line 24 bun error poll before initialie
 
 gizmos
-[] bevel gizmos shape
+*[] bevel gizmos shape
 [+] remove gizmos for flatcut
-[] planar gizmos
+**[] planar gizmos
+[] gizmot poll ohne active nach löschen
+
+
 resolved bug:
 [+] coupsize planar
 [+] bevel bei MF nur oberefläche
@@ -95,6 +92,7 @@ resolved bug:
 [+] move up toggles when its applied to top Coupling
 [+] move down without lower limit
 [+] remove gizmos for flatcut
+[+] planar in move up and down fail
 
 Tests
 [] test linux, Mag

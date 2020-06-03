@@ -444,9 +444,4 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mps.matrix_basis[2][3] += 1
 
 
-"""
-def isnt_order(ob):
-    for ch in ob.children:
-        if "Order" in ch.name:
-            return False
-    return True"""
+

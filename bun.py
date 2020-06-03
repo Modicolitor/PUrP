@@ -582,7 +582,7 @@ def genPlanar():
     mod.use_merge_vertices = True
 
     # Solidify
-    mod = obj.modifiers.new(name="PUrP_Thickness", type="SOLIDIFY")
+    mod = obj.modifiers.new(name="PUrP_Solidify", type="SOLIDIFY")
 
     mod.thickness = Oversize
     mod.offset = -1.0
@@ -642,21 +642,24 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         CouplingModes = bpy.context.scene.PUrP.SingleCouplingModes
         selected = context.selected_objects[:]
 
-        for obj in selected:
-            if PUrP_name in obj.name:
+        for obj in selected:  # für die selektierten
+            if PUrP_name in obj.name:  # eines meiner coupling
 
-                for mod in obj.parent.modifiers:
+                for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
                     if obj.name in mod.name:
                         obj.parent.modifiers.remove(mod)
 
-                for child in obj.children:
+                for child in obj.children:  # lösche alle kinder
                     child.hide_select = False
                     child.select_set(True)
                     obj.select_set(False)
                     bpy.ops.object.delete(use_global=False)
 
                 loc = mathutils.Vector((0, 0, 0))
-                if CouplingModes == "4":  # when planar
+                # when  new object planar types oder das ursprüngliche object planar ist
+                if CouplingModes == "4":
+
+                    print(f"obj.data.name {obj.data.name}")
                     loc = obj.location.copy()
                     trans = obj.matrix_world.copy()
                     oldname = obj.name
@@ -666,11 +669,30 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     obj.select_set(True)
                     # delete the old planar coupling
                     bpy.ops.object.delete(use_global=False)
-                    coupModeDivision(CenterObj, oldname)
+
+                    coupModeDivision(CenterObj, oldname)  # generate new planar
                     context.object.matrix_world = trans
-                    # context.object.location = loc                                                ##planarversion
-                else:
+                    # context.object.location = loc
+                    #  ##planarversion
+                else:  # when it was SingleCoupling, the mainplane is kept
+                    if "Plane" not in obj.data.name:
+                        print(f"2obj.data.name {obj.data.name}")
+                        loc = obj.location.copy()
+                        trans = obj.matrix_world.copy()
+                        oldname = obj.name
+
+                        for ob in context.selected_objects:  # deselte all
+                            ob.select_set(False)
+                        obj.select_set(True)
+                        # delete the old planar coupling
+                        bpy.ops.object.delete(use_global=False)
+
+                        # generate new planar
+                        coupModeDivision(CenterObj, oldname)
+                        context.object.matrix_world = trans
+
                     obj.modifiers["PUrP_Solidify"].thickness = CutThickness
+
                     mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
                     mod.object = obj
@@ -894,8 +916,8 @@ def applyCenterObj(CenterObj):
  '''
 
 
-def centerObjDecider(CenterObj):
-    PUrP = bpy.context.scene.PUrP
+def centerObjDecider(context, CenterObj):
+    PUrP = context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
     Objects = bpy.data.objects
 
@@ -931,8 +953,16 @@ def centerObjDecider(CenterObj):
                         print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
 
+                            # triangulate () Mainplane
+                            context.view_layer.objects.active = Objects[mod]
+                            bpy.ops.object.editmode_toggle()
+                            bpy.ops.mesh.quads_convert_to_tris(
+                                quad_method='BEAUTY', ngon_method='BEAUTY')
+                            bpy.ops.object.editmode_toggle()
+
                             print(
                                 f"Intersect test: Connector {Objects[mod]} and Center obj {Cobj} {bmesh_check_intersect_objects(Objects[mod], Cobj)}")
+
                             if bmesh_check_intersect_objects(Objects[mod], Cobj):
                                 print(
                                     f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
@@ -1057,7 +1087,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                 if CenterBool:
                     #Daughtercollection = []
                     # Daughtercollection.append(obj)
-                    centerObjDecider(obj)
+                    centerObjDecider(context, obj)
 
                     # CenterObjCollector()
 
@@ -1073,7 +1103,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                     #Daughtercollection = []
                     # Daughtercollection.append(obj.parent)
                     # CenterObjCollector()
-                    centerObjDecider(obj.parent)
+                    centerObjDecider(context, obj.parent)
                 else:
                     for child in obj.child:  # gibt es kinder Coupling in diesem Object
                         if PUrP_name in child:
@@ -1083,7 +1113,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                     #Daughtercollection = []
                     # Daughtercollection.append(obj)
                     # CenterObjCollector()
-                    centerObjDecider(obj)
+                    centerObjDecider(context, obj)
                     # applyCenterObj(obj)
 
         # wenn coupling selected, apply für alle
