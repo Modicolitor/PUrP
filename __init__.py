@@ -22,6 +22,7 @@ from .bun import PP_OT_DeleteCoupling
 from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_ExChangeCoup
 from .bun import PP_OT_AddSingleCoupling
+from .bvh_overlap import PP_OT_OverlapcheckOperator
 from bpy.types import Scene, Image, Object
 import bpy
 
@@ -74,6 +75,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
            PP_OT_ApplyAllCouplings,
+           PP_OT_OverlapcheckOperator,
            PUrPropertyGroup
            )
 #classes = ()
