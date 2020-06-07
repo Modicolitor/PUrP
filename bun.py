@@ -7,6 +7,7 @@ from bpy.types import Scene, Image, Object
 import random
 import os
 from .intersect import bmesh_check_intersect_objects
+from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
 
 
@@ -984,17 +985,18 @@ def centerObjDecider(context, CenterObj):
                         print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
 
-                            # triangulate () Mainplane
+                            '''# triangulate () Mainplane
                             context.view_layer.objects.active = Objects[mod]
                             bpy.ops.object.editmode_toggle()
                             bpy.ops.mesh.quads_convert_to_tris(
                                 quad_method='BEAUTY', ngon_method='BEAUTY')
-                            bpy.ops.object.editmode_toggle()
+                            bpy.ops.object.editmode_toggle()'''
 
                             print(
                                 f"Intersect test: Connector {Objects[mod]} and Center obj {Cobj} {bmesh_check_intersect_objects(Objects[mod], Cobj)}")
 
-                            if bmesh_check_intersect_objects(Objects[mod], Cobj):
+                            # bmesh_check_intersect_objects(, Cobj):
+                            if bvhOverlap(context, Objects[mod], Cobj):
                                 print(
                                     f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
                                 applySingleCoup(Objects[mod], Cobj)

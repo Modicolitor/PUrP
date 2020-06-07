@@ -2,27 +2,36 @@ import bpy
 import mathutils
 
 
-def bvhOverlap():
-    context = bpy.context
+def bvhOverlap(context, coup, CenterObj):
 
-    obj = context.object
-    for e in context.selected_objects:
-        if e != obj:
-            obj2 = e
+    couptmpdata = coup.data.copy()
+    # generate copy at origin
+    coup_tmp = bpy.data.objects.new(name="tmp", object_data=couptmpdata)
+    # context.scene.collection.objects.link(coup_tmp)
 
-    # mathutils.bvhtree.BVHTree(bmesh, epsilon=0.0) BVH tree based on BMesh data.
+    # move in edit mode,.... to lazy for bmesh
+    # +++the location of the Centerobj (parent) + the location of the original mainplane
+    for v in coup_tmp.data.vertices:
+        v.co += coup.parent.location
+        v.co += coup.location
+
+    # BVH Tree creation
     depsgraph = context.evaluated_depsgraph_get()
     BVHTree = mathutils.bvhtree.BVHTree
-    BVHTree1 = BVHTree.FromObject(
-        obj, depsgraph, deform=True)
+    BVHTreeCoup = BVHTree.FromObject(
+        coup, depsgraph, deform=True)
 
-    BVHTree2 = BVHTree.FromObject(
-        obj2, depsgraph, deform=True)  # render=False, cage=False, epsilon=0.0
+    BVHTreeCenterObj = BVHTree.FromObject(
+        CenterObj, depsgraph, deform=True)  # render=False, cage=False, epsilon=0.0
 
-    overlaplist = BVHTree1.overlap(BVHTree2)
+    overlaplist = BVHTreeCoup.overlap(BVHTreeCenterObj)
     print("###########################")
-    for num, el in enumerate(overlaplist):
-        print(str(num) + str(el))
+    # remove coup tmp
+    bpy.data.objects.remove(coup_tmp)
 
-
-bvhOverlap()
+    if len(overlaplist) > 0:
+        print("BVH Overlap True")
+        return True
+    else:
+        print("BVH Overlap False")
+        return False
