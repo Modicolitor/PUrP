@@ -6,7 +6,7 @@ from math import radians
 from bpy.types import Scene, Image, Object
 import random
 import os
-from .intersect import bmesh_check_intersect_objects
+#from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
 
@@ -953,18 +953,23 @@ def centerObjDecider(context, CenterObj):
     PUrP_name = PUrP.PUrP_name
     Objects = bpy.data.objects
 
-    CouplingsMods = CenterObj.modifiers[:]
+    CenterMods = CenterObj.modifiers[:]
     ModList = []
-    for PriMod in CouplingsMods:  # look through the modifers of the centerObj and make a list of the Couplings that need to be applied
+    for PriMod in CenterMods:  # look through the modifers of the centerObj and make a list of the Couplings that need to be applied
         if ("PUrP_" in PriMod.name) and ("diff" not in PriMod.name) and ("union" not in PriMod.name):
             primodname = PriMod.name[:]
             print(f"primodname {primodname}")
             ModList.append(primodname)
+        elif "PUrP_Planar" in PriMod.name:
+            primodname = PriMod.name[:]
+            print(f"primodname {primodname}")
+            ModList.append(primodname)
+    #name, ModList = couplingList(CenterObj)
 
     for mod in ModList:
         print(f"centerObjdecider mod name {mod}")
         if PUrP_name in mod:
-            if ("diff" not in mod) and ("union" not in mod):
+            if "PUrP_Planar" in mod or ("diff" not in mod) and ("union" not in mod):
 
                 # potential Cobj list (checking the Object bool),otherwise when I loo through all objects and delete objects during the round, the Objects change adress
                 Cobjlist = []
@@ -980,22 +985,14 @@ def centerObjDecider(context, CenterObj):
                     for ele in Cobj.modifiers:
                         if ("PUrP_" in ele.name) and ("diff" not in ele.name) and ("union" not in ele.name):
                             Cobjmodslist.append(ele)
+                        elif "PUrP_Planar" in ele.name:
+                            print("decider Planar to list")
+                            Cobjmodslist.append(ele)
 
                     for Cmod in Cobjmodslist:  # look through addon own modifier liste and
                         print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
 
-                            '''# triangulate () Mainplane
-                            context.view_layer.objects.active = Objects[mod]
-                            bpy.ops.object.editmode_toggle()
-                            bpy.ops.mesh.quads_convert_to_tris(
-                                quad_method='BEAUTY', ngon_method='BEAUTY')
-                            bpy.ops.object.editmode_toggle()'''
-
-                            print(
-                                f"Intersect test: Connector {Objects[mod]} and Center obj {Cobj} {bmesh_check_intersect_objects(Objects[mod], Cobj)}")
-
-                            # bmesh_check_intersect_objects(, Cobj):
                             if bvhOverlap(context, Objects[mod], Cobj):
                                 print(
                                     f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
@@ -1216,7 +1213,7 @@ def moveModdown(Coup, CenterObj):
 
     # list of coupling names connected to the centerobj
     PUrP_Modsnames = listPUrPMods(CenterObj)
-    CoupList = couplingList(CenterObj)
+    CoupList, mods = couplingList(CenterObj)
 
     #####
     for ele in PUrP_Modsnames:
@@ -1294,14 +1291,17 @@ def listPUrPMods(CenterObj):  # returns list of mod names
 
 def couplingList(CenterObj):
 
-    list = []
+    name = []
+    mods = []
     for mod in CenterObj.modifiers:
         if "PUrP" in mod.name:
             if "diff" not in mod.name and "union" not in mod.name:
-                list.append(mod.name)
+                name.append(mod.name)
+                mods.append(mod)
             elif "PlanarConnector" in mod.name:
-                list.append(mod.name)
-    return list
+                name.append(mod.name)
+                mods.append(mod)
+    return name, mods
 
 
 def modindex(modifier, modifiers):
@@ -1728,7 +1728,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
             # garbage run
             removePUrPOrder()
             # new numbers
-            PUrPlist = couplingList(CenterObj)
+            PUrPlist, mods = couplingList(CenterObj)
             for num, modname in enumerate(PUrPlist):
                 matrixWorld = data.objects[modname].matrix_world
                 bpy.ops.object.text_add(

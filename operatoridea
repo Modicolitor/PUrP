@@ -53,6 +53,9 @@ Object typen
     [+] initial implementation in code, and ui
     [] active to settings needs adjustment
 
+after applying
+[] remove parents relation ships 
+[] generate line of objects (maybe rotatet to the flat parts)
 
 
 
@@ -63,7 +66,10 @@ Object typen
 bugs:
 general operator bug:
 *[] apply coupling auf eines beschränken oder multiapply auf anpassen
-****[] apply all fails try triangulate plane
+[] apply single maybe broken for many couplings, after apply all couplings stay on both, oder? lösche ich vom richtigen
+
+
+
 
 planar stuff 
 ** [] planar fails partially for stopper puzzle last etrude 
@@ -93,6 +99,7 @@ resolved bug:
 [+] move down without lower limit
 [+] remove gizmos for flatcut
 [+] planar in move up and down fail
+****[+] apply all fails
 
 Tests
 [] test linux, Mag
