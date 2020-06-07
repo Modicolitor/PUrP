@@ -1,8 +1,10 @@
+
+
 import bpy
 import mathutils
 
 
-def bvhOverlap(context, coup, CenterObj):
+def bvhOverlap(coup, CenterObj):
 
     couptmpdata = coup.data.copy()
     # generate copy at origin
@@ -12,7 +14,7 @@ def bvhOverlap(context, coup, CenterObj):
     # move in edit mode,.... to lazy for bmesh
     # +++the location of the Centerobj (parent) + the location of the original mainplane
     for v in coup_tmp.data.vertices:
-        #v.co += coup.parent.location
+        # v.co += coup.parent.location  #### moving for parent not necessary because child already in centerobj space
         v.co += coup.location
 
     # BVH Tree creation
@@ -35,3 +37,10 @@ def bvhOverlap(context, coup, CenterObj):
     else:
         print("BVH Overlap False")
         return False
+
+
+context = bpy.context
+coup = context.object
+CenterObj = context.object.parent
+
+bvhOverlap(coup, CenterObj)
