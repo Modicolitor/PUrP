@@ -40,7 +40,7 @@ Object typen
 
 [] Add by tastenkürzel 
 [] Stopper for planar
-[]
+
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 [] single coupling gizmot
     []  bevel options 
@@ -68,7 +68,7 @@ general operator bug:
 *[] apply coupling auf eines beschränken oder multiapply auf anpassen
 [] apply single maybe broken for many couplings, after apply all couplings stay on both, oder? lösche ich vom richtigen
 
-
+[] Exchange doesn't add bool modifier for mainplane
 
 
 planar stuff 

@@ -495,8 +495,6 @@ def genPlanar():
         verts_extrude_b = [ele for ele in geom_extrude_mid
                            if isinstance(ele, bmesh.types.BMVert)]
 
-        # edges_extrude_b = [ele for ele in geom_extrude_mid
-        #            if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
         # translate to stopper height
         bmesh.ops.translate(
             bm,
@@ -553,7 +551,7 @@ def genPlanar():
 
         # bmesh.ops.weld_verts(bm, bm.verts)
 
-        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+        #bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     # Finish up, write the bmesh back to the mesh

@@ -8,6 +8,7 @@
 # You should have received a copy of the GNU General Public License along with Power Sequencer. If
 # not, see <https://www.gnu.org/licenses/>.
 
+from .gizmotshape import PUrP_CustomShapeWidget
 from .ui import PP_PT_PuzzlePrintMenu
 from .properties import PUrPropertyGroup
 from .bun import PP_OT_ApplyAllCouplings
@@ -74,6 +75,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_zScaleGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
+           PUrP_CustomShapeWidget,
            PP_OT_ApplyAllCouplings,
            PP_OT_OverlapcheckOperator,
            PUrPropertyGroup

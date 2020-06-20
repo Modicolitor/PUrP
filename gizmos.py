@@ -1,4 +1,5 @@
 import bpy
+from .gizmotshape import PUrP_CustomShapeWidget
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -349,10 +350,10 @@ class PUrP_OversizeGizmo(GizmoGroup):
 
         mpr.line_width = 3
 
-        mpr.color = 0.8, 0.2, 0.8
+        mpr.color = 0.05, 0.2, 0.8
         mpr.alpha = 0.5
 
-        mpr.color_highlight = 1.0, 0.5, 1.0
+        mpr.color_highlight = 0.03, 0.05, 1.0
         mpr.alpha_highlight = 1.0
 
         self.roll_widget = mpr
@@ -371,7 +372,7 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpa.color = 0.2, 0.2, 0.8
         mpa.alpha = 0.5
 
-        mpa.color_highlight = 0.3, 0.5, 1.0
+        mpa.color_highlight = 0.2, 0.03, 0.9
         mpa.alpha_highlight = 1.0
         mpa.scale_basis = 2
         self.roll_widge = mpa
@@ -383,48 +384,55 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mph.matrix_basis = ob.matrix_world.normalized()
         mph.draw_style = 'BOX'
 
-        mph.color = 1.0, 0.5, 0.0
+        mph.color = 1.0, 0.03, 0.03
         mph.alpha = 0.5
-        mph.color_highlight = 1.0, 0.5, 1.0
+        mph.color_highlight = 1.0, 0.03, 0.04
         mph.alpha_highlight = 0.5
         self.roll_widg = mph
 
         # Bevel offset gizmot
-        mpo = self.gizmos.new("GIZMO_GT_dial_3d")
+        mpo = self.gizmos.new(PUrP_CustomShapeWidget.bl_idname)
+        #mpo = self.gizmos.new("GIZMO_GT_dial_3d")
         mpo.target_set_operator("purp.bevoffset")
 
         mpo.matrix_basis = ob.matrix_world.normalized()
-        mpo.matrix_basis[2][3] += 1
-        mpo.line_width = 3
+        mpo.matrix_offset.col[3][0] += 0.5  # [3] - location, 0 -x
+        #mpo.matrix_basis[2][3] += 8
+        #mpo.matrix_basis[0][3] += 3
+        mpo.line_width = 10
 
-        mpo.color = 0.2, 0.2, 0.8
+        mpo.color = 0.05, 0.9, 0.05
         mpo.alpha = 0.5
 
-        mpo.color_highlight = 0.0, 0.5, 0.3
+        mpo.color_highlight = 0.03, 1.0, 0.03
         mpo.alpha_highlight = 1.0
-        mpo.scale_basis = 2
+        mpo.scale_basis = 0.5
 
         mpo.use_draw_value
 
         self.roll_wid = mpo
 
         # Bevel segments gizmot
-        mps = self.gizmos.new("GIZMO_GT_dial_3d")
+        mps = self.gizmos.new(PUrP_CustomShapeWidget.bl_idname)
+        #mps = self.gizmos.new("GIZMO_GT_dial_3d")
         mps.target_set_operator("purp.bevseggiz")
 
         mps.matrix_basis = ob.matrix_world.normalized()
-        mps.matrix_basis[2][3] += 1
-        mps.line_width = 3
+        mps.matrix_offset.col[3][0] += 0.2
+        mps.matrix_offset.col[3][2] -= 0.5
+        #mps.matrix_basis[2][3] += 0.8
+        #mps.matrix_basis[0][3] += 0.5
+        mps.line_width = 10
 
-        mps.color = 0.2, 0.2, 0.8
+        mps.color = 0.03, 0.8, 0.03
         mps.alpha = 0.5
 
-        mps.color_highlight = 0.0, 0.5, 0.3
+        mps.color_highlight = 0.01, 1.0, 0.01
         mps.alpha_highlight = 1.0
-        mps.scale_basis = 1
+        mps.scale_basis = 0.2
         mps.use_draw_value
 
-        self.roll_wi = mps
+        self.bevseggizm = mps
 
     def refresh(self, context):
         ob = context.object
@@ -433,7 +441,7 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpa = self.roll_widge
         mph = self.roll_widg
         mpo = self.roll_wid
-        mps = self.roll_wi
+        mps = self.bevseggizm
 
         mpa.matrix_basis = ob.matrix_world.normalized()
         mph.matrix_basis = ob.matrix_world.normalized()
