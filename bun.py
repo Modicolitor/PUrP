@@ -551,7 +551,7 @@ def genPlanar():
 
         # bmesh.ops.weld_verts(bm, bm.verts)
 
-        #bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     # Finish up, write the bmesh back to the mesh
@@ -585,7 +585,10 @@ def genPlanar():
 
     mod.thickness = Oversize
     mod.offset = -1.0
-    mod.use_even_offset = False
+    mod.solidify_mode = "NON_MANIFOLD"
+    mod.nonmanifold_thickness_mode = 'FIXED'
+
+    mod.use_even_offset = True
     mod.use_rim = True
 
     # boolean _diff at parent object
