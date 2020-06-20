@@ -641,11 +641,12 @@ def newmainPlane(context, CenterObj):
     context.object.parent = CenterObj
 
     # set boolean for the slice plane
+    '''
     mod = data.objects[CenterObj.name].modifiers.new(
         name=context.object.name, type="BOOLEAN")
     mod.object = data.objects[newname_mainplane]
     mod.operation = 'DIFFERENCE'
-    return newname_mainplane
+    return newname_mainplane'''
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
@@ -724,13 +725,13 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                             context, data.objects[parentname])
                         obj = context.object
 
-                    obj.modifiers["PUrP_Solidify"].thickness = CutThickness
+                    #obj.modifiers["PUrP_Solidify"].thickness = CutThickness
 
-                    '''mod = CenterObj.modifiers.new(
+                    mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
                     mod.object = obj
                     mod.operation = 'DIFFERENCE'
-                    obj.scale = mathutils.Vector((1, 1, 1))'''
+                    #obj.scale = mathutils.Vector((1, 1, 1))
                     coupModeDivision(CenterObj, obj.name)
                     #print(f"obj at rescale {obj}")
                     obj.scale.x = GlobalScale
@@ -1582,14 +1583,13 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
 
-            PUrP.Oversize = obj.modifiers["PUrP_Thickness"].thickness
+            PUrP.Oversize = obj.modifiers["PUrP_Solidify"].thickness
             PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].relative_offset_displace[1]
             PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
             # double checl
-            PUrP.OffsetRight = obj.data.vertices[0].co.x - 0.375
-            PUrP.OffsetLeft = - \
-                obj.data.vertices[1].co.x - 0.375  # double checl
+            PUrP.OffsetRight = obj.data.vertices[0].co.x*4 - 1.5
+            PUrP.OffsetLeft = - obj.data.vertices[1].co.x*4 - 1.5
 
             #
 
@@ -1610,7 +1610,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             if len(lowestlist) == 4:  # with 4 verts its a stopper
                 PUrP.StopperBool = True
 
-            # for stopper height such den kürzesten abstand bei gleichen
+            # for stopper height such den kürzesten abstand bei gleichen x
             smallestdistance = 50
             distance = []
             for vert in obj.data.vertices:
@@ -1624,8 +1624,11 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.StopperHeight = distance[0]
 
             # zscale top vert at co.z = 0
+            if PUrP.StopperBool == True:
+                PUrP.zScale = -lowestexample.co.z - distance[0]
+            else:
+                PUrP.zScale = distance[0]
 
-            PUrP.zScale = - lowestexample.co.z - distance[0]
         return {'FINISHED'}
 
     def coneanalysizer(self, context, obj):

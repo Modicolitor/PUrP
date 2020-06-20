@@ -7,8 +7,6 @@
 
 [] preview  
 
-[] Active Coupling to default
-
 special menu for active Coupling 
 
 
@@ -39,11 +37,10 @@ Object typen
 #################feature ideen 
 
 [] Add by tastenkürzel 
-[] Stopper for planar
+
 
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
-[] single coupling gizmot
-    []  bevel options 
+
     
 [] planar gizmot
     [] Coupsize --> scale all (z is definition problem)
@@ -63,30 +60,34 @@ after applying
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
 ###############################################################
+
 bugs:
 general operator bug:
 *[] apply coupling auf eines beschränken oder multiapply auf anpassen
 [] apply single maybe broken for many couplings, after apply all couplings stay on both, oder? lösche ich vom richtigen
 
-[] Exchange doesn't add bool modifier for mainplane
-
-
 planar stuff 
 
-****[] exchange Singleconnector to planar
-**[] ActiveToSettings: zscale to 0 when no stopper, 
-  *  [] Coupsize scale is applied --> no reproduction by active to setting 
-    
-[] line 24 bun error poll before initialie
+???*[] Coupsize scale is applied --> no reproduction by active to setting ????
 
 gizmos
-*[] bevel gizmos shape
-[+] remove gizmos for flatcut
+
 **[] planar gizmos
 [] gizmot poll ohne active nach löschen
 
 
+
+
+
 resolved bug:
+****[+] exchange Singleconnector to planar
+**[+] ActiveToSettings: zscale to 0 when no stopper, 
+
+[+] line 24 bun error poll before initialie
+[+] Stopper for planar
+*[+] bevel gizmos shape
+[+] remove gizmos for flatcut
+[+] Exchange doesn't add bool modifier for mainplane
 ** [+] planar fails partially for stopper puzzle last etrude 
 [+] coupsize planar
 [+] bevel bei MF nur oberefläche
@@ -101,6 +102,8 @@ resolved bug:
 [+] remove gizmos for flatcut
 [+] planar in move up and down fail
 ****[+] apply all fails
+[+] single coupling gizmot
+    [+]  bevel options 
 
 Tests
 [] test linux, Mag
