@@ -9,6 +9,7 @@
 # not, see <https://www.gnu.org/licenses/>.
 
 from .gizmotshape import PUrP_CustomShapeWidget
+from .gizmotshape import PUrP_ArrowShapeWidget
 from .ui import PP_PT_PuzzlePrintMenu
 from .properties import PUrPropertyGroup
 from .bun import PP_OT_ApplyAllCouplings
@@ -45,7 +46,8 @@ bl_info = {  # für export als addon
 
 
 #from .ui import PP_PT_PuzzlePrintActive
-from.gizmos import PUrP_OversizeGizmo
+from.gizmos import PUrP_SinglCoupGizmo
+from.gizmos import PUrP_PlanarGizmo
 from.gizmos import PP_OT_CouplSizeGizmo
 from.gizmos import PP_OT_zScaleGizmo
 from.gizmos import PP_OT_BevelOffsetGizmo
@@ -70,12 +72,14 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_ActiveCoupDefaultOperator,
            PP_OT_CouplingOrder,
            PP_OT_OversizeGizmo,
-           PUrP_OversizeGizmo,
+           PUrP_SinglCoupGizmo,
+           PUrP_PlanarGizmo,
            PP_OT_CouplSizeGizmo,
            PP_OT_zScaleGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
            PUrP_CustomShapeWidget,
+           PUrP_ArrowShapeWidget,
            PP_OT_ApplyAllCouplings,
            PP_OT_OverlapcheckOperator,
            PUrPropertyGroup

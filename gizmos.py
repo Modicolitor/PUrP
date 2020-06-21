@@ -1,5 +1,6 @@
 import bpy
 from .gizmotshape import PUrP_CustomShapeWidget
+from .gizmotshape import PUrP_ArrowShapeWidget
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -315,7 +316,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-class PUrP_OversizeGizmo(GizmoGroup):
+class PUrP_SinglCoupGizmo(GizmoGroup):
     bl_idname = "OBJECT_GGT_test_camera"
     bl_label = "Object Camera Test Widget"
     bl_space_type = 'VIEW_3D'
@@ -451,3 +452,71 @@ class PUrP_OversizeGizmo(GizmoGroup):
         mpo.matrix_basis[2][3] += 1
         mps.matrix_basis = ob.matrix_world.normalized()
         mps.matrix_basis[2][3] += 1
+
+
+# planar connector gizmos
+
+def has_stopper(obj):
+    lowestvert = 0
+    for vert in obj.data.vertices:  # find lowest z coordinate
+        if vert.co.z <= lowestvert:
+            lowestvert = vert.co.z
+
+    lowestlist = []
+    lowestexample = obj.data.vertices[0]
+    for vert in obj.data.vertices:  # collect all verts with lowest co.z values
+        if vert.co.z == lowestvert:
+            lowestlist.append(vert.co.z)
+            lowestexample = vert  # example for stopperheight evaluation
+
+    #PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        return True
+    return False
+
+
+class PUrP_PlanarGizmo(GizmoGroup):
+    bl_idname = "OBJECT_GGT_PLANARCONNECTOR"
+    bl_label = "Object Camera Test Widget"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'WINDOW'
+    bl_options = {'3D', 'PERSISTENT'}
+
+    @classmethod
+    def poll(cls, context):
+        ob = context.object
+        if ob != None:
+            if ("PUrP" in ob.name) and ("Planar" in ob.name):
+                return True
+            return False
+
+    def setup(self, context):
+        # Run an operator using the dial gizmo
+        ob = context.object
+
+        #matrixWorld = context.object[:]
+        print(f"has stopper {has_stopper(ob)}")
+        self.hasStopper = has_stopper(ob)
+        # if has_stopper(ob):
+        mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        props = mpz.target_set_operator("object.oversize")
+        #props.constraint_axis = True, True, True
+        #props.orient_type = 'LOCAL'
+        #props.release_confirm = True
+        print(
+            f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+        mpz.matrix_basis = ob.matrix_world.normalized()
+        mpz.matrix_basis[2][3] += 1
+        mpz.matrix_basis[2][1] += 2
+        mpz.line_width = 3
+        mpz.color = 0.05, 0.2, 0.8
+        mpz.alpha = 0.5
+        mpz.color_highlight = 0.03, 0.05, 1.0
+        mpz.alpha_highlight = 1.0
+
+        self.zScale_widget = mpz
+
+    def refresh(self, context):
+        ob = context.object
+        # if has_stopper(ob):
+        mpz = self.zScale_widget
