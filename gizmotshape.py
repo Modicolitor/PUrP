@@ -31,7 +31,7 @@ v15 = Vector((0.0, 0.5, -0.0))
 
 
 # Coordinates (each one is a triangle).
-custom_shape_verts = (
+corner_shape_verts = (
     v0, v1, v13,
     v0, v1, v7,
     v0, v7, v6,
@@ -66,8 +66,8 @@ custom_shape_verts = (
 )
 
 
-class PUrP_CustomShapeWidget(Gizmo):
-    bl_idname = "VIEW3D_GT_PURP"
+class PUrP_CornerShapeWidget(Gizmo):
+    bl_idname = "VIEW3D_GT_PURPCORNERSHAPE"
     bl_target_properties = (
         {"id": "scale", "type": 'FLOAT', "array_length": 1},
     )
@@ -97,7 +97,7 @@ class PUrP_CustomShapeWidget(Gizmo):
     def setup(self):
         if not hasattr(self, "custom_shape"):
             self.custom_shape = self.new_custom_shape(
-                'TRIS', custom_shape_verts)
+                'TRIS', corner_shape_verts)
 
     def invoke(self, context, event):
         self.init_mouse_y = event.mouse_y

@@ -1,11 +1,12 @@
 import bpy
-from .gizmotshape import PUrP_CustomShapeWidget
+from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
 from bpy.types import (
     Operator,
     GizmoGroup,
 )
 import mathutils
+from math import radians
 
 
 class PP_OT_OversizeGizmo(bpy.types.Operator):
@@ -392,7 +393,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         self.roll_widg = mph
 
         # Bevel offset gizmot
-        mpo = self.gizmos.new(PUrP_CustomShapeWidget.bl_idname)
+        mpo = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
         #mpo = self.gizmos.new("GIZMO_GT_dial_3d")
         mpo.target_set_operator("purp.bevoffset")
 
@@ -414,7 +415,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         self.roll_wid = mpo
 
         # Bevel segments gizmot
-        mps = self.gizmos.new(PUrP_CustomShapeWidget.bl_idname)
+        mps = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
         #mps = self.gizmos.new("GIZMO_GT_dial_3d")
         mps.target_set_operator("purp.bevseggiz")
 
@@ -506,8 +507,13 @@ class PUrP_PlanarGizmo(GizmoGroup):
         print(
             f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpz.matrix_basis = ob.matrix_world.normalized()
-        mpz.matrix_basis[2][3] += 1
-        mpz.matrix_basis[2][1] += 2
+
+        mat_rot = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot
+        mpz.matrix_basis = mat
+        mpz.matrix_basis[2][3] += 0.4
+
         mpz.line_width = 3
         mpz.color = 0.05, 0.2, 0.8
         mpz.alpha = 0.5
