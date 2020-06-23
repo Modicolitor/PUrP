@@ -8,6 +8,13 @@
 # You should have received a copy of the GNU General Public License along with Power Sequencer. If
 # not, see <https://www.gnu.org/licenses/>.
 
+from .gizmos import PP_OT_PlanarRoffsetGizmo
+from .gizmos import PP_OT_BevelSegmentGizmo
+from .gizmos import PP_OT_BevelOffsetGizmo
+from .gizmos import PP_OT_zScaleGizmo
+from .gizmos import PP_OT_CouplSizeGizmo
+from .gizmos import PUrP_PlanarGizmo
+from .gizmos import PUrP_SinglCoupGizmo
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
 from .ui import PP_PT_PuzzlePrintMenu
@@ -46,12 +53,6 @@ bl_info = {  # für export als addon
 
 
 #from .ui import PP_PT_PuzzlePrintActive
-from.gizmos import PUrP_SinglCoupGizmo
-from.gizmos import PUrP_PlanarGizmo
-from.gizmos import PP_OT_CouplSizeGizmo
-from.gizmos import PP_OT_zScaleGizmo
-from.gizmos import PP_OT_BevelOffsetGizmo
-from.gizmos import PP_OT_BevelSegmentGizmo
 #from.gizmos import PUrP_CouplSizeGizmo
 
 
@@ -78,6 +79,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_zScaleGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
+           PP_OT_PlanarRoffsetGizmo,
            PUrP_CornerShapeWidget,
            PUrP_ArrowShapeWidget,
            PP_OT_ApplyAllCouplings,

@@ -500,7 +500,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         self.hasStopper = has_stopper(ob)
         # if has_stopper(ob):
         mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
-        props = mpz.target_set_operator("object.oversize")
+        props = mpz.target_set_operator("purp.planarzscale")
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
@@ -526,3 +526,66 @@ class PUrP_PlanarGizmo(GizmoGroup):
         ob = context.object
         # if has_stopper(ob):
         mpz = self.zScale_widget
+
+
+class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.planarzscale"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+
+        children = context.object.children
+        children[1].modifiers[0].width = self.value
+        children[0].modifiers[0].width = self.value
+        context.scene.PUrP.BevelOffset = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.init_position + self.delta / 1000
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for v in self.rightestV:
+                v.co.x = self.init_position
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        children = context.object.children
+        #
+        rightestx = 0
+        for v in ob.data.vertices:
+            if v.co.x > rightestx:
+                rightestx = v.co.x
+        ###rightestx is now
+        self.rightestV = []
+        for v in ob.data.vertices:
+            if rightestx == v.co.x:
+                self.rightestV.append(v)
+        self.init_position = rightestx
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = children[0].modifiers[0].width
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
