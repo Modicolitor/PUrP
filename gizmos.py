@@ -496,11 +496,11 @@ class PUrP_PlanarGizmo(GizmoGroup):
         ob = context.object
 
         #matrixWorld = context.object[:]
-        print(f"has stopper {has_stopper(ob)}")
-        self.hasStopper = has_stopper(ob)
+        #print(f"has stopper {has_stopper(ob)}")
+        #self.hasStopper = has_stopper(ob)
         # if has_stopper(ob):
         mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
-        props = mpz.target_set_operator("purp.planarzscale")
+        props = mpz.target_set_operator("purp.roffsetgiz")
         #props.constraint_axis = True, True, True
         #props.orient_type = 'LOCAL'
         #props.release_confirm = True
@@ -508,29 +508,80 @@ class PUrP_PlanarGizmo(GizmoGroup):
             f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpz.matrix_basis = ob.matrix_world.normalized()
 
-        mat_rot = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+
+        mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot
         mpz.matrix_basis = mat
-        mpz.matrix_basis[2][3] += 0.4
+        mpz.matrix_basis[0][3] += 0.4
 
+        mpz.scale_basis = 0.5
         mpz.line_width = 3
         mpz.color = 0.05, 0.2, 0.8
         mpz.alpha = 0.5
         mpz.color_highlight = 0.03, 0.05, 1.0
         mpz.alpha_highlight = 1.0
 
-        self.zScale_widget = mpz
+        self.Roffset = mpz
+
+        # left offset
+        mpl = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        props = mpz.target_set_operator("purp.loffsetgiz")
+        #props.constraint_axis = True, True, True
+        #props.orient_type = 'LOCAL'
+        #props.release_confirm = True
+
+        mpl.matrix_basis = ob.matrix_world.normalized()
+
+        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+
+        mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot
+        mpl.matrix_basis = mat
+        mpl.matrix_basis[0][3] += 0.4
+
+        mpl.scale_basis = 0.5
+        mpl.line_width = 3
+        mpl.color = 0.05, 0.2, 0.8
+        mpl.alpha = 0.5
+        mpl.color_highlight = 0.03, 0.05, 1.0
+        mpl.alpha_highlight = 1.0
+
+        self.Loffset = mpl
 
     def refresh(self, context):
         ob = context.object
         # if has_stopper(ob):
-        mpz = self.zScale_widget
+        mpz = self.Roffset
+
+        mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+
+        mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot
+        mpz.matrix_basis = mat
+        mpz.matrix_basis[0][3] += 0.4
+
+        mpl = self.Loffset
+
+        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+
+        mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot
+        mpl.matrix_basis = mat
+        mpl.matrix_basis[0][3] -= 0.4
 
 
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
     '''Change the beveloffset of the coupling'''
-    bl_idname = "purp.planarzscale"
+    bl_idname = "purp.roffsetgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
@@ -542,18 +593,17 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        for v in self.rightestV:
+            v.co.x = self.value
 
-        children = context.object.children
-        children[1].modifiers[0].width = self.value
-        children[0].modifiers[0].width = self.value
-        context.scene.PUrP.BevelOffset = self.value
+        context.scene.PUrP.OffsetRight = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
 
         if event.type == 'MOUSEMOVE':  # Apply
 
-            self.delta = event.mouse_y - self.init_value
+            self.delta = event.mouse_x - self.init_value
             self.value = self.init_position + self.delta / 1000
 
             self.execute(context)
@@ -568,7 +618,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-        children = context.object.children
+        ob = context.object
         #
         rightestx = 0
         for v in ob.data.vertices:
@@ -580,10 +630,72 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
             if rightestx == v.co.x:
                 self.rightestV.append(v)
         self.init_position = rightestx
-        self.init_value = event.mouse_y
+        self.init_value = event.mouse_x
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = children[0].modifiers[0].width
+        self.value = rightestx  # ???
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.loffsetgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        for v in self.leftestV:
+            v.co.x = self.value
+
+        context.scene.PUrP.OffsetLeft = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_x - self.init_value
+            self.value = self.init_position + self.delta / 1000
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for v in self.leftestV:
+                v.co.x = self.init_position
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+        #
+        leftestx = 0
+        for v in ob.data.vertices:
+            if v.co.x < leftestx:
+                leftestx = v.co.x
+        ###rightestx is now
+        self.leftestV = []
+        for v in ob.data.vertices:
+            if leftestx == v.co.x:
+                self.leftestV.append(v)
+        self.init_position = leftestx
+        self.init_value = event.mouse_x
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = leftestx  # ???
 
         self.execute(context)
 

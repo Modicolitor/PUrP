@@ -11,7 +11,8 @@
 from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_BevelSegmentGizmo
 from .gizmos import PP_OT_BevelOffsetGizmo
-from .gizmos import PP_OT_zScaleGizmo
+#from .gizmos import PP_OT_PlanarRoffsetGizmo
+from .gizmos import PP_OT_PlanarLoffsetGizmo
 from .gizmos import PP_OT_CouplSizeGizmo
 from .gizmos import PUrP_PlanarGizmo
 from .gizmos import PUrP_SinglCoupGizmo
@@ -76,10 +77,10 @@ classes = (PP_PT_PuzzlePrintMenu,
            PUrP_SinglCoupGizmo,
            PUrP_PlanarGizmo,
            PP_OT_CouplSizeGizmo,
-           PP_OT_zScaleGizmo,
+           PP_OT_PlanarRoffsetGizmo,
+           PP_OT_PlanarLoffsetGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
-           PP_OT_PlanarRoffsetGizmo,
            PUrP_CornerShapeWidget,
            PUrP_ArrowShapeWidget,
            PP_OT_ApplyAllCouplings,
