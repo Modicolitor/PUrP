@@ -20,6 +20,9 @@ from .gizmos import PUrP_PlanarGizmo
 from .gizmos import PUrP_SinglCoupGizmo
 from .gizmos import PP_OT_OversizeGizmo
 from .gizmos import PP_OT_PlanarLineCountGizmo
+from .gizmos import PP_OT_PlanarLineLengthGizmo
+from .gizmos import PP_OT_PlanarLineDistanceGizmo
+
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
 from .gizmotshape import PUrP_linecountShapeWidget
@@ -92,6 +95,8 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_PlanarStopperHeightGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
+           PP_OT_PlanarLineLengthGizmo,
+           PP_OT_PlanarLineDistanceGizmo,
            PUrP_CornerShapeWidget,
            PUrP_ArrowShapeWidget,
            PUrP_linecountShapeWidget,

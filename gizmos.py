@@ -646,7 +646,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mplength = self.gizmos.new(PUrP_LineLengthShapeWidget.bl_idname)
         # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
-        props = mplength.target_set_operator("purp.planzscalegiz")
+        props = mplength.target_set_operator("purp.linelengthgiz")
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
@@ -678,7 +678,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpdistance = self.gizmos.new(PUrP_LineDistanceShapeWidget.bl_idname)
         # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
-        props = mpdistance.target_set_operator("purp.planzscalegiz")
+        props = mpdistance.target_set_operator("purp.linedistancegiz")
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
@@ -1127,10 +1127,9 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-'''
 class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
     '''Change the Zscale of the coupling'''
-    bl_idname = "purp.linecountgiz"
+    bl_idname = "purp.linelengthgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
@@ -1143,9 +1142,9 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        ob.modifiers["PUrP_Array_2"].count = int(self.value)
+        ob.modifiers["PUrP_Array_1"].count = int(self.value)
 
-        context.scene.PUrP.LineCount = int(self.value)
+        context.scene.PUrP.LineLength = int(self.value)
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -1160,7 +1159,7 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            ob.modifiers["PUrP_Array_2"].count = self.init_count
+            ob.modifiers["PUrP_Array_1"].count = self.init_count
 
             return {'CANCELLED'}
 
@@ -1172,9 +1171,64 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
         self.init_value = event.mouse_y
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = ob.modifiers["PUrP_Array_2"].count
+        self.value = ob.modifiers["PUrP_Array_1"].count
 
-        self.init_count = ob.modifiers["PUrP_Array_2"].count
+        self.init_count = ob.modifiers["PUrP_Array_1"].count
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
+    '''Change the Zscale of the coupling'''
+    bl_idname = "purp.linedistancegiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        ob = context.object
+
+        ob.modifiers["PUrP_Array_2"].relative_offset_displace[1] = self.value
+
+        context.scene.PUrP.LineDistance = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.value + self.delta / 1000
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.modifiers["PUrP_Array_2"].relative_offset_displace[1] = self.init_count
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+
+        self.init_count = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
 
         self.execute(context)
 
