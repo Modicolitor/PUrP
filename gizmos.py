@@ -1,6 +1,10 @@
 import bpy
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
+from .gizmotshape import PUrP_linecountShapeWidget
+from .gizmotshape import PUrP_LineLengthShapeWidget
+from .gizmotshape import PUrP_LineDistanceShapeWidget
+
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -43,7 +47,7 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             self.valuey = self.init_scale_y + self.delta/1000
             self.valuez = self.init_scale_z + self.delta/1000
 
-            #print(f"MouspositionX: {self.value}")
+            # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
@@ -117,7 +121,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             self.valuey0 = self.init_scale_y0 + self.delta/1000
             self.valuez0 = self.init_scale_z0 + self.delta/1000
 
-            #print(f"MouspositionX: {self.value}")
+            # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
@@ -185,7 +189,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
             self.value = self.init_scale_z + self.delta / \
                 1000  # - self.window_width/2 #(HD Screen 800)
-            #print(f"MouspositionX: {self.value}")
+            # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
@@ -332,7 +336,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
                 if len(ob.children) > 1:  # flatcut has zero or
                     # 1 (order) child... excluded from gizmos
                     # if len(ob.children) != 1 and isnt_order(ob):
-                    #print(f"isnt {isnt_order(ob)}")
+                    # print(f"isnt {isnt_order(ob)}")
                     return True
             return False
 
@@ -340,12 +344,12 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # Run an operator using the dial gizmo
         ob = context.object
 
-        #matrixWorld = context.object[:]
+        # matrixWorld = context.object[:]
         mpr = self.gizmos.new("GIZMO_GT_dial_3d")
         props = mpr.target_set_operator("object.oversize")
-        #props.constraint_axis = True, True, True
-        #props.orient_type = 'LOCAL'
-        #props.release_confirm = True
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
         print(
             f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpr.matrix_basis = ob.matrix_world.normalized()
@@ -363,9 +367,9 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # couple size gizmot
         mpa = self.gizmos.new("GIZMO_GT_dial_3d")
         props = mpa.target_set_operator("object.couplesize")
-        #props.constraint_axis = True, True, True
-        #props.orient_type = 'LOCAL'
-        #props.release_confirm = True
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
         print(
             f"Size matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpa.matrix_basis = ob.matrix_world.normalized()
@@ -394,13 +398,13 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         # Bevel offset gizmot
         mpo = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
-        #mpo = self.gizmos.new("GIZMO_GT_dial_3d")
+        # mpo = self.gizmos.new("GIZMO_GT_dial_3d")
         mpo.target_set_operator("purp.bevoffset")
 
         mpo.matrix_basis = ob.matrix_world.normalized()
         mpo.matrix_offset.col[3][0] += 0.5  # [3] - location, 0 -x
-        #mpo.matrix_basis[2][3] += 8
-        #mpo.matrix_basis[0][3] += 3
+        # mpo.matrix_basis[2][3] += 8
+        # mpo.matrix_basis[0][3] += 3
         mpo.line_width = 10
 
         mpo.color = 0.05, 0.9, 0.05
@@ -416,14 +420,14 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         # Bevel segments gizmot
         mps = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
-        #mps = self.gizmos.new("GIZMO_GT_dial_3d")
+        # mps = self.gizmos.new("GIZMO_GT_dial_3d")
         mps.target_set_operator("purp.bevseggiz")
 
         mps.matrix_basis = ob.matrix_world.normalized()
         mps.matrix_offset.col[3][0] += 0.2
         mps.matrix_offset.col[3][2] -= 0.5
-        #mps.matrix_basis[2][3] += 0.8
-        #mps.matrix_basis[0][3] += 0.5
+        # mps.matrix_basis[2][3] += 0.8
+        # mps.matrix_basis[0][3] += 0.5
         mps.line_width = 10
 
         mps.color = 0.03, 0.8, 0.03
@@ -470,7 +474,7 @@ def has_stopper(obj):
             lowestlist.append(vert.co.z)
             lowestexample = vert  # example for stopperheight evaluation
 
-    #PUrP.StopperBool = False
+    # PUrP.StopperBool = False
     if len(lowestlist) == 4:  # with 4 verts its a stopper
         return True
     return False
@@ -495,18 +499,12 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # Run an operator using the dial gizmo
         ob = context.object
 
-        #matrixWorld = context.object[:]
-        #print(f"has stopper {has_stopper(ob)}")
-        #self.hasStopper = has_stopper(ob)
-        # if has_stopper(ob):
-        mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
-        props = mpz.target_set_operator("purp.roffsetgiz")
-        #props.constraint_axis = True, True, True
-        #props.orient_type = 'LOCAL'
-        #props.release_confirm = True
+        mpr = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        props = mpr.target_set_operator("purp.roffsetgiz")
+
         print(
             f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
-        mpz.matrix_basis = ob.matrix_world.normalized()
+        mpr.matrix_basis = ob.matrix_world.normalized()
 
         mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
         mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
@@ -514,24 +512,24 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot
-        mpz.matrix_basis = mat
-        mpz.matrix_basis[0][3] += 0.4
+        mpr.matrix_basis = mat
+        mpr.matrix_basis[0][3] += 0.4
 
-        mpz.scale_basis = 0.5
-        mpz.line_width = 3
-        mpz.color = 0.05, 0.2, 0.8
-        mpz.alpha = 0.5
-        mpz.color_highlight = 0.03, 0.05, 1.0
-        mpz.alpha_highlight = 1.0
+        mpr.scale_basis = 0.5
+        mpr.line_width = 3
+        mpr.color = 0.05, 0.2, 0.8
+        mpr.alpha = 0.5
+        mpr.color_highlight = 0.03, 0.05, 1.0
+        mpr.alpha_highlight = 1.0
 
-        self.Roffset = mpz
+        self.Roffset = mpr
 
         # left offset
         mpl = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
-        props = mpz.target_set_operator("purp.loffsetgiz")
-        #props.constraint_axis = True, True, True
-        #props.orient_type = 'LOCAL'
-        #props.release_confirm = True
+        props = mpl.target_set_operator("purp.loffsetgiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
 
         mpl.matrix_basis = ob.matrix_world.normalized()
 
@@ -553,10 +551,165 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         self.Loffset = mpl
 
+        # zscale
+        mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        props = mpz.target_set_operator("purp.planzscalegiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
+
+        mpz.matrix_basis = ob.matrix_world.normalized()
+
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpz.matrix_basis = mat
+        mpz.matrix_basis[0][3] += 0.4
+
+        mpz.scale_basis = 0.5
+        mpz.line_width = 3
+        mpz.color = 0.05, 0.2, 0.8
+        mpz.alpha = 0.5
+        mpz.color_highlight = 0.03, 0.05, 1.0
+        mpz.alpha_highlight = 1.0
+
+        self.zScale = mpz
+
+        # stopper scale
+
+        # if has_stopper():
+        mps = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        props = mps.target_set_operator("purp.stopperheightgiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
+
+        mps.matrix_basis = ob.matrix_world.normalized()
+
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(
+            radians(-90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mps.matrix_basis = mat
+        mps.matrix_basis[2][3] -= 0.4
+
+        mps.scale_basis = 0.5
+        mps.line_width = 3
+        mps.color = 0.05, 0.2, 0.8
+        mps.alpha = 0.5
+        mps.color_highlight = 0.03, 0.05, 1.0
+        mps.alpha_highlight = 1.0
+
+        self.stopper = mps
+
+        # lineCount
+
+        mpcount = self.gizmos.new(PUrP_linecountShapeWidget.bl_idname)
+        # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
+        props = mpcount.target_set_operator("purp.linecountgiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
+
+        mpcount.matrix_basis = ob.matrix_world.normalized()
+
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpcount.matrix_basis = mat
+        mpcount.matrix_basis[2][3] += 0.4
+        mpcount.matrix_basis[0][3] += 0.4
+        mpcount.matrix_basis[1][3] += 0.4
+
+        mpcount.scale_basis = 0.5
+        mpcount.line_width = 3
+        mpcount.color = 0.05, 0.2, 0.8
+        mpcount.alpha = 0.5
+        mpcount.color_highlight = 0.03, 0.05, 1.0
+        mpcount.alpha_highlight = 1.0
+
+        self.linecount = mpcount
+
+        # linelength
+
+        mplength = self.gizmos.new(PUrP_LineLengthShapeWidget.bl_idname)
+        # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
+        props = mplength.target_set_operator("purp.planzscalegiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
+
+        mplength.matrix_basis = ob.matrix_world.normalized()
+
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mplength.matrix_basis = mat
+        mplength.matrix_basis[2][3] += 0.4
+        mplength.matrix_basis[1][3] += 0.4
+        mplength.matrix_basis[2][3] -= 0.4
+
+        mplength.scale_basis = 0.5
+        mplength.line_width = 3
+        mplength.color = 0.05, 0.2, 0.8
+        mplength.alpha = 0.5
+        mplength.color_highlight = 0.03, 0.05, 1.0
+        mplength.alpha_highlight = 1.0
+
+        self.linelength = mplength
+
+        # linedistance
+
+        mpdistance = self.gizmos.new(PUrP_LineDistanceShapeWidget.bl_idname)
+        # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
+        props = mpdistance.target_set_operator("purp.planzscalegiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
+
+        mpdistance.matrix_basis = ob.matrix_world.normalized()
+
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpdistance.matrix_basis = mat
+        mpdistance.matrix_basis[2][3] += 0.4
+        mpdistance.matrix_basis[1][3] -= 0.4
+        mpdistance.matrix_basis[0][3] -= 0.4
+
+        mpdistance.scale_basis = 0.5
+        mpdistance.line_width = 3
+        mpdistance.color = 0.05, 0.2, 0.8
+        mpdistance.alpha = 0.5
+        mpdistance.color_highlight = 0.03, 0.05, 1.0
+        mpdistance.alpha_highlight = 1.0
+
+        self.linedistance = mpdistance
+
     def refresh(self, context):
         ob = context.object
         # if has_stopper(ob):
-        mpz = self.Roffset
+        mpr = self.Roffset
 
         mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
         mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
@@ -564,8 +717,8 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot
-        mpz.matrix_basis = mat
-        mpz.matrix_basis[0][3] += 0.4
+        mpr.matrix_basis = mat
+        mpr.matrix_basis[0][3] += 0.4
 
         mpl = self.Loffset
 
@@ -577,6 +730,59 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat = mat_trans @ mat_rot
         mpl.matrix_basis = mat
         mpl.matrix_basis[0][3] -= 0.4
+
+        mpz = self.zScale
+
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpz.matrix_basis = mat
+        mpz.matrix_basis[2][3] += 0.4
+
+        if has_stopper(ob):
+            mps = self.stopper
+
+            mat_rot2 = mathutils.Matrix.Rotation(
+                radians(-90.0), 4, 'X')  # rotate
+            mat_trans = mathutils.Matrix.Translation(ob.location)
+            mat = mat_trans @ mat_rot2
+            mps.matrix_basis = mat
+            mps.matrix_basis[2][3] -= 0.4
+            mps.scale_basis = 0.5
+        else:
+
+            mps = self.stopper
+
+            mat_rot2 = mathutils.Matrix.Rotation(
+                radians(-90.0), 4, 'X')  # rotate
+            mat_trans = mathutils.Matrix.Translation(ob.location)
+            mat = mat_trans @ mat_rot2
+            mps.matrix_basis = mat
+            mps.matrix_basis[2][3] -= 0.4
+            mps.scale_basis = 0.0001
+
+        mpcount = self.linecount
+        mpcount.matrix_basis = ob.matrix_world
+        mpcount.matrix_basis[2][3] += 0.4
+        mpcount.matrix_basis[0][3] += 0.4
+        mpcount.matrix_basis[1][3] += 0.4
+        mpcount.scale_basis = 0.5
+
+        mplength = self.linelength
+        mplength.matrix_basis = ob.matrix_world
+        mplength.matrix_basis[2][3] += 0.4
+        mplength.matrix_basis[0][3] -= 0.4
+        mplength.matrix_basis[1][3] += 0.4
+        mplength.scale_basis = 0.5
+
+        mpdistance = self.linedistance
+        mpdistance.matrix_basis = ob.matrix_world
+        mpdistance.matrix_basis[2][3] += 0.4
+        mpdistance.matrix_basis[0][3] -= 0.4
+        mpdistance.matrix_basis[1][3] -= 0.4
+        mpdistance.scale_basis = 0.5
 
 
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
@@ -624,7 +830,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         for v in ob.data.vertices:
             if v.co.x > rightestx:
                 rightestx = v.co.x
-        ###rightestx is now
+        # rightestx is now
         self.rightestV = []
         for v in ob.data.vertices:
             if rightestx == v.co.x:
@@ -686,7 +892,7 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         for v in ob.data.vertices:
             if v.co.x < leftestx:
                 leftestx = v.co.x
-        ###rightestx is now
+        # rightestx is now
         self.leftestV = []
         for v in ob.data.vertices:
             if leftestx == v.co.x:
@@ -696,6 +902,279 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = leftestx  # ???
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
+    '''Change the Zscale of the coupling'''
+    bl_idname = "purp.planzscalegiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        for v in self.lowestV:
+            v.co.z = self.valuelow
+        if self.has_stopper:
+            for v in self.middleV:
+                v.co.z = self.valuemiddle
+        context.scene.PUrP.zScale = self.valuelow
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.valuelow = self.lowestz + self.delta / 100
+            if self.has_stopper:
+                self.valuemiddle = self.middlez + self.delta / 100
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for v in self.lowestV:
+                v.co.z = self.lowestz
+            if self.has_stopper:
+                for v in self.middleV:
+                    v.co.z = self.middlez
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+        self.middleV = []
+        self.lowestV = []
+        self.lowestz = 0
+        for v in ob.data.vertices:
+            if v.co.z < self.lowestz:
+                self.lowestz = v.co.z
+
+        self.has_stopper = has_stopper(ob)
+
+        if self.has_stopper:  # zscale with stopper is like moving all below the top line
+            print("stopper")
+
+            for v in ob.data.vertices:
+                if v.co.z != 0 and v.co.z != self.lowestz:
+                    self.middlez = v.co.z
+                    self.middleV.append(v)
+
+            for v in ob.data.vertices:
+                if v.co.z == self.lowestz:
+                    self.lowestV.append(v)
+
+            # for v in ob.data.vertices:
+            #    if v.co.z == self.middlez:
+            #        self.middleV.append(v)
+
+        else:
+            self.lowestz = 0
+            for v in ob.data.vertices:
+                if v.co.z < self.lowestz:
+                    self.lowestz = v.co.z
+            # self.lowestV = []
+            for v in ob.data.vertices:
+                if v.co.z == self.lowestz:
+                    self.lowestV.append(v)
+            # coordinaten aller
+
+        # self.init_position1 = lowestz
+        # self.init_position2 = self.middlez
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.valuelow = self.lowestz
+        if self.has_stopper:
+            self.valuemiddle = self.middlez
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
+    '''Change the Zscale of the coupling'''
+    bl_idname = "purp.stopperheightgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        for v in self.lowestV:
+            v.co.z = self.value
+
+        context.scene.PUrP.zScale = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.lowestz + self.delta / 100
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for v in self.lowestV:
+                v.co.z = self.lowestz
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+        self.lowestV = []
+        self.lowestz = 0
+        for v in ob.data.vertices:
+            if v.co.z < self.lowestz:
+                self.lowestz = v.co.z
+
+        for v in ob.data.vertices:
+            if v.co.z == self.lowestz:
+                self.lowestV.append(v)
+            # coordinaten aller
+
+        # self.init_position1 = lowestz
+        # self.init_position2 = self.middlez
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = self.lowestz
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
+    '''Change the Zscale of the coupling'''
+    bl_idname = "purp.linecountgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        ob = context.object
+        ob.modifiers["PUrP_Array_2"].count = int(self.value)
+
+        context.scene.PUrP.LineCount = int(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.value + self.delta / 1000
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.modifiers["PUrP_Array_2"].count = self.init_count
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.modifiers["PUrP_Array_2"].count
+
+        self.init_count = ob.modifiers["PUrP_Array_2"].count
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+'''
+class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
+    '''Change the Zscale of the coupling'''
+    bl_idname = "purp.linecountgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        ob = context.object
+        ob.modifiers["PUrP_Array_2"].count = int(self.value)
+
+        context.scene.PUrP.LineCount = int(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.value + self.delta / 1000
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.modifiers["PUrP_Array_2"].count = self.init_count
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.modifiers["PUrP_Array_2"].count
+
+        self.init_count = ob.modifiers["PUrP_Array_2"].count
 
         self.execute(context)
 

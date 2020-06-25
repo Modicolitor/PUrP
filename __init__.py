@@ -8,20 +8,29 @@
 # You should have received a copy of the GNU General Public License along with Power Sequencer. If
 # not, see <https://www.gnu.org/licenses/>.
 
-from .gizmos import PP_OT_PlanarRoffsetGizmo
+#from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_BevelSegmentGizmo
 from .gizmos import PP_OT_BevelOffsetGizmo
-#from .gizmos import PP_OT_PlanarRoffsetGizmo
+from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_PlanarLoffsetGizmo
+from .gizmos import PP_OT_PlanarzScaleGizmo
+from .gizmos import PP_OT_PlanarStopperHeightGizmo
 from .gizmos import PP_OT_CouplSizeGizmo
 from .gizmos import PUrP_PlanarGizmo
 from .gizmos import PUrP_SinglCoupGizmo
+from .gizmos import PP_OT_OversizeGizmo
+from .gizmos import PP_OT_PlanarLineCountGizmo
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
+from .gizmotshape import PUrP_linecountShapeWidget
+from .gizmotshape import PUrP_LineLengthShapeWidget
+from .gizmotshape import PUrP_LineDistanceShapeWidget
+
+
 from .ui import PP_PT_PuzzlePrintMenu
 from .properties import PUrPropertyGroup
 from .bun import PP_OT_ApplyAllCouplings
-from .gizmos import PP_OT_OversizeGizmo
+
 from .bun import PP_OT_CouplingOrder
 from .bun import PP_OT_ActiveCoupDefaultOperator
 from .bun import PP_OT_ToggleCoupVisibilityOperator
@@ -79,10 +88,16 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_CouplSizeGizmo,
            PP_OT_PlanarRoffsetGizmo,
            PP_OT_PlanarLoffsetGizmo,
+           PP_OT_PlanarzScaleGizmo,
+           PP_OT_PlanarStopperHeightGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
            PUrP_CornerShapeWidget,
            PUrP_ArrowShapeWidget,
+           PUrP_linecountShapeWidget,
+           PUrP_LineLengthShapeWidget,
+           PUrP_LineDistanceShapeWidget,
+           PP_OT_PlanarLineCountGizmo,
            PP_OT_ApplyAllCouplings,
            PP_OT_OverlapcheckOperator,
            PUrPropertyGroup
