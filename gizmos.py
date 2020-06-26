@@ -799,10 +799,11 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        ob = context.object
         for v in self.rightestV:
             v.co.x = self.value
 
-        context.scene.PUrP.OffsetRight = self.value
+        context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x*4 - 1.5
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -861,10 +862,11 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        ob = context.object
         for v in self.leftestV:
             v.co.x = self.value
 
-        context.scene.PUrP.OffsetLeft = self.value
+        context.scene.PUrP.OffsetLeft = - ob.data.vertices[1].co.x*4 - 1.5
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -923,12 +925,37 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        for v in self.lowestV:
-            v.co.z = self.valuelow
+
         if self.has_stopper:
-            for v in self.middleV:
-                v.co.z = self.valuemiddle
-        context.scene.PUrP.zScale = self.valuelow
+            if self.valuemiddle >= 0:  # upper limiter
+                for v in self.middleV:
+                    v.co.z = -0.01
+                for v in self.lowestV:
+                    v.co.z = -0.01 - context.scene.PUrP.StopperHeight
+                context.scene.PUrP.zScale = 0.01
+            else:  # positioning
+
+                for v in self.middleV:
+                    v.co.z = self.valuemiddle
+
+                for v in self.lowestV:
+                    v.co.z = self.valuelow
+
+                context.scene.PUrP.zScale = -self.valuemiddle
+        else:  # no stopper
+            if self.valuelow >= 0:
+                for v in self.lowestV:
+                    v.co.z = -0.01
+                context.scene.PUrP.zScale = 0.01
+            else:
+                for v in self.lowestV:
+                    v.co.z = self.valuelow
+                context.scene.PUrP.zScale = -self.valuelow
+
+                # if self.has_stopper:
+                #    for v in self.middleV:
+                #        v.co.z = self.valuemiddle
+
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -937,8 +964,9 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
 
             self.delta = event.mouse_y - self.init_value
             self.valuelow = self.lowestz + self.delta / 100
-            if self.has_stopper:
-                self.valuemiddle = self.middlez + self.delta / 100
+            # if self.has_stopper:
+            self.valuemiddle = self.middlez + self.delta / 100
+            print(self.valuemiddle)
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -958,6 +986,7 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         self.middleV = []
         self.lowestV = []
         self.lowestz = 0
+        self.middlez = 0
         for v in ob.data.vertices:
             if v.co.z < self.lowestz:
                 self.lowestz = v.co.z
@@ -1021,10 +1050,15 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        for v in self.lowestV:
-            v.co.z = self.value
-
-        context.scene.PUrP.zScale = self.value
+        zscale = -context.scene.PUrP.zScale
+        if self.value - zscale >= 0:
+            for v in self.lowestV:
+                v.co.z = zscale - 0.01
+            context.scene.PUrP.StopperHeight = 0.01
+        else:
+            for v in self.lowestV:
+                v.co.z = self.value
+            context.scene.PUrP.StopperHeight = -self.value + zscale
         return {'FINISHED'}
 
     def modal(self, context, event):
