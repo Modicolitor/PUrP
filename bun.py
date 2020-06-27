@@ -379,6 +379,8 @@ def genPlanar():
         objectname = "T-RoundedTop"
     elif type == "15":
         objectname = "T-Straight"
+    elif type == "16":
+        objectname = "Flat"
     else:
         objectname = "Cubic"
 

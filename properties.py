@@ -82,11 +82,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ('13', 'T-RoundedAll', ''),
                ('14', 'T-RoundedTop', ''),
                ('15', 'T-Straight', ''),
-
-
-
-
-
+               ('16', 'Flat', ''),
 
                ]
     )
