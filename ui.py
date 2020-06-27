@@ -99,6 +99,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
             subcol.operator("object.pp_ot_overlapcheck",
                             text='Check Overlap', icon="HIDE_OFF")
+            subcol.operator("object.remapcoups",
+                            text='RemapToActive', icon="FILE_REFRESH")
         else:
             col.operator("pup.init", icon="SHADERFX")
 

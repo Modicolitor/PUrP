@@ -1827,19 +1827,47 @@ def removePUrPOrder():
 
 
 class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
-    '''Remap selected Couplings to active centerobject'''
+    '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
 
     def execute(self, context):
-
+        print("remap")
         selected = context.selected_objects[:]
         active = context.object
         CenterObj = active
-        if "SingleConnector" or "Planar" in active.name:
+        if "SingleConnector" in active.name or "Planar" in active.name:
+            print("finish remap")
             return {'FINISHED'}
+        elif not CenterObj.PUrPCobj:
+            self.report({'WARNING'}, 'Active was never a Centerobject before')
 
+        PUrP = context.scene.PUrP
+
+        CenterObj.PUrPCobj = True
+
+        # reparent
+
+        for coup in selected:
+            if coup != CenterObj:
+                print(f"coup {coup.name}")
+                Couplist = []
+                Couplist.append(coup)  # only the one in the list in this case
+                print(f"parent {coup.parent}")
+                AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
+                print(f"a allcoupsmods remap {AllCoupmods}")
+                for mod in AllCoupmods:
+
+                    # make new in CenterObj
+                    newmod = CenterObj.modifiers.new(mod.name, mod.type)
+                    newmod.operation = mod.operation
+                    newmod.object = mod.object
+
+                    # remove in parent
+
+                    coup.parent.modifiers.remove(mod)
+
+                coup.parent = CenterObj
+
+        PUrP.CenterObj = CenterObj
         return {'FINISHED'}
-
-
-def ReMapCoup():
