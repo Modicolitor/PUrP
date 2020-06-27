@@ -42,9 +42,9 @@ Object typen
 [] keep cut out (z.B. größeres Loch schneiden, verbinder rein, extrateil draufkleben um zu schließen, )
 
     
-[] planar gizmot
+[+] planar gizmot
     [] Coupsize --> scale all (z is definition problem)
-    [] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
+    [+] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
 [] BuildRoom 
 [] cone radius 2 
     [+] initial implementation in code, and ui
@@ -54,11 +54,12 @@ after applying
 [] remove parents relation ships 
 [] generate line of objects (maybe rotatet to the flat parts)
 
-
-
+[] label in UI when non scale not zero 
 
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
+
+[]flatcut
 ###############################################################
 
 bugs:
@@ -68,18 +69,23 @@ general operator bug:
 
 planar stuff 
 
-???*[] Coupsize scale is applied --> no reproduction by active to setting ????
+
 
 gizmos
 
-**[] planar gizmos
-[] gizmot poll ohne active nach löschen
+*
 
 
+mögliche Probleme
+
+####
+[] apply single hat kein eigenen context
 
 
 
 resolved bug:
+*[+] planar gizmos
+[+] gizmot poll ohne active nach löschen
 ****[+] exchange Singleconnector to planar
 **[+] ActiveToSettings: zscale to 0 when no stopper, 
 

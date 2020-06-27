@@ -11,6 +11,7 @@
 #from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_BevelSegmentGizmo
 from .gizmos import PP_OT_BevelOffsetGizmo
+from .gizmos import PP_OT_zScaleGizmo
 from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_PlanarLoffsetGizmo
 from .gizmos import PP_OT_PlanarzScaleGizmo
@@ -95,6 +96,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_PlanarStopperHeightGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
+           PP_OT_zScaleGizmo,
            PP_OT_PlanarLineLengthGizmo,
            PP_OT_PlanarLineDistanceGizmo,
            PUrP_CornerShapeWidget,

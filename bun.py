@@ -6,12 +6,12 @@ from math import radians
 from bpy.types import Scene, Image, Object
 import random
 import os
-#from .intersect import bmesh_check_intersect_objects
+# from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
 
 
-#from .properties import PUrPropertyGroup
+# from .properties import PUrPropertyGroup
 
 '''Operator in Blender'''
 
@@ -22,7 +22,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        #PUrP = context.scene.PUrP
+        # PUrP = context.scene.PUrP
         if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
             if (context.view_layer.objects.active != None):
                 return True
@@ -40,11 +40,11 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         CenterObj = PUrP.CenterObj
         PUrP_name = PUrP.PUrP_name
         CutThickness = PUrP.CutThickness
-        #Oversize = PUrP.Oversize
+        # Oversize = PUrP.Oversize
         GlobalScale = PUrP.GlobalScale
         cursorloc = context.scene.cursor.location
         cursorlocori = context.scene.cursor.location
-        #Prim = self.PrimTypes
+        # Prim = self.PrimTypes
 
         # handling CenterObj
         if active != None:
@@ -80,7 +80,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             mod.thickness = CutThickness
             mod.offset = 1.0
             context.object.display_type = 'WIRE'
-            #context.object.show_in_front = True
+            # context.object.show_in_front = True
 
             context.object.parent = data.objects[CenterObj_name]
 
@@ -93,11 +93,11 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             newname_mainplane = "Null"  # for planar
 
-        #loc = mathutils.Vector((0,0,0))
-        #print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
+        # loc = mathutils.Vector((0,0,0))
+        # print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
         coupModeDivision(CenterObj, newname_mainplane)
 
-        #CenterObj.scale *= GlobalScale
+        # CenterObj.scale *= GlobalScale
         cursorloc.x -= CenterObj.location.x
         cursorloc.y -= CenterObj.location.y
         cursorloc.z -= CenterObj.location.z
@@ -132,8 +132,8 @@ def coupModeDivision(CenterObj, newname_mainplane):
     data = bpy.data
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
-    #Oversize = PUrP.Oversize
-    #zScale = PUrP.zScale
+    # Oversize = PUrP.Oversize
+    # zScale = PUrP.zScale
     GlobalScale = PUrP.GlobalScale
     if PUrP.SingleCouplingModes == "3":                     # flatCut
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
@@ -142,7 +142,7 @@ def coupModeDivision(CenterObj, newname_mainplane):
     elif PUrP.SingleCouplingModes == "2":  # Male - female
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
         # add negativ object
-        #loc.z += 0.45
+        # loc.z += 0.45
         ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff')
 
         # add positiv object
@@ -182,7 +182,7 @@ def oversizeToPrim(ob0, ob1):
     ob0.scale = mathutils.Vector((size, size, size))
     ob1.scale = mathutils.Vector((size, size, size))
 
-    #ob1.scale.z *= zScale
+    # ob1.scale.z *= zScale
     ob0.scale.z *= zScale
 
     print(f"ob0 {ob0.name} dimensions z {ob0.dimensions.z}")
@@ -205,8 +205,8 @@ def oversizeToPrim(ob0, ob1):
     print(f"dimensions y {ob1.scale.y}")
     ob1.scale.z = oversizeDimz
     print(f"dimensions z {ob1.scale.z}")
-    #ob1.scale.z *= zScale
-    #ob0.scale.z *= zScale - oversizeDim
+    # ob1.scale.z *= zScale
+    # ob0.scale.z *= zScale - oversizeDim
 
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd):
@@ -304,8 +304,8 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context.object.name = str(newname_mainplane) + str(nameadd)
     context.object.parent = bpy.data.objects[newname_mainplane]
 
-    #print(f"zscale should affect obj {context.object.name}")
-    #context.object.scale.z *= PUrP.zScale
+    # print(f"zscale should affect obj {context.object.name}")
+    # context.object.scale.z *= PUrP.zScale
     mod = context.object.modifiers.new(
         name=context.object.name + "Bevel", type="BEVEL")  # bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset
@@ -407,12 +407,12 @@ def genPlanar():
     obj.scale.x *= adjustScale
     obj.scale.y *= adjustScale
 
-    '''# but then also have a global scale 
-    obj.scale *= GlobalScale 
-    
-    ###apply scale to get scale to one #####################################might need coupsize, too? 
+    '''# but then also have a global scale
+    obj.scale *= GlobalScale
+
+    # apply scale to get scale to one #####################################might need coupsize, too?
     obj.select_set(True)
-    #bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    # bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
     obj.scale *=  CoupSize
     print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
@@ -466,7 +466,7 @@ def genPlanar():
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     else:
         # extrude
-        #lowestverts = bm.verts[:]
+        # lowestverts = bm.verts[:]
         ret = bmesh.ops.extrude_edge_only(  # first extrude
             bm,
             edges=bm.edges)
@@ -482,7 +482,7 @@ def genPlanar():
             vec=(0.0, 0.0, -height))  # zScale as height for the couple part
 
         # second extrude
-        #lowestverts = bm.verts[:]
+        # lowestverts = bm.verts[:]
         edges_extrude_a = [ele for ele in geom_extrude_start  # collectect edges on cut
                            if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and ele.verts[0].co.y == Oriy and ele.verts[1].co.y == Oriy]
 
@@ -606,7 +606,7 @@ def appendCoupling(filename, objectname):
     subpath = "blend" + os.sep + filename
     cp = os.path.join(script_path, subpath)
 
-    #filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
+    # filepath = "//2.82\scripts\addons\purp\blend\new_library.blend"
     with bpy.data.libraries.load(cp) as (data_from, data_to):
         print('I am in')
         data_to.objects = [
@@ -636,7 +636,7 @@ def newmainPlane(context, CenterObj):
     mod.thickness = CutThickness
     mod.offset = 1.0
     context.object.display_type = 'WIRE'
-    #context.object.show_in_front = True
+    # context.object.show_in_front = True
 
     context.object.parent = CenterObj
 
@@ -712,7 +712,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
-                        #oldname = obj.name
+                        # oldname = obj.name
                         parentname = obj.parent.name[:]
 
                         for ob in context.selected_objects:  # deselte all
@@ -725,15 +725,15 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                             context, data.objects[parentname])
                         obj = context.object
 
-                    #obj.modifiers["PUrP_Solidify"].thickness = CutThickness
+                    # obj.modifiers["PUrP_Solidify"].thickness = CutThickness
 
                     mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
                     mod.object = obj
                     mod.operation = 'DIFFERENCE'
-                    #obj.scale = mathutils.Vector((1, 1, 1))
+                    # obj.scale = mathutils.Vector((1, 1, 1))
                     coupModeDivision(CenterObj, obj.name)
-                    #print(f"obj at rescale {obj}")
+                    # print(f"obj at rescale {obj}")
                     obj.scale.x = GlobalScale
                     obj.scale.y = GlobalScale
                     obj.scale.z = GlobalScale
@@ -768,7 +768,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         context = bpy.context
         data = bpy.data
         selected = context.selected_objects[:]
-        #CenterObj = context.scene.PUrP.CenterObj
+        # CenterObj = context.scene.PUrP.CenterObj
         PUrP_name = bpy.context.scene.PUrP.PUrP_name
 
         # start conditions: seperators selected
@@ -776,15 +776,16 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         for obj in selected:
             if PUrP_name in obj.name:
                 CenterObj = obj.parent
-                applySingleCoup(obj, CenterObj)
+                applySingleCoup(context, obj, CenterObj)
 
         data = bpy.data
         Orderbool = False
         for ob in data.objects:
             if "PUrP" in ob.name and "_Order" in ob.name:
                 Orderbool = True
-                bpy.ops.pup.couplingorder()
-                bpy.ops.pup.couplingorder()
+                ob.select_set(True)
+                # bpy.ops.pup.couplingorder()
+                # bpy.ops.pup.couplingorder()
                 break
         return{"FINISHED"}
 
@@ -868,14 +869,14 @@ def removeCoupling(Coupl):
                     apply_as='DATA', modifier=mod.name)
 
             child.display_type = 'SOLID'
-            #child.location = mathutils.Vector((0,0,0))
+            # child.location = mathutils.Vector((0,0,0))
             globloc = Coupl.matrix_world
             print(f" Matrix World  von Coupl {globloc}")
 
             child.parent = None
             child.matrix_world = globloc
-            #child.parent = context.scene.PUrP.CenterObj
-            #child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
+            # child.parent = context.scene.PUrP.CenterObj
+            # child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
 
     for ob in data.objects:
         ob.select_set(False)  # for deleting after this modifier removal
@@ -896,25 +897,26 @@ def CenterObjCollector():
     PUrP = bpy.context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
 
-    #if len(Daughtercollection) == 0:
+    # if len(Daughtercollection) == 0:
     test = False
     print (f"DaughterCollection content {Daughtercollection}")
     for Daughter in Daughtercollection:
         for mod in Daughter.modifiers:
-            if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):                 
+            if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):
                 if bmesh_check_intersect_objects(data.objects[mod.name], Daughter):
-                    print(f"intersect in Collector True for {mod.name} and {Daughter}")
-                
+                    print(
+                        f"intersect in Collector True for {mod.name} and {Daughter}")
+
                     test = True
                     continue
-                
+
         if test:
             print(f"Test is for {Daughter}")
             applyCenterObj(Daughter)
         else:
-            Daughtercollection.remove(Daughter)    
-    
-    
+            Daughtercollection.remove(Daughter)
+
+
     if len(Daughtercollection) != 0:
         CenterObjCollector()
 
@@ -925,28 +927,29 @@ def applyCenterObj(CenterObj):
     data = bpy.data
     PUrP = context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
-    
-    print('frisch in appyl centerObj {CenterObj}')
-    
-    #n = 0
-    #test = True 
-    modifiers = CenterObj.modifiers[:] 
 
-    for mod in modifiers: 
-    #while test == True:
+    print('frisch in appyl centerObj {CenterObj}')
+
+    # n = 0
+    # test = True
+    modifiers = CenterObj.modifiers[:]
+
+    for mod in modifiers:
+    # while test == True:
         print(f'nächste Runde für mod {mod.name} in CenterObj {CenterObj}')
-        #if (len(CenterObj.modifiers) != 0) and (len(CenterObj.modifiers)-1 >= n):
-        if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):  
+        # if (len(CenterObj.modifiers) != 0) and (len(CenterObj.modifiers)-1 >= n):
+        if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):
             print('nächste Runde')
-            #try: 
-            #if PUrP_name in CenterObj.modifiers[n].name:
-            #mod_name = CenterObj.modifiers[n].name
+            # try:
+            # if PUrP_name in CenterObj.modifiers[n].name:
+            # mod_name = CenterObj.modifiers[n].name
             if bmesh_check_intersect_objects(data.objects[mod.name], CenterObj):
                 print("Intersection test is positiv")
-                Daughters = applySingleCoup(data.objects[mod.name], CenterObj)
+                Daughters = applySingleCoup(
+                    context, data.objects[mod.name], CenterObj)
                 print(f"Daughters send to collection {Daughters}")
                 Daughtercollection.append(Daughters)
-            
+
  '''
 
 
@@ -966,7 +969,7 @@ def centerObjDecider(context, CenterObj):
             primodname = PriMod.name[:]
             print(f"primodname {primodname}")
             ModList.append(primodname)
-    #name, ModList = couplingList(CenterObj)
+    # name, ModList = couplingList(CenterObj)
 
     for mod in ModList:
         print(f"centerObjdecider mod name {mod}")
@@ -998,16 +1001,16 @@ def centerObjDecider(context, CenterObj):
                             if bvhOverlap(context, Objects[mod], Cobj):
                                 print(
                                     f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
-                                applySingleCoup(Objects[mod], Cobj)
+                                applySingleCoup(context, Objects[mod], Cobj)
                             else:
                                 print(
                                     f"centerObjdecider remove now mod {mod} of Cobj {Cobj}")
-                                #mid = Cobj.modifiers[mod]
+                                # mid = Cobj.modifiers[mod]
                                 # Cobj.modifiers.remove(mid)
 
 
-def applySingleCoup(Coup, CenterObj):
-    context = bpy.context
+def applySingleCoup(context, Coup, CenterObj):
+    # context = bpy.context
     data = bpy.data
     PUrP_name = bpy.context.scene.PUrP.PUrP_name
 
@@ -1015,6 +1018,9 @@ def applySingleCoup(Coup, CenterObj):
 
     for sel in context.selected_objects:
         sel.select_set(False)
+
+    # remeber which couplings are parented to (alternative via modifiers)
+    oriCoupNames, oriCoupMods = couplingList(CenterObj)
 
     # apply boolean to seperate Centralobj parts
     context.view_layer.objects.active = CenterObj
@@ -1046,7 +1052,7 @@ def applySingleCoup(Coup, CenterObj):
     Daughtertwo_side = "NULL"
     while ctl == False:
 
-        #geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
+        # geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
         geo = mathutils.geometry
 
         direction = CouplingNormal.dot(
@@ -1078,12 +1084,44 @@ def applySingleCoup(Coup, CenterObj):
     else:
         applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
     # deleConnector (later propably with checkbox)
+
+    # sort the couplings to the new Daughters
+    objects = bpy.data.objects
+    DOneCoupList = []
+    DTwoCoupList = []
+    for coupname in oriCoupNames:
+        coup = objects[coupname]
+        if bvhOverlap(context, coup, DaughterOne):
+            coup.parent = DaughterOne
+            DOneCoupList.append(coup)
+
+        elif bvhOverlap(context, coup, DaughterTwo):
+            coup.parent = DaughterTwo
+            DTwoCoupList.append(coup)
+        else:
+            print(f"coup {coup.name} was false with both daughters")
+
+    DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)
+    DTwoAllMods = AllCoupMods(context, DTwoCoupList, DaughterTwo)
+
+    print(f"DoneAllMods {DOneAllMods}")
+    print(f"DoneAllMods {DTwoAllMods}")
+
+    for mod in DaughterOne.modifiers:
+
+        if mod not in DOneAllMods:
+            DaughterOne.modifiers.remove(mod)
+
+    for mod in DaughterTwo.modifiers:
+        if mod not in DTwoAllMods:
+            DaughterTwo.modifiers.remove(mod)
+
     context.view_layer.objects.active = obj
     removeCoupling(obj)
     Daughters = (DaughterOne, DaughterTwo)
     return Daughters
 
-    #SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
+    # SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
 
 
 class PP_OT_ApplyAllCouplings(bpy.types.Operator):
@@ -1117,7 +1155,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                         CenterBool = True
                         pass
                 if CenterBool:
-                    #Daughtercollection = []
+                    # Daughtercollection = []
                     # Daughtercollection.append(obj)
                     centerObjDecider(context, obj)
 
@@ -1132,7 +1170,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                 if PUrP_name in obj.name:
                     print("I am a selected Connector such meinen Papa")
                     # applyCenterObj(obj.parent)
-                    #Daughtercollection = []
+                    # Daughtercollection = []
                     # Daughtercollection.append(obj.parent)
                     # CenterObjCollector()
                     centerObjDecider(context, obj.parent)
@@ -1142,7 +1180,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                             CenterBool = True
                             pass
                 if CenterBool:
-                    #Daughtercollection = []
+                    # Daughtercollection = []
                     # Daughtercollection.append(obj)
                     # CenterObjCollector()
                     centerObjDecider(context, obj)
@@ -1179,7 +1217,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                 for ob in context.selected_objects:
                     ob.select_set(False)
 
-                    #name_active = obj.name
+                    # name_active = obj.name
                 for child in obj.children:
                     child.hide_select = False
                     child.select_set(True)
@@ -1242,7 +1280,7 @@ def moveModdown(Coup, CenterObj):
         indexLowestLowerCoup = modindex(
             CenterObj.modifiers[LowerCoup_name], CenterObj.modifiers) + LowerCoupcount - 1
         nameLowestLowerCoup = CenterObj.modifiers[indexLowestLowerCoup].name
-        #print(f"nameLowestLowerCoup {nameLowestLowerCoup}")
+        # print(f"nameLowestLowerCoup {nameLowestLowerCoup}")
         # now move the modifiers starting with the lowest of the coup children for as often as we have modifiers of LowerCoup
         realcoupindex = modindex(
             CenterObj.modifiers[PUrP_Modsnames[coupindex]], CenterObj.modifiers)
@@ -1280,15 +1318,33 @@ def howManyModsCoup(Coup_name, CenterObj):
     return count
 
 
+# returns list of modifiers on CenterObj belonging to one coup inclusive main modifier
+def CoupModifiers(context, coup, CenterObj):
+    CoupModlist = []
+    for mod in CenterObj.modifiers:
+        if coup.name in mod.name:
+            CoupModlist.append(mod)
+    return CoupModlist
+
+
+# takes list of Singcouplings and returns all modifiers in one list
+def AllCoupMods(context, Couplist, CenterObj):
+    AllMods = []
+    for coup in Couplist:
+        allmodsOcoup = CoupModifiers(context, coup, CenterObj)
+        AllMods.extend(allmodsOcoup)
+    return AllMods
+
+
 def listPUrPMods(CenterObj):  # returns list of mod names
-    list = []
+    namelist = []
     for mod in CenterObj.modifiers:
         if ("PUrP" in mod.name):
             if ("diff" not in mod.name) and ("union" not in mod.name):
-                list.append(mod.name)
+                namelist.append(mod.name)
             elif ("Planar" in mod.name):
-                list.append(mod.name)
-    return list
+                namelist.append(mod.name)
+    return namelist
 
 
 def couplingList(CenterObj):
@@ -1440,16 +1496,16 @@ class PP_OT_Ini(bpy.types.Operator):
                 name=MColName)  # makes collection
             # scene.collection.children.link(collection) ###### when its not linked the user can not delete and break the ui, better solution for init behaviour necessary
 
-        #Scene.PUrP.CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
+        # Scene.PUrP.CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
 
         CenterObj = bpy.context.scene.PUrP.CenterObj
         CenterObj = active
 
         # Puzzle Ur print Element Name
-        #bpy.types.Scene.PUrP.PUrP_name = bpy.props.StringProperty()
+        # bpy.types.Scene.PUrP.PUrP_name = bpy.props.StringProperty()
         PUrP = bpy.context.scene.PUrP
         PUrP.PUrP_name = "PUrP_"
-        #PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
+        # PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
         # CylVert
 
         return{"FINISHED"}
@@ -1515,17 +1571,17 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 PUrP.SingleCouplingModes = "2"
 
             if len(obj.children) != 0:
-                #print(f"meshadata name {obj.data.name}")
+                # print(f"meshadata name {obj.data.name}")
                 if "Cube" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '1'
                 elif "Cylinder" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '2'
-                    #PUrP.CylVert = len(obj.data.vertices)/2
+                    # PUrP.CylVert = len(obj.data.vertices)/2
                     PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(  # cylinder is a special case of cone
                         context, obj.children[0])
                 elif "Cone" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '3'
-                    #PUrP.CylVert = len(obj.data.vertices) - 1
+                    # PUrP.CylVert = len(obj.data.vertices) - 1
                     PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
                         context, obj.children[0])
                 for child in obj.children:
@@ -1687,7 +1743,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-                #print(f"context.object != None {context.object != None}")
+                # print(f"context.object != None {context.object != None}")
                 if context.object.PUrPCobj:
                     return True
                 elif context.object.parent != None:
@@ -1768,3 +1824,22 @@ def removePUrPOrder():
             if "_Order" in ob.name:
                 ob.select_set(True)
     bpy.ops.object.delete(use_global=False)
+
+
+class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
+    '''Remap selected Couplings to active centerobject'''
+    bl_idname = "object.remapcoups"
+    bl_label = "PP_OT_ReMapCoups"
+
+    def execute(self, context):
+
+        selected = context.selected_objects[:]
+        active = context.object
+        CenterObj = active
+        if "SingleConnector" or "Planar" in active.name:
+            return {'FINISHED'}
+
+        return {'FINISHED'}
+
+
+def ReMapCoup():

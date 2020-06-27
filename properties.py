@@ -44,6 +44,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name='Vertexcount',
         description='Set the resolution of the cylic objects',
         default=16,
+        min=0,
     )
 
     SingleCouplingTypes = bpy.props.EnumProperty(
