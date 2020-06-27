@@ -1873,3 +1873,31 @@ class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
 
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
+
+
+class PP_OT_MakeBuildVolumeOperator(bpy.types.Operator):
+    bl_idname = "object.makebuildvolume"
+    bl_label = "PP_OT_MakeBuildVolume"
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        BuildplateX = PUrP.BuildplateX
+        BuildplateY = PUrP.BuildplateY
+        BuildplateZ = PUrP.BuildplateZ
+
+        cursorloc = context.scene.cursor.location
+
+        bpy.ops.mesh.primitive_cube_add(
+            enter_editmode=False, align='WORLD', location=cursorloc)
+        BuildVol = context.object
+        BuildVol.name = "PUrP_BuildVolume"
+
+        BuildVol.scale[0] = BuildplateX/2  # cube is 2m
+        BuildVol.scale[1] = BuildplateY/2
+        BuildVol.scale[2] = BuildplateZ/2
+
+        BuildVol.display_type = 'WIRE'
+        bpy.ops.object.transform_apply(
+            location=False, rotation=False, scale=True)
+
+        return {'FINISHED'}

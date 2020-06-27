@@ -39,6 +39,12 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Beveloffset", default=0.2, min=0.0)
     StopperBool = bpy.props.BoolProperty(
         name="Beveloffset", default=False)
+    BuildplateX = bpy.props.FloatProperty(
+        name="Buildplate X-Dimensions", default=19, min=0.0)
+    BuildplateY = bpy.props.FloatProperty(
+        name="Buildplate Y-Dimensions", default=19, min=0.0)
+    BuildplateZ = bpy.props.FloatProperty(
+        name="Buildplate Z-Dimensions", default=19, min=0.0)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

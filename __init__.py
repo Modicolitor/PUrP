@@ -46,6 +46,7 @@ from .bun import PP_OT_ApplyCoupling
 from .bun import PP_OT_ExChangeCoup
 from .bun import PP_OT_AddSingleCoupling
 from .bun import PP_OT_ReMapCoupsOperator
+from .bun import PP_OT_MakeBuildVolumeOperator
 from .bvh_overlap import PP_OT_OverlapcheckOperator
 from bpy.types import Scene, Image, Object
 import bpy
@@ -88,6 +89,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_ActiveCoupDefaultOperator,
            PP_OT_CouplingOrder,
            PP_OT_ReMapCoupsOperator,
+           PP_OT_MakeBuildVolumeOperator,
            PP_OT_OversizeGizmo,
            PUrP_SinglCoupGizmo,
            PUrP_PlanarGizmo,

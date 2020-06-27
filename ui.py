@@ -88,7 +88,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
 
-            subcol.label(text="Move Operators")
+            subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
             subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
@@ -101,6 +101,13 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             text='Check Overlap', icon="HIDE_OFF")
             subcol.operator("object.remapcoups",
                             text='RemapToActive', icon="FILE_REFRESH")
+            subcol.label(text="Modifier Visibility")
+            subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
+            subcol.prop(PUrP, "BuildplateY", text='Buildplate Y')
+            subcol.prop(PUrP, "BuildplateZ", text='Buildplate Z')
+            subcol.operator("object.makebuildvolume",
+                            text='Generate Buildvolume', icon="MESH_CUBE")
+
         else:
             col.operator("pup.init", icon="SHADERFX")
 
