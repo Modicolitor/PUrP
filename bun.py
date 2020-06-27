@@ -1850,24 +1850,26 @@ class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
 
         for coup in selected:
             if coup != CenterObj:
-                print(f"coup {coup.name}")
-                Couplist = []
-                Couplist.append(coup)  # only the one in the list in this case
-                print(f"parent {coup.parent}")
-                AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
-                print(f"a allcoupsmods remap {AllCoupmods}")
-                for mod in AllCoupmods:
+                if "PUrP" in coup.name:
+                    print(f"coup {coup.name}")
+                    Couplist = []
+                    # only the one in the list in this case
+                    Couplist.append(coup)
+                    print(f"parent {coup.parent}")
+                    AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
+                    print(f"a allcoupsmods remap {AllCoupmods}")
+                    for mod in AllCoupmods:
 
-                    # make new in CenterObj
-                    newmod = CenterObj.modifiers.new(mod.name, mod.type)
-                    newmod.operation = mod.operation
-                    newmod.object = mod.object
+                        # make new in CenterObj
+                        newmod = CenterObj.modifiers.new(mod.name, mod.type)
+                        newmod.operation = mod.operation
+                        newmod.object = mod.object
 
-                    # remove in parent
+                        # remove in parent
 
-                    coup.parent.modifiers.remove(mod)
+                        coup.parent.modifiers.remove(mod)
 
-                coup.parent = CenterObj
+                    coup.parent = CenterObj
 
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
