@@ -189,7 +189,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
             self.value = self.init_scale_z + self.delta / \
                 1000  # - self.window_width/2 #(HD Screen 800)
-            # print(f"MouspositionX: {self.value}")
+
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
@@ -350,8 +350,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
-        print(
-            f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+
         mpr.matrix_basis = ob.matrix_world.normalized()
 
         mpr.line_width = 3
@@ -370,8 +369,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
-        print(
-            f"Size matrix world object name{ob.name} {ob.matrix_world.normalized()}")
+
         mpa.matrix_basis = ob.matrix_world.normalized()
         mpa.line_width = 3
 
@@ -502,8 +500,6 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mpr = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
         props = mpr.target_set_operator("purp.roffsetgiz")
 
-        print(
-            f"Oversize matrix world object name{ob.name} {ob.matrix_world.normalized()}")
         mpr.matrix_basis = ob.matrix_world.normalized()
 
         mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
@@ -966,7 +962,7 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
             self.valuelow = self.lowestz + self.delta / 100
             # if self.has_stopper:
             self.valuemiddle = self.middlez + self.delta / 100
-            print(self.valuemiddle)
+
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -994,7 +990,6 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         self.has_stopper = has_stopper(ob)
 
         if self.has_stopper:  # zscale with stopper is like moving all below the top line
-            print("stopper")
 
             for v in ob.data.vertices:
                 if v.co.z != 0 and v.co.z != self.lowestz:

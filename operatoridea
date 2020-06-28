@@ -45,7 +45,7 @@ Object typen
 [+] planar gizmot
     [] Coupsize --> scale all (z is definition problem)
     [+] bmesh operation möglich? --> left right offset, winkel, stopper height, zscale
-[] BuildRoom 
+[] BuildRoom  - Einheit  --> globalSize overhaul
 [] cone radius 2 
     [+] initial implementation in code, and ui
     [] active to settings needs adjustment
@@ -59,26 +59,37 @@ after applying
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
 
-[]flatcut
+
 ###############################################################
 
 bugs:
 general operator bug:
-*[] apply coupling auf eines beschränken oder multiapply auf anpassen
-[] apply single maybe broken for many couplings, after apply all couplings stay on both, oder? lösche ich vom richtigen
+
+
+[] apply coupling: respect order 
+[] special fall planar schneidet in mehr als 2 teile
+
+
+[] new apply operator: apply Active Planar to several selected objects
+[] new apply operator: apply multiple planar to  active object
+
 
 in apply 
 
 
 planar stuff 
 
+[]flatcut
+    [+] implementation
+    [] stopper verbieten oder problem mit gizmos kompensieren
 
 
+[] planar flat - stopper verbieten oder problem mit gizmos kompensieren
 
 
 gizmos
 
-*
+[] planar gizmos thickness (Oversize)
 
 
 mögliche Probleme
@@ -89,6 +100,7 @@ mögliche Probleme
 
 
 resolved bug:
+[x] BuildRoom 
 *[+] planar gizmos
 [+] gizmot poll ohne active nach löschen
 ****[+] exchange Singleconnector to planar

@@ -76,7 +76,13 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 subcol.prop(PUrP, "LineDistance", text='Linedistance')
                 subcol.prop(PUrP, "OffsetRight", text='Right Offset')
                 subcol.prop(PUrP, "OffsetLeft", text='Left Offset')
+
+                subcol = col.column()
                 subcol.prop(PUrP, "StopperBool", text='Stopper')
+                if PUrP.PlanarCouplingTypes == "16":
+                    subcol.enabled = False
+                else:
+                    subcol.enabled = True
                 if PUrP.StopperBool:
                     subcol.prop(PUrP, "StopperHeight", text='Stopper Height')
 
@@ -87,6 +93,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             icon="MOD_DYNAMICPAINT")  # zeige button an
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
+            subcol.label(text="Special Apply Methods")
+            subcol.operator("object.applyplanarmultiobj", text='Planar To Multiple Objects',
+                            icon="PARTICLE_POINT")  # zeige button an
 
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",

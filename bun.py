@@ -32,7 +32,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
     def execute(self, context):
         # createSingleCoupling()
-        # def createSingleCoupling():
+
         context = bpy.context
         data = bpy.data
         active = context.view_layer.objects.active
@@ -381,6 +381,8 @@ def genPlanar():
         objectname = "T-Straight"
     elif type == "16":
         objectname = "Flat"
+        PUrP.StopperBool = False
+        StopperBool = False
     else:
         objectname = "Cubic"
 
@@ -1828,7 +1830,7 @@ def removePUrPOrder():
     bpy.ops.object.delete(use_global=False)
 
 
-class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
+class PP_OT_ReMapCoups(bpy.types.Operator):
     '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
@@ -1877,7 +1879,7 @@ class PP_OT_ReMapCoupsOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class PP_OT_MakeBuildVolumeOperator(bpy.types.Operator):
+class PP_OT_MakeBuildVolume(bpy.types.Operator):
     bl_idname = "object.makebuildvolume"
     bl_label = "PP_OT_MakeBuildVolume"
 
@@ -1901,5 +1903,54 @@ class PP_OT_MakeBuildVolumeOperator(bpy.types.Operator):
         BuildVol.display_type = 'WIRE'
         bpy.ops.object.transform_apply(
             location=False, rotation=False, scale=True)
+
+        return {'FINISHED'}
+
+
+class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
+    '''Applys the active  planar connector to all selected objects. First select all objects, then the planar connector last. Used  '''
+    bl_idname = "object.applyplanarmultiobj"
+    bl_label = "PP_OT_ApplyPlanarMultiObj"
+
+    def execute(self, context):
+
+        coup = bpy.data.objects[context.object.name]
+
+        # Centerobjects sammeln
+        CenterObjs = []
+        for ob in context.selected_objects:
+            if ob != coup:
+                if "SingleConnector" not in ob.name and "PlanarConnector" not in ob.name:  # fail selection
+                    CenterObjs.append(ob)
+
+        # suchen nach dem Centerobj mit dem Planar?
+        OriCenterObj = coup.parent
+
+        # Generate Modifier on all CenterObj and apply
+        for CenterObj in CenterObjs:
+
+            # is there already a modifier for this coup
+            BoolCool = False
+            for mod in CenterObj.modifiers:
+                if mod.name == coup.name:
+                    BoolCool = True
+
+            if not BoolCool:
+                mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+                mod.object = coup
+                mod.operation = 'DIFFERENCE'
+
+            context.view_layer.objects.active = CenterObj
+            bpy.ops.object.modifier_apply(modifier=coup.name)
+
+            CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.mesh.separate(type='LOOSE')
+            bpy.ops.object.editmode_toggle()
+
+        # delete planar coupling
+        removeCoupling(coup)
 
         return {'FINISHED'}
