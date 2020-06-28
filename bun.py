@@ -1943,7 +1943,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
             context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
 
-            CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+            #CenterObj.modifiers.new(coup.name, 'BOOLEAN')
 
             bpy.ops.object.editmode_toggle()
             bpy.ops.mesh.select_all(action='SELECT')
@@ -1953,4 +1953,45 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
         # delete planar coupling
         removeCoupling(coup)
 
+        return {'FINISHED'}
+
+
+# apply multiple planar to  active object  ---- maybe alternative with the normal one
+class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
+    '''Apply multiple planar connectors to the active Object. First select all planar connectors and then the CenterObj last. Helpful when CenterObj will be cut in a lot of pieces'''
+    bl_idname = "object.applymultipleplanartoobject"
+    bl_label = "PP_OT_ApplyMultiplePlanarToObject"
+
+    def execute(self, context):
+        coups = context.selected_objects[:]
+        CenterObj = bpy.data.objects[context.object.name]
+
+        # deselect all for the separate by selection
+        for ob in context.selected_objects:
+            ob.select_set(False)
+
+        # check for modifier
+        for coup in coups:
+            if "PlanarConnector" not in coup.name:
+                continue
+            is_coup = False
+            for mod in CenterObj.modifiers:
+                if mod.name == coup.name:
+                    is_coup = True
+                    break
+            # make modifiers when there aren't the right ones
+            if not is_coup:
+                CenterObj.modifiers.new(coup.name, "BOOLEAN")
+                mod.object = coup
+                mod.operation = 'DIFFERENCE'
+
+            #context.view_layer.objects.active = CenterObj
+            bpy.ops.object.modifier_apply(modifier=coup.name)
+            removeCoupling(coup)
+
+        CenterObj.select_set(True)
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.separate(type='LOOSE')
+        bpy.ops.object.editmode_toggle()
         return {'FINISHED'}

@@ -48,6 +48,7 @@ from .bun import PP_OT_AddSingleCoupling
 from .bun import PP_OT_ReMapCoups
 from .bun import PP_OT_MakeBuildVolume
 from .bun import PP_OT_ApplyPlanarMultiObj
+from .bun import PP_OT_ApplyMultiplePlanarToObject
 from .bvh_overlap import PP_OT_OverlapcheckOperator
 from bpy.types import Scene, Image, Object
 import bpy
@@ -92,6 +93,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_ReMapCoups,
            PP_OT_MakeBuildVolume,
            PP_OT_ApplyPlanarMultiObj,
+           PP_OT_ApplyMultiplePlanarToObject,
            PP_OT_OversizeGizmo,
            PUrP_SinglCoupGizmo,
            PUrP_PlanarGizmo,

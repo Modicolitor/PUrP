@@ -96,6 +96,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.label(text="Special Apply Methods")
             subcol.operator("object.applyplanarmultiobj", text='Planar To Multiple Objects',
                             icon="PARTICLE_POINT")  # zeige button an
+            subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
+                            icon="MOD_INSTANCE")
 
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",

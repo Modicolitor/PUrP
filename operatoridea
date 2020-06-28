@@ -60,46 +60,56 @@ after applying
 
 
 
+[] global scale value (ist couple size die cubes in single oder die fläche)
+
 ###############################################################
 
 bugs:
 general operator bug:
 
 
+
 [] apply coupling: respect order 
 [] special fall planar schneidet in mehr als 2 teile
 
 
-[] new apply operator: apply Active Planar to several selected objects
+[+] new apply operator: apply Active Planar to several selected objects
 [] new apply operator: apply multiple planar to  active object
 
+[] COUPscale planar for active to setting and add (scale should not be 1 but coup scale )
 
 in apply 
 
 
 planar stuff 
 
-[]flatcut
-    [+] implementation
-    [] stopper verbieten oder problem mit gizmos kompensieren
 
 
-[] planar flat - stopper verbieten oder problem mit gizmos kompensieren
+
+
 
 
 gizmos
+[] gizmos size absolut or relativ to coup scaling (planar), probaly because not centered but moved.
+
 
 [] planar gizmos thickness (Oversize)
+[] planar scale  gizmos
+[] color planar gizmos
 
+[] with puzzle not all vertices moving together with zScale gizmo (not the same height?)
 
 mögliche Probleme
 
-####
-[] apply single hat kein eigenen context
+
+
 
 
 
 resolved bug:
+[+]flatcut
+    [+] implementation
+    [+] stopper verbieten oder problem mit gizmos kompensieren
 [x] BuildRoom 
 *[+] planar gizmos
 [+] gizmot poll ohne active nach löschen
