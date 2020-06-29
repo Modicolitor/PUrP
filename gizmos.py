@@ -502,14 +502,14 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpr.matrix_basis = ob.matrix_world.normalized()
 
-        mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
-        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'X')  # rotate
+        # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
 
-        mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
-        mat = mat_trans @ mat_rot
-        mpr.matrix_basis = mat
-        mpr.matrix_basis[0][3] += 0.4
+        #mat_rot = mat_rot1 @ mat_rot2
+        #mat_trans = mathutils.Matrix.Translation(ob.location)
+       # mat = mat_trans @ mat_rot1
+        #mpr.matrix_basis = mat
+        #mpr.matrix_basis[0][3] += 0.4
 
         mpr.scale_basis = 0.5
         mpr.line_width = 3
@@ -529,14 +529,14 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpl.matrix_basis = ob.matrix_world.normalized()
 
-        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
-        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
 
-        mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
-        mat = mat_trans @ mat_rot
-        mpl.matrix_basis = mat
-        mpl.matrix_basis[0][3] += 0.4
+        #mat_rot = mat_rot1 @ mat_rot2
+        #mat_trans = mathutils.Matrix.Translation(ob.location)
+        #mat = mat_trans @ mat_rot
+        #mpl.matrix_basis = mat
+        #mpl.matrix_basis[0][3] += 0.4
 
         mpl.scale_basis = 0.5
         mpl.line_width = 3
@@ -558,13 +558,13 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         #
         # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
-        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
 
         # mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
-        mat = mat_trans @ mat_rot2
-        mpz.matrix_basis = mat
-        mpz.matrix_basis[0][3] += 0.4
+        #mat_trans = mathutils.Matrix.Translation(ob.location)
+        #mat = mat_trans @ mat_rot2
+        #mpz.matrix_basis = mat
+        #mpz.matrix_basis[0][3] += 0.4
 
         mpz.scale_basis = 0.5
         mpz.line_width = 3
@@ -713,8 +713,8 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot
-        mpr.matrix_basis = mat
-        mpr.matrix_basis[0][3] += 0.4
+        mpr.matrix_basis = ob.matrix_world.normalized()
+        #mpr.matrix_basis[0][3] += 0.4
 
         mpl = self.Loffset
 
