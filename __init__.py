@@ -23,12 +23,14 @@ from .gizmos import PP_OT_OversizeGizmo
 from .gizmos import PP_OT_PlanarLineCountGizmo
 from .gizmos import PP_OT_PlanarLineLengthGizmo
 from .gizmos import PP_OT_PlanarLineDistanceGizmo
+from .gizmos import PP_OT_PlanarThicknessGizmo
 
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowShapeWidget
 from .gizmotshape import PUrP_linecountShapeWidget
 from .gizmotshape import PUrP_LineLengthShapeWidget
 from .gizmotshape import PUrP_LineDistanceShapeWidget
+from .gizmotshape import PUrP_ThicknessShapeWidget
 
 
 from .ui import PP_PT_PuzzlePrintMenu
@@ -107,11 +109,13 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_zScaleGizmo,
            PP_OT_PlanarLineLengthGizmo,
            PP_OT_PlanarLineDistanceGizmo,
+           PP_OT_PlanarThicknessGizmo,
            PUrP_CornerShapeWidget,
            PUrP_ArrowShapeWidget,
            PUrP_linecountShapeWidget,
            PUrP_LineLengthShapeWidget,
            PUrP_LineDistanceShapeWidget,
+           PUrP_ThicknessShapeWidget,
            PP_OT_PlanarLineCountGizmo,
            PP_OT_ApplyAllCouplings,
            PP_OT_OverlapcheckOperator,

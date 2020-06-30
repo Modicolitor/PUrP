@@ -511,7 +511,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         #mpr.matrix_basis = mat
         #mpr.matrix_basis[0][3] += 0.4
 
-        mpr.scale_basis = 0.5
+        #mpr.scale_basis = 0.5
         mpr.line_width = 3
         mpr.color = 0.05, 0.2, 0.8
         mpr.alpha = 0.5
@@ -530,15 +530,15 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mpl.matrix_basis = ob.matrix_world.normalized()
 
         # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
-        # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Y')  # rotate
 
         #mat_rot = mat_rot1 @ mat_rot2
-        #mat_trans = mathutils.Matrix.Translation(ob.location)
-        #mat = mat_trans @ mat_rot
-        #mpl.matrix_basis = mat
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpl.matrix_basis = mat
         #mpl.matrix_basis[0][3] += 0.4
 
-        mpl.scale_basis = 0.5
+        #mpl.scale_basis = 0.5
         mpl.line_width = 3
         mpl.color = 0.05, 0.2, 0.8
         mpl.alpha = 0.5
@@ -558,15 +558,15 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         #
         # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
-        # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
 
         # mat_rot = mat_rot1 @ mat_rot2
-        #mat_trans = mathutils.Matrix.Translation(ob.location)
-        #mat = mat_trans @ mat_rot2
-        #mpz.matrix_basis = mat
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpz.matrix_basis = mat
         #mpz.matrix_basis[0][3] += 0.4
 
-        mpz.scale_basis = 0.5
+        #mpz.scale_basis = 0.5
         mpz.line_width = 3
         mpz.color = 0.05, 0.2, 0.8
         mpz.alpha = 0.5
@@ -589,15 +589,15 @@ class PUrP_PlanarGizmo(GizmoGroup):
         #
         # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
         mat_rot2 = mathutils.Matrix.Rotation(
-            radians(-90.0), 4, 'X')  # rotate
+            radians(180.0), 4, 'Y')  # rotate
 
         # mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot2
         mps.matrix_basis = mat
-        mps.matrix_basis[2][3] -= 0.4
+        #mps.matrix_basis[2][3] -= 0.4
 
-        mps.scale_basis = 0.5
+        #mps.scale_basis = 0.5
         mps.line_width = 3
         mps.color = 0.05, 0.2, 0.8
         mps.alpha = 0.5
@@ -625,11 +625,11 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot2
         mpcount.matrix_basis = mat
-        mpcount.matrix_basis[2][3] += 0.4
-        mpcount.matrix_basis[0][3] += 0.4
-        mpcount.matrix_basis[1][3] += 0.4
+        #mpcount.matrix_basis[2][3] += 0.4
+        #mpcount.matrix_basis[0][3] += 0.4
+        #mpcount.matrix_basis[1][3] += 0.4
 
-        mpcount.scale_basis = 0.5
+        #mpcount.scale_basis = 0.5
         mpcount.line_width = 3
         mpcount.color = 0.05, 0.2, 0.8
         mpcount.alpha = 0.5
@@ -661,7 +661,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mplength.matrix_basis[1][3] += 0.4
         mplength.matrix_basis[2][3] -= 0.4
 
-        mplength.scale_basis = 0.5
+        #mplength.scale_basis = 0.5
         mplength.line_width = 3
         mplength.color = 0.05, 0.2, 0.8
         mplength.alpha = 0.5
@@ -689,11 +689,11 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot2
         mpdistance.matrix_basis = mat
-        mpdistance.matrix_basis[2][3] += 0.4
-        mpdistance.matrix_basis[1][3] -= 0.4
-        mpdistance.matrix_basis[0][3] -= 0.4
+        #mpdistance.matrix_basis[2][3] += 0.4
+        #mpdistance.matrix_basis[1][3] -= 0.4
+        #mpdistance.matrix_basis[0][3] -= 0.4
 
-        mpdistance.scale_basis = 0.5
+        #mpdistance.scale_basis = 0.5
         mpdistance.line_width = 3
         mpdistance.color = 0.05, 0.2, 0.8
         mpdistance.alpha = 0.5
@@ -702,50 +702,82 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         self.linedistance = mpdistance
 
-    def refresh(self, context):
-        ob = context.object
-        # if has_stopper(ob):
-        mpr = self.Roffset
+        # thickness 
 
-        mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
-        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+        mpthickness = self.gizmos.new(PUrP_ThicknessShapeWidget.bl_idname)
+        # mpcount.target_set_prop("offset", context.scene.PUrP, "LineCount")
+        props = mpthickness.target_set_operator("purp.thicknessgiz")
+        # props.constraint_axis = True, True, True
+        # props.orient_type = 'LOCAL'
+        # props.release_confirm = True
 
-        mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
-        mat = mat_trans @ mat_rot
-        mpr.matrix_basis = ob.matrix_world.normalized()
-        #mpr.matrix_basis[0][3] += 0.4
+        mpthickness.matrix_basis = ob.matrix_world.normalized()
 
-        mpl = self.Loffset
-
-        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
-        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
-
-        mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
-        mat = mat_trans @ mat_rot
-        mpl.matrix_basis = mat
-        mpl.matrix_basis[0][3] -= 0.4
-
-        mpz = self.zScale
-
+        #
+        # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
         mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
 
         # mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot2
-        mpz.matrix_basis = mat
-        mpz.matrix_basis[2][3] += 0.4
+        mpthickness.matrix_basis = mat
+        #mpdistance.matrix_basis[2][3] += 0.4
+        #mpdistance.matrix_basis[1][3] -= 0.4
+        #mpdistance.matrix_basis[0][3] -= 0.4
+
+        #mpdistance.scale_basis = 0.5
+        mpthickness.line_width = 3
+        mpthickness.color = 0.05, 0.2, 0.8
+        mpthickness.alpha = 0.5
+        mpthickness.color_highlight = 0.03, 0.05, 1.0
+        mpthickness.alpha_highlight = 1.0
+
+        self.thickness = mpthickness
+
+    def refresh(self, context):
+        ob = context.object
+        # if has_stopper(ob):
+        mpr = self.Roffset
+
+        #mat_rot1 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Y')  # rotate
+
+        #mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpr.matrix_basis = mat
+        #mpr.matrix_basis[0][3] += 0.4
+
+        mpl = self.Loffset
+
+        #mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
+        mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
+
+        #mat_rot = mat_rot1 @ mat_rot2
+        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat = mat_trans @ mat_rot2
+        mpl.matrix_basis = mat
+        #mpl.matrix_basis[0][3] -= 0.4
+
+        mpz = self.zScale
+
+        #mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+
+        # mat_rot = mat_rot1 @ mat_rot2
+        #mat_trans = mathutils.Matrix.Translation(ob.location)
+        #mat = mat_trans @ mat_rot2
+        mpz.matrix_basis = ob.matrix_world.normalized()
+        #mpz.matrix_basis[2][3] += 0.4
 
         if has_stopper(ob):
             mps = self.stopper
 
             mat_rot2 = mathutils.Matrix.Rotation(
-                radians(-90.0), 4, 'X')  # rotate
+                radians(180.0), 4, 'Y')  # rotate
             mat_trans = mathutils.Matrix.Translation(ob.location)
             mat = mat_trans @ mat_rot2
             mps.matrix_basis = mat
-            mps.matrix_basis[2][3] -= 0.4
+            #mps.matrix_basis[2][3] -= 0.4
             mps.scale_basis = 0.5
         else:
 
@@ -756,30 +788,32 @@ class PUrP_PlanarGizmo(GizmoGroup):
             mat_trans = mathutils.Matrix.Translation(ob.location)
             mat = mat_trans @ mat_rot2
             mps.matrix_basis = mat
-            mps.matrix_basis[2][3] -= 0.4
+            #mps.matrix_basis[2][3] -= 0.4
             mps.scale_basis = 0.0001
 
         mpcount = self.linecount
-        mpcount.matrix_basis = ob.matrix_world
-        mpcount.matrix_basis[2][3] += 0.4
-        mpcount.matrix_basis[0][3] += 0.4
-        mpcount.matrix_basis[1][3] += 0.4
-        mpcount.scale_basis = 0.5
+        mpcount.matrix_basis = ob.matrix_world.normalized()
+        #mpcount.matrix_basis[2][3] += 0.4
+        #mpcount.matrix_basis[0][3] += 0.4
+        #mpcount.matrix_basis[1][3] += 0.4
+        #mpcount.scale_basis = 0.5
 
         mplength = self.linelength
-        mplength.matrix_basis = ob.matrix_world
-        mplength.matrix_basis[2][3] += 0.4
-        mplength.matrix_basis[0][3] -= 0.4
-        mplength.matrix_basis[1][3] += 0.4
-        mplength.scale_basis = 0.5
+        mplength.matrix_basis = ob.matrix_world.normalized()
+        #mplength.matrix_basis[2][3] += 0.4
+        #mplength.matrix_basis[0][3] -= 0.4
+        #mplength.matrix_basis[1][3] += 0.4
+        #mplength.scale_basis = 0.5
 
         mpdistance = self.linedistance
-        mpdistance.matrix_basis = ob.matrix_world
-        mpdistance.matrix_basis[2][3] += 0.4
-        mpdistance.matrix_basis[0][3] -= 0.4
-        mpdistance.matrix_basis[1][3] -= 0.4
-        mpdistance.scale_basis = 0.5
+        mpdistance.matrix_basis = ob.matrix_world.normalized()
+        #mpdistance.matrix_basis[2][3] += 0.4
+        #mpdistance.matrix_basis[0][3] -= 0.4
+        #mpdistance.matrix_basis[1][3] -= 0.4
+        #mpdistance.scale_basis = 0.5
 
+        mpthickness = self.thickness
+        mpthickness.matrix_basis = ob.matrix_world.normalized()
 
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
     '''Change the beveloffset of the coupling'''
@@ -1258,6 +1292,61 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
         self.value = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
 
         self.init_count = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
+    '''Change the Oversize (Thickness) of the planar connector'''
+    bl_idname = "purp.thicknessgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        ob = context.object
+
+        ob.modifiers["PUrP_Solidify"].thickness = self.value
+
+        context.scene.PUrP.Oversize = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.value + self.delta / 1000
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.modifiers["PUrP_Solidify"].thickness = self.init_count
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+
+        self.init_value = event.mouse_y
+
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.modifiers["PUrP_Solidify"].thickness
+
+        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
 
         self.execute(context)
 

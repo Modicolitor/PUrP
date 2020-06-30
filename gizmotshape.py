@@ -495,3 +495,97 @@ class PUrP_LineDistanceShapeWidget(Gizmo):
         # self.target_set_value("offset", value)
         # context.area.header_text_set("My Gizmo: %.4f" % value)
         return {'RUNNING_MODAL'}
+
+##thickness widget
+
+thickness0 = Vector((-2.4682538509368896, -2.0, 1.720690131187439))
+thickness1 = Vector((-2.5148062705993652, -2.0, 1.720690131187439))
+thickness2 = Vector((-2.4682538509368896, -2.0, 2.2793097496032715))
+thickness3 = Vector((-2.5148062705993652, -2.0, 2.2793097496032715))
+thickness4 = Vector((-2.3993964195251465, -2.0, 2.2793097496032715))
+thickness5 = Vector((-2.5554041862487793, -2.0, 2.2793097496032715))
+thickness6 = Vector((-2.5554041862487793, -2.0, 1.720690131187439))
+thickness7 = Vector((-1.5430042743682861, -2.0, 2.2793097496032715))
+thickness8 = Vector((-1.9233784675598145, -2.0, 2.2793097496032715))
+thickness9 = Vector((-1.963794469833374, -2.0, 1.720690131187439))
+thickness10 = Vector((-1.9233784675598145, -2.0, 1.720690131187439))
+thickness11 = Vector((-2.3993964195251465, -2.0, 1.720690131187439))
+thickness12 = Vector((-1.5430042743682861, -2.0, 1.720690131187439))
+thickness13 = Vector((-2.1905112266540527, -2.0, 1.720690131187439))
+thickness14 = Vector((-2.2210400104522705, -2.0, 1.720690131187439))
+thickness15 = Vector((-2.2210400104522705, -2.0, 2.2793097496032715))
+thickness16 = Vector((-2.35250186920166, -2.0, 2.2793097496032715))
+thickness17 = Vector((-2.35250186920166, -2.0, 1.720690131187439))
+thickness18 = Vector((-2.1905112266540527, -2.0, 2.2793097496032715))
+thickness19 = Vector((-1.963794469833374, -2.0, 2.2793097496032715))
+
+
+
+thickness_shape_verts = (
+    thickness1,thickness5,thickness6,
+    thickness1,thickness5,thickness3,
+    thickness0,thickness2,thickness11,
+    thickness4,thickness2,thickness11,
+    thickness16,thickness17,thickness14,
+    thickness16,thickness15,thickness14,
+    thickness13,thickness18,thickness9,
+    thickness19,thickness18,thickness9,
+    thickness8,thickness10,thickness12,
+    thickness8,thickness7,thickness12,
+)
+
+
+
+class PUrP_ThicknessShapeWidget(Gizmo):
+    bl_idname = "VIEW3D_GT_PURP_LINEDISTANCE"
+    bl_target_properties = (
+        {"id": "scale", "type": 'FLOAT', "array_length": 1},
+    )
+
+    __slots__ = (
+        "custom_shape",
+        "init_mouse_y",
+        "init_value",
+    )
+
+    # def matrix_basis():
+
+    def _update_offset_matrix(self):
+        # offset behind the light
+        # print("jaja")
+        #self.matrix_offset.col[3][2] = context.object.matrix_world
+        pass
+
+    def draw(self, context):
+        # self._update_offset_matrix()
+        self.draw_custom_shape(self.custom_shape)
+
+    def draw_select(self, context, select_id):
+        # self._update_offset_matrix()
+        self.draw_custom_shape(self.custom_shape, select_id=select_id)
+
+    def setup(self):
+        if not hasattr(self, "custom_shape"):
+            self.custom_shape = self.new_custom_shape(
+                'TRIS', linedistant_shape_verts)
+
+    def invoke(self, context, event):
+        self.init_mouse_y = event.mouse_y
+        # self.init_value = self.target_get_value("offset")
+        return {'RUNNING_MODAL'}
+
+    def exit(self, context, cancel):
+        context.area.header_text_set(None)
+        # if cancel:
+        #    self.target_set_value("offset", self.init_value)
+
+    def modal(self, context, event, tweak):
+        delta = (event.mouse_y - self.init_mouse_y) / 10.0
+        # if 'SNAP' in tweak:
+        #    delta = round(delta)
+        # if 'PRECISE' in tweak:
+        #    delta /= 10.0
+        # value = self.init_value - delta
+        # self.target_set_value("offset", value)
+        # context.area.header_text_set("My Gizmo: %.4f" % value)
+        return {'RUNNING_MODAL'}
