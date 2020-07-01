@@ -537,7 +537,7 @@ thickness_shape_verts = (
 
 
 class PUrP_ThicknessShapeWidget(Gizmo):
-    bl_idname = "VIEW3D_GT_PURP_LINEDISTANCE"
+    bl_idname = "VIEW3D_GT_PURP_THICKNESS"
     bl_target_properties = (
         {"id": "scale", "type": 'FLOAT', "array_length": 1},
     )
@@ -567,7 +567,7 @@ class PUrP_ThicknessShapeWidget(Gizmo):
     def setup(self):
         if not hasattr(self, "custom_shape"):
             self.custom_shape = self.new_custom_shape(
-                'TRIS', linedistant_shape_verts)
+                'TRIS', thickness_shape_verts)
 
     def invoke(self, context, event):
         self.init_mouse_y = event.mouse_y
