@@ -318,6 +318,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     if ("_diff" in bpy.context.object.name) or ("_union" in bpy.context.object.name):
         mod = CenterObj.modifiers.new(name=context.object.name, type="BOOLEAN")
         mod.object = context.object
+        mod.show_viewport = False
         if nameadd == "_diff":
             mod.operation = 'DIFFERENCE'
         elif nameadd == '_union':
@@ -808,6 +809,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
+                mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
 
@@ -816,6 +818,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
+                mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_union' == mod.name:
@@ -830,6 +833,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
+                mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
 
@@ -838,6 +842,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                 print(f"active: {active}")
                 print(
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
+                mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_diff' == mod.name:
@@ -1019,6 +1024,7 @@ def applySingleCoup(context, Coup, CenterObj):
     PUrP_name = bpy.context.scene.PUrP.PUrP_name
 
     obj = Coup
+    oriCoupname = Coup.name[:]
 
     for sel in context.selected_objects:
         sel.select_set(False)
@@ -1093,8 +1099,10 @@ def applySingleCoup(context, Coup, CenterObj):
     objects = bpy.data.objects
     DOneCoupList = []
     DTwoCoupList = []
+    oriCoupNames.remove(oriCoupname)
     for coupname in oriCoupNames:
         coup = objects[coupname]
+        print(f"restliche Coup verteilen liste {coupname}")
         if bvhOverlap(context, coup, DaughterOne):
             coup.parent = DaughterOne
             DOneCoupList.append(coup)
@@ -1112,7 +1120,6 @@ def applySingleCoup(context, Coup, CenterObj):
     print(f"DoneAllMods {DTwoAllMods}")
 
     for mod in DaughterOne.modifiers:
-
         if mod not in DOneAllMods:
             DaughterOne.modifiers.remove(mod)
 

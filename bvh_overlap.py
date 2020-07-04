@@ -3,7 +3,9 @@ import mathutils
 
 
 def bvhOverlap(context, coup, CenterObj):
-    matrix = coup.matrix_local
+    print(f"in BVHanfang coup.location")
+    # making a copy of the coup plane
+    matrix = coup.matrix_world
     couptmpdata = coup.data.copy()
     # generate copy at origin
     coup_tmp = bpy.data.objects.new(name="tmp", object_data=couptmpdata)
@@ -11,27 +13,28 @@ def bvhOverlap(context, coup, CenterObj):
 
     context.scene.collection.objects.link(coup_tmp)
 
-    context.view_layer.objects.active = coup_tmp
+    for ob in context.selected_objects:
+        ob.select_set(False)
+    # coup.select_set(False)
+    # CenterObj.select_set(False)
     coup_tmp.select_set(True)
-    coup.select_set(False)
+    context.view_layer.objects.active = coup_tmp
+    coup_tmp.matrix_world = matrix
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
 
+    '''
+    ##make Solidify to the 
     for mod in coup.modifiers:
         mod = coup_tmp.modifiers.new(name=mod.name, type=mod.type)
         if "PUrP_Solidify" == mod.name:
             mod.thickness = coup.modifiers["PUrP_Solidify"].thickness
             mod.offset = -1.0
         bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
+    '''
 
-    coup_tmp.matrix_local = matrix
-    coup_tmp.select_set(True)
-    coup.select_set(False)
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
-    # move in edit mode,.... to lazy for bmesh
-    # +++the location of the Centerobj (parent) + the location of the original mainplane
-    # for v in coup_tmp.data.vertices:
-    #v.co += coup.parent.location
-    #    v.co += coup.location
+    # coup_tmp.select_set(True)
+    # coup.select_set(False)
+    #bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
 
     # BVH Tree creation
     depsgraph = context.evaluated_depsgraph_get()
@@ -61,6 +64,9 @@ class PP_OT_OverlapcheckOperator(bpy.types.Operator):
 
     def execute(self, context):
         coup = context.object
-        bvhOverlap(context, coup, coup.parent)
+        for ob in context.selected_objects:
+            if ob != coup:
+                CenterObj = ob
+        bvhOverlap(context, coup, CenterObj)
 
         return {'FINISHED'}
