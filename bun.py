@@ -19,6 +19,7 @@ from .warning import noCutthroughWarn, coneTrouble
 class PP_OT_AddSingleCoupling(bpy.types.Operator):
     bl_label = "Add Single Couplings"
     bl_idname = "add.coup"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -658,6 +659,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
     '''Exchange selected couplings'''
     bl_idname = "object.exchangecoup"
     bl_label = "ExChangeCoupling"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -757,6 +759,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label = "ApplyCouplings"
     bl_idname = "apl.coup"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1191,6 +1194,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
     '''Applies all Couplings. If nothing is selected it applies the Couplings to all modified objects. If an Centerobject is selected, it only applies the all Coupling for this Object. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied'''
     bl_idname = "apl.allcoup"
     bl_label = "PP_OT_ApplyAllCouplings"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1257,6 +1261,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
 class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_label = "DeleteCouplings"
     bl_idname = "rem.coup"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1440,6 +1445,7 @@ def modindex(modifier, modifiers):
 class PP_OT_MoveModDown(bpy.types.Operator):
     bl_idname = "pup.moddown"
     bl_label = "PP_OT_MoveModDown"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1473,6 +1479,7 @@ class PP_OT_MoveModDown(bpy.types.Operator):
 class PP_OT_MoveModUp(bpy.types.Operator):
     bl_idname = "pup.modup"
     bl_label = "PP_OT_MoveModup"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1526,9 +1533,9 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
 
 class PP_OT_Ini(bpy.types.Operator):
-
     bl_label = "Initialize PuzzleUrPrint"
     bl_idname = "pup.init"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1579,6 +1586,7 @@ class PP_OT_Ini(bpy.types.Operator):
 class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
     bl_idname = "object.togglecoupvisibility"
     bl_label = "PP_OT_ToggleCoupVisibility"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1611,6 +1619,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
     bl_idname = "object.activecoupdefault"
     bl_label = "PP_OT_ActiveCoupDefault"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1803,6 +1812,7 @@ def zSym(obj):
 class PP_OT_CouplingOrder(bpy.types.Operator):
     bl_idname = "pup.couplingorder"
     bl_label = "PP_OT_CouplingOrder"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -1895,6 +1905,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
     '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
+    bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
         print("remap")
@@ -1943,6 +1954,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
     bl_idname = "object.makebuildvolume"
     bl_label = "PP_OT_MakeBuildVolume"
+    bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
         PUrP = context.scene.PUrP
@@ -1972,6 +1984,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
     '''Applys the active  planar connector to all selected objects. First select all objects, then the planar connector last. Used  '''
     bl_idname = "object.applyplanarmultiobj"
     bl_label = "PP_OT_ApplyPlanarMultiObj"
+    bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
 
@@ -2022,6 +2035,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
     '''Apply multiple planar connectors to the active Object. First select all planar connectors and then the CenterObj last. Helpful when CenterObj will be cut in a lot of pieces'''
     bl_idname = "object.applymultipleplanartoobject"
     bl_label = "PP_OT_ApplyMultiplePlanarToObject"
+    bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
         coups = context.selected_objects[:]
