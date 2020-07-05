@@ -1203,7 +1203,9 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
                 if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
                     return True
-
+                for child in context.object.children:
+                    if ("SingleConnector" in child.name) or ("PlanarConnector" in child.name):
+                        return True
         else:
             return False
 
@@ -1242,10 +1244,11 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
                     # CenterObjCollector()
                     centerObjDecider(context, obj.parent)
                 else:
-                    for child in obj.child:  # gibt es kinder Coupling in diesem Object
-                        if PUrP_name in child:
+                    for child in obj.children:  # gibt es kinder Coupling in diesem Object
+                        if PUrP_name in child.name:
                             CenterBool = True
                             pass
+
                 if CenterBool:
                     # Daughtercollection = []
                     # Daughtercollection.append(obj)
