@@ -856,6 +856,7 @@ def applyRemoveCouplMods(daughter, connector, side):
 
 def removeCoupling(Coupl):
     '''removes objects related to the coupling after apllying or when it is a fixed '''
+    print(f"Delete now Coupling {Coupl.name}")
     data = bpy.data
     context = bpy.context
     active = context.view_layer.objects.active
@@ -1044,95 +1045,129 @@ def applySingleCoup(context, Coup, CenterObj):
 
     # remember both objects
     CenterObjDaughters = context.selected_objects[:]
-    print(f'CenterObjDaugters are {CenterObjDaughters}')
-    DaughterOne = context.active_object
-    DaughterTwo = None
-    for ob in CenterObjDaughters:  # setze das ob für zweite Tochter
-        if ob != DaughterOne:
-            DaughterTwo = ob
 
-    # teste on which side a vertex of one object lays
-    context.view_layer.objects.active = obj
-    # apply rotation centerplane obj damit die vector rechnung funktioniert
-    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    if len(CenterObjDaughters) <= 2:
+        print(f'CenterObjDaugters are {CenterObjDaughters}')
+        DaughterOne = context.active_object
+        DaughterTwo = None
+        for ob in CenterObjDaughters:  # setze das ob für zweite Tochter
+            if ob != DaughterOne:
+                DaughterTwo = ob
 
-    CouplingNormal = obj.data.vertices[0].normal
-    ctl = False
-    n = 0
-    Daughtertwo_side = "NULL"
-    while ctl == False:
+        # teste on which side a vertex of one object lays
+        context.view_layer.objects.active = obj
+        # apply rotation centerplane obj damit die vector rechnung funktioniert
+        bpy.ops.object.transform_apply(
+            location=False, rotation=True, scale=True)
 
-        # geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
-        geo = mathutils.geometry
+        CouplingNormal = obj.data.vertices[0].normal
+        ctl = False
+        n = 0
+        Daughtertwo_side = "NULL"
+        while ctl == False:
 
-        direction = CouplingNormal.dot(
-            DaughterOne.data.vertices[n].co) - CouplingNormal.dot(obj.data.vertices[0].co)
-        print(f"that's the direction value {direction}")
-        if direction == 0:  # actual vector geometry part
-            n += 1
-            print("vertice number" + str(n))
+            # geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
+            geo = mathutils.geometry
 
-        elif direction < 0:
+            direction = CouplingNormal.dot(
+                DaughterOne.data.vertices[n].co) - CouplingNormal.dot(obj.data.vertices[0].co)
+            print(f"that's the direction value {direction}")
+            if direction == 0:  # actual vector geometry part
+                n += 1
+                print("vertice number" + str(n))
 
-            ctl = True
-            print('Object auf der Positiven Seite')
-            DaughterOne_side = "POSITIV"
-            DaughterTwo_side = "NEGATIV"
-            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
-        elif direction > 0:
-            ctl = True
-            print('negativ seite')
-            DaughterOne_side = "NEGATIV"
-            DaughterTwo_side = "POSITIV"
-            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+            elif direction < 0:
 
+                ctl = True
+                print('Object auf der Positiven Seite')
+                DaughterOne_side = "POSITIV"
+                DaughterTwo_side = "NEGATIV"
+                applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+            elif direction > 0:
+                ctl = True
+                print('negativ seite')
+                DaughterOne_side = "NEGATIV"
+                DaughterTwo_side = "POSITIV"
+                applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+
+            else:
+                print('Probleme with side detection')
+        if DaughterTwo == None:
+            bpy.context.window_manager.popup_menu(
+                noCutthroughWarn, title="Error", icon='ERROR')  # raise error message
         else:
-            print('Probleme with side detection')
-    if DaughterTwo == None:
-        bpy.context.window_manager.popup_menu(
-            noCutthroughWarn, title="Error", icon='ERROR')  # raise error message
-    else:
-        applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
-    # deleConnector (later propably with checkbox)
+            applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
+        # deleConnector (later propably with checkbox)
 
-    # sort the couplings to the new Daughters
-    objects = bpy.data.objects
-    DOneCoupList = []
-    DTwoCoupList = []
-    oriCoupNames.remove(oriCoupname)
-    for coupname in oriCoupNames:
-        coup = objects[coupname]
-        print(f"restliche Coup verteilen liste {coupname}")
-        if bvhOverlap(context, coup, DaughterOne):
-            coup.parent = DaughterOne
-            DOneCoupList.append(coup)
+        # sort the couplings to the new Daughters
+        objects = bpy.data.objects
+        DOneCoupList = []
+        DTwoCoupList = []
+        oriCoupNames.remove(oriCoupname)
+        for coupname in oriCoupNames:
+            coup = objects[coupname]
+            print(f"restliche Coup verteilen liste {coupname}")
+            if bvhOverlap(context, coup, DaughterOne):
+                coup.parent = DaughterOne
+                DOneCoupList.append(coup)
 
-        elif bvhOverlap(context, coup, DaughterTwo):
-            coup.parent = DaughterTwo
-            DTwoCoupList.append(coup)
-        else:
-            print(f"coup {coup.name} was false with both daughters")
+            elif bvhOverlap(context, coup, DaughterTwo):
+                coup.parent = DaughterTwo
+                DTwoCoupList.append(coup)
+            else:
+                print(f"coup {coup.name} was false with both daughters")
 
-    DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)
-    DTwoAllMods = AllCoupMods(context, DTwoCoupList, DaughterTwo)
+        # all modifiers of all couplings which are identified as overlapping
+        DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)
+        DTwoAllMods = AllCoupMods(context, DTwoCoupList, DaughterTwo)
 
-    print(f"DoneAllMods {DOneAllMods}")
-    print(f"DoneAllMods {DTwoAllMods}")
+        print(f"DoneAllMods {DOneAllMods}")
+        print(f"DoneAllMods {DTwoAllMods}")
 
-    for mod in DaughterOne.modifiers:
-        if mod not in DOneAllMods:
-            DaughterOne.modifiers.remove(mod)
+        for mod in DaughterOne.modifiers:
+            if mod not in DOneAllMods:
+                DaughterOne.modifiers.remove(mod)
 
-    for mod in DaughterTwo.modifiers:
-        if mod not in DTwoAllMods:
-            DaughterTwo.modifiers.remove(mod)
+        for mod in DaughterTwo.modifiers:
+            if mod not in DTwoAllMods:
+                DaughterTwo.modifiers.remove(mod)
 
-    context.view_layer.objects.active = obj
-    removeCoupling(obj)
-    Daughters = (DaughterOne, DaughterTwo)
-    return Daughters
+        # delete Coupling
+        context.view_layer.objects.active = obj
+        removeCoupling(obj)
+        Daughters = (DaughterOne, DaughterTwo)
+        return Daughters
 
-    # SingleConnectorNormal = objects.data.meshes['Cube.013'].vertices[1].normal
+    elif len(CenterObjDaughters) > 2:  # branch where a planar cuts the Centerobj in many pieces
+        print("more then 2 Daughters")
+
+        # sort couplings by overlap
+
+        objects = bpy.data.objects
+        DCoupList = []
+
+        oriCoupNames.remove(oriCoupname)
+
+        for Daughter in CenterObjDaughters:
+            DCoupList = []
+
+            for coupname in oriCoupNames:
+                coup = objects[coupname]
+                if bvhOverlap(context, coup, Daughter):
+                    coup.parent = Daughter
+                    DCoupList.append(coup)
+
+            # all modifiers of all couplings which are identified as overlapping
+            DAllMods = AllCoupMods(context, DCoupList, Daughter)
+
+            for mod in Daughter.modifiers:
+                if mod not in DAllMods:
+                    Daughter.modifiers.remove(mod)
+
+        print(f" before remove multi daughters obj {obj.name} coup Coup.name")
+        removeCoupling(obj)
+        Daughters = CenterObjDaughters
+        return Daughters
 
 
 class PP_OT_ApplyAllCouplings(bpy.types.Operator):
