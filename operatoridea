@@ -62,17 +62,19 @@ after applying
 
 [] global scale value (ist couple size die cubes in single oder die fläche)
 
+
+
+[] can a planar cut, comunicate to the following planar that it should cut through all, or does it makes problem in combination with Apply all/parent aply zuordnung ...???????????
+
 ###############################################################
 
 bugs:
 general operator bug:
-[] apply all planar ignored 
 
 
 
 
-[+] new apply operator: apply Active Planar to several selected objects
-[] new apply operator: apply multiple planar to  active object
+
 
 [] COUPscale planar for active to setting and add (scale should not be 1 but coup scale )
 
@@ -108,7 +110,9 @@ mögliche Probleme
 
 
 resolved bug:
-
+[+] new apply operator: apply Active Planar to several selected objects
+[+] new apply operator: apply multiple planar to  active object
+[+] apply all planar ignored 
 [+] apply coupling: respect order 
 [+] special fall planar schneidet in mehr als 2 teile
 [+] apply zuordnung geht gar nicht für male female, aber für stick

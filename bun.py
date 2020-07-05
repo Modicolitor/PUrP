@@ -1,5 +1,3 @@
-
-
 import bpy
 import mathutils
 from math import radians
