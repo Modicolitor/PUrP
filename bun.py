@@ -775,13 +775,30 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         selected = context.selected_objects[:]
         # CenterObj = context.scene.PUrP.CenterObj
         PUrP_name = bpy.context.scene.PUrP.PUrP_name
+        ############
+        # presort selected according to modifer order
 
-        # start conditions: seperators selected
-
+        # how many parents (connectors can have different CenterObj)
+        Centerobjs = []
         for obj in selected:
-            if PUrP_name in obj.name:
-                CenterObj = obj.parent
-                applySingleCoup(context, obj, CenterObj)
+            if obj.parent not in Centerobjs:
+                Centerobjs.append(obj.parent)
+
+        # start conditions: connectors selected
+        # sort selected by modifier order
+        for CenterObj in Centerobjs:
+            coupssorted = []
+            Connectornamelist, modlist = couplingList(CenterObj)
+            for coup in Connectornamelist:
+                coup = data.objects[coup]  # name to object
+                if coup in selected:
+                    coupssorted.append(coup)
+
+            for obj in coupssorted:
+                print(f"Coup will be send to apply {obj.name}")
+                if PUrP_name in obj.name:
+                    CenterObj = obj.parent
+                    applySingleCoup(context, obj, CenterObj)
 
         data = bpy.data
         Orderbool = False
@@ -1392,6 +1409,8 @@ def listPUrPMods(CenterObj):  # returns list of mod names
                 namelist.append(mod.name)
     return namelist
 
+# returns Connectors name- and modifierlists of  a CenterObj
+
 
 def couplingList(CenterObj):
 
@@ -1985,7 +2004,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
             context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
 
-            #CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+            # CenterObj.modifiers.new(coup.name, 'BOOLEAN')
 
             bpy.ops.object.editmode_toggle()
             bpy.ops.mesh.select_all(action='SELECT')
@@ -2027,7 +2046,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
                 mod.object = coup
                 mod.operation = 'DIFFERENCE'
 
-            #context.view_layer.objects.active = CenterObj
+            # context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
             removeCoupling(coup)
 

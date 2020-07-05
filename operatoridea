@@ -66,11 +66,9 @@ after applying
 
 bugs:
 general operator bug:
+[] apply all planar ignored 
 
-[] apply zuordnung geht gar nicht für male female, aber für stick
 
-[] apply coupling: respect order 
-[] special fall planar schneidet in mehr als 2 teile
 
 
 [+] new apply operator: apply Active Planar to several selected objects
@@ -93,6 +91,7 @@ gizmos
 [] ********gizmos size absolut or relativ to coup scaling (planar), probaly because not centered but moved.
 
 [] thickness gizmo beschränken und feiner
+[] left right offset gizmos not refreshing 
 
 
 [] planar gizmos thickness (Oversize)
@@ -109,6 +108,10 @@ mögliche Probleme
 
 
 resolved bug:
+
+[+] apply coupling: respect order 
+[+] special fall planar schneidet in mehr als 2 teile
+[+] apply zuordnung geht gar nicht für male female, aber für stick
 [+]flatcut
     [+] implementation
     [+] stopper verbieten oder problem mit gizmos kompensieren

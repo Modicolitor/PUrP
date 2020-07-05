@@ -22,19 +22,18 @@ def bvhOverlap(context, coup, CenterObj):
     coup_tmp.matrix_world = matrix
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
 
-    '''
-    ##make Solidify to the 
+    # make Solidify to the mainplane, but also more stuff for planar
+
     for mod in coup.modifiers:
         mod = coup_tmp.modifiers.new(name=mod.name, type=mod.type)
         if "PUrP_Solidify" == mod.name:
             mod.thickness = coup.modifiers["PUrP_Solidify"].thickness
             mod.offset = -1.0
         bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
-    '''
 
     # coup_tmp.select_set(True)
     # coup.select_set(False)
-    #bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+    # bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
 
     # BVH Tree creation
     depsgraph = context.evaluated_depsgraph_get()
