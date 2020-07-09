@@ -96,15 +96,20 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         # print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
         coupModeDivision(CenterObj, newname_mainplane)
 
-        # CenterObj.scale *= GlobalScale
-        cursorloc.x -= CenterObj.location.x
-        cursorloc.y -= CenterObj.location.y
-        cursorloc.z -= CenterObj.location.z
+        # cursorloc.x -= CenterObj.location.x
+        # cursorloc.y -= CenterObj.location.y
+        # cursorloc.z -= CenterObj.location.z
         # context.scene.objects.link(unioncopy)
 
         if PUrP.SingleCouplingModes != "4":
             data.objects[newname_mainplane].location += cursorloc
-            data.objects[newname_mainplane].select_set(True)
+            # data.objects[newname_mainplane].scale *= PUrP.CoupScale * \
+            # PUrP.GlobalScale
+            # data.objects[newname_mainplane].select_set(True)
+            #context.view_layer.objects.active = data.objects[newname_mainplane]
+            # bpy.ops.object.transform_apply(
+            #    location=False, rotation=False, scale=True)
+
         elif PUrP.SingleCouplingModes == "4":
             context.object.location += cursorloc
             # context.object.select_set(True)
@@ -162,13 +167,14 @@ def coupModeDivision(CenterObj, newname_mainplane):
     elif PUrP.SingleCouplingModes == "4":
         newMain = genPlanar()
     # Adjustment for globalscale
-    newMain.scale = mathutils.Vector((GlobalScale, GlobalScale, GlobalScale))
+    # newMain.scale = mathutils.Vector((GlobalScale, GlobalScale, GlobalScale))
 
     for ob in context.selected_objects:
         ob.select_set(False)
 
     context.view_layer.objects.active = newMain
     newMain.select_set(True)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
 
 def oversizeToPrim(ob0, ob1):
@@ -293,6 +299,11 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
                 print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
 
+    scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+    obj.scale *= scalefactor
+    context.view_layer.objects.active = obj
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
     # apply oversize
     if nameadd == "_diff":
         context.object.scale.x += PUrP.Oversize
@@ -346,6 +357,7 @@ def genPlanar():
     StopperBool = PUrP.StopperBool
     Oversize = PUrP.Oversize
     height = PUrP.zScale
+    CoupScale = PUrP.CoupScale
     type = PUrP.PlanarCouplingTypes
 
     # I don't know how to get the name from the enum property might be simpler
@@ -406,10 +418,18 @@ def genPlanar():
         ob.select_set(False)
 
     obj = bpy.data.objects[context.object.name]
+
     # scale it a bit smaller than in the file
-    adjustScale = 0.25
-    obj.scale.x *= adjustScale
-    obj.scale.y *= adjustScale
+    adjustScale = PUrP.PlanarCorScale
+    obj.scale.x *= adjustScale * GlobalScale * CoupScale
+    obj.scale.y *= adjustScale * GlobalScale * CoupScale
+
+    # apply scale to get scale to one #####################################might need coupsize, too?
+
+    obj.select_set(True)
+    context.view_layer.objects.active = obj
+    print(f"obj before apply scale {obj.name}")
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
     '''# but then also have a global scale
     obj.scale *= GlobalScale
@@ -433,8 +453,8 @@ def genPlanar():
     # bm.edges.ensure_lookup_table()
 
     # prepare values for  offsets
-    right = OffsetRight * GlobalScale
-    left = OffsetLeft * GlobalScale
+    right = OffsetRight
+    left = OffsetLeft
 
     bm.verts[0].co.x += right
     bm.verts[1].co.x -= left
@@ -562,15 +582,8 @@ def genPlanar():
     bm.to_mesh(me)
     bm.free()  # free
 
-    # but then also have a global scale
-    obj.scale *= GlobalScale
-
-    # apply scale to get scale to one #####################################might need coupsize, too?
-    obj.select_set(True)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-
-    obj.scale *= CoupSize
-    print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
+    # obj.scale *= CoupSize
+    # print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
 
     # array 1 und 2
     mod = obj.modifiers.new(name="PUrP_Array_1", type="ARRAY")
@@ -710,6 +723,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
                     coupModeDivision(CenterObj, oldname)  # generate new planar
                     context.object.matrix_world = trans
+
                     # context.object.location = loc
                     #  ##planarversion
                 else:  # when it was SingleCoupling, the mainplane is kept
@@ -739,9 +753,20 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     # obj.scale = mathutils.Vector((1, 1, 1))
                     coupModeDivision(CenterObj, obj.name)
                     # print(f"obj at rescale {obj}")
-                    obj.scale.x = GlobalScale
-                    obj.scale.y = GlobalScale
-                    obj.scale.z = GlobalScale
+                    scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+                    obj.data.vertices[0].co = mathutils.Vector(
+                        (- 3 * scalefactor, - 3 * scalefactor, 0))
+                    obj.data.vertices[1].co = mathutils.Vector(
+                        (3 * scalefactor, - 3 * scalefactor, 0))
+                    obj.data.vertices[2].co = mathutils.Vector(
+                        (- 3 * scalefactor, 3 * scalefactor, 0))
+                    obj.data.vertices[3].co = mathutils.Vector(
+                        (3 * scalefactor, 3 * scalefactor, 0))
+
+                    obj.select_set(True)
+                    context.view_layer.objects.active = obj
+                    bpy.ops.object.transform_apply(
+                        location=False, rotation=False, scale=True)
 
         Orderbool = False
         for ob in data.objects:
@@ -759,7 +784,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_idname = "apl.coup"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.view_layer.objects.active != None) and context.mode == 'OBJECT':
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -1194,7 +1219,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
     bl_label = "PP_OT_ApplyAllCouplings"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if (context.view_layer.objects.active != None):
@@ -1264,7 +1289,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
     bl_idname = "rem.coup"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if (context.view_layer.objects.active != None):
@@ -1448,7 +1473,7 @@ class PP_OT_MoveModDown(bpy.types.Operator):
     bl_label = "PP_OT_MoveModDown"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if (context.view_layer.objects.active != None):
@@ -1482,7 +1507,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
     bl_label = "PP_OT_MoveModup"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if (context.view_layer.objects.active != None):
@@ -1538,7 +1563,7 @@ class PP_OT_Ini(bpy.types.Operator):
     bl_idname = "pup.init"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -1589,7 +1614,7 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
     bl_label = "PP_OT_ToggleCoupVisibility"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if (context.view_layer.objects.active != None):
@@ -1622,7 +1647,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
     bl_label = "PP_OT_ActiveCoupDefault"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.view_layer.objects.active != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -1645,7 +1670,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             else:
                 PUrP.SingleCouplingModes = "2"
 
-            if len(obj.children) != 0:
+            if len(obj.children) != 0:  # flatcut
                 # print(f"meshadata name {obj.data.name}")
                 if "Cube" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '1'
@@ -1708,8 +1733,9 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 PUrP.PlanarCouplingTypes = "14"
             elif "T-Straight" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "15"
+            elif "T-Straight" in obj.data.name:
+                PUrP.PlanarCouplingTypes = "16"
 
-            PUrP.CoupSize = obj.scale.x
             # Apply scale e.g. zscale determination
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
@@ -1718,9 +1744,15 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].relative_offset_displace[1]
             PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
-            # double checl
-            PUrP.OffsetRight = obj.data.vertices[0].co.x*4 - 1.5
-            PUrP.OffsetLeft = - obj.data.vertices[1].co.x*4 - 1.5
+
+            coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+            PUrP.CoupScale = obj.data.vertices[3].co.x / coupfaktor
+
+            PUrP.OffsetRight = obj.data.vertices[0].co.x - \
+                1.5*coupfaktor * PUrP.CoupScale
+
+            PUrP.OffsetLeft = - \
+                obj.data.vertices[1].co.x - 1.5*coupfaktor * PUrP.CoupScale
 
             #
 
@@ -1815,7 +1847,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
     bl_label = "PP_OT_CouplingOrder"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':

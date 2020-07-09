@@ -45,6 +45,10 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Buildplate Y-Dimensions", default=19, min=0.0)
     BuildplateZ = bpy.props.FloatProperty(
         name="Buildplate Z-Dimensions", default=19, min=0.0)
+    CoupScale = bpy.props.FloatProperty(
+        name="Connector Scale", default=1)
+    PlanarCorScale = bpy.props.FloatProperty(
+        name="PlanarKorrekturBG", default=1)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

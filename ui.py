@@ -49,6 +49,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 subcol.prop(PUrP, "SingleCouplingTypes", text='Coupling Type')
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text='Coupling Type')
+            subcol.prop(PUrP, "GlobalScale", text='Global Scale')
+            subcol.prop(PUrP, "CoupScale", text='Connector Scale')
 
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":  # cylinder cone
                 subcol.prop(context.scene.PUrP, "CylVert", text='Vertices')
@@ -57,11 +59,11 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 if PUrP.SingleCouplingTypes == "3":
                     subcol.prop(PUrP, "bRadius", text='Radius Top')
 
-            subcol.prop(PUrP, "GlobalScale", text='Globalscalefaktor')
             # for stick, mf, planecut
             if context.scene.PUrP.SingleCouplingModes == '1' or context.scene.PUrP.SingleCouplingModes == '2' or context.scene.PUrP.SingleCouplingModes == '3':
+
                 subcol.prop(PUrP, "Oversize", text='Oversize')
-                subcol.prop(PUrP, "CoupSize", text='Coupling Size')
+                subcol.prop(PUrP, "CoupSize", text='Inlay Size')
                 subcol.prop(PUrP, "zScale", text='z-Scale')
                 subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
                 subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
