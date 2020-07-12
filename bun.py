@@ -72,6 +72,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.name = str(
                 PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
             newname_mainplane = context.object.name
+            context.object.scale *= PUrP.GlobalScale * PUrP.CoupScale
+            bpy.ops.object.transform_apply(
+                location=False, rotation=False, scale=True)
 
             # bpy.ops.object.modifier_add(type='SOLIDIFY')
             mod = context.object.modifiers.new(
@@ -1662,6 +1665,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
         if "SingleConnector" in obj.name:
             PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
+            PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
 
             if len(obj.children) == 0:
                 PUrP.SingleCouplingModes = "3"
