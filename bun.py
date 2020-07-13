@@ -1674,7 +1674,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             else:
                 PUrP.SingleCouplingModes = "2"
 
-            if len(obj.children) != 0:  # flatcut
+            if len(obj.children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")
                 if "Cube" in obj.children[0].data.name:
                     PUrP.SingleCouplingTypes = '1'
