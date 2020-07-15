@@ -61,7 +61,7 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-       # self.window_width = context.window.width
+        # self.window_width = context.window.width
         self.init_scale_x = context.object.children[1].scale.x
         self.init_scale_y = context.object.children[1].scale.y
         self.init_scale_z = context.object.children[1].scale.z
@@ -137,7 +137,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-       # self.window_width = context.window.width
+        # self.window_width = context.window.width
         self.init_scale_x0 = context.object.children[0].scale.x
         self.init_scale_y0 = context.object.children[0].scale.y
         self.init_scale_z0 = context.object.children[0].scale.z
@@ -322,6 +322,63 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+class PP_OT_CoupScaleGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.coupscalegizmo"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        ob = context.object
+
+        ob.scale = self.value
+
+        context.scene.PUrP.CoupScale = ob.data.vertices[1].co.x / (
+            3 * PUrP.GlobalScale)
+        # print(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        ob = context.object
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_x - self.init_value
+            print(
+                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.init_scale {self.init_scale} ")
+            self.value = self.init_scale + \
+                mathutils.Vector(
+                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            bpy.ops.object.transform_apply(
+                location=False, rotation=False, scale=True)
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.scale = self.init_scale
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+        self.init_scale = ob.scale.copy()
+        self.init_value = event.mouse_x
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.scale
+        self.execute(context)
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
 class PUrP_SinglCoupGizmo(GizmoGroup):
     bl_idname = "OBJECT_GGT_test_camera"
     bl_label = "Object Camera Test Widget"
@@ -361,7 +418,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         mpr.color_highlight = 0.03, 0.05, 1.0
         mpr.alpha_highlight = 1.0
-        
+
         mpr.scale_basis = 0.3
         #mpr.matrix_offset[2][3] = 1
 
@@ -376,7 +433,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # props.release_confirm = True
 
         mpa.matrix_basis = ob.matrix_world.normalized()
-        
+
         mpa.line_width = 3
 
         mpa.color = 0.2, 0.2, 0.8
@@ -390,7 +447,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         # zscale gizmot
         mph = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         mph.target_set_operator("object.zscale")
-        
+
         mph.use_draw_offset_scale = True
         mph.matrix_basis = ob.matrix_world.normalized()
         mph.color = 0.8, 0.03, 0.03
@@ -405,7 +462,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpo.target_set_operator("purp.bevoffset")
         mpo.use_draw_offset_scale = True
         mpo.matrix_basis = ob.matrix_world.normalized()
-        #mpo.matrix_offset[2][0] = 0.5  # [3] - location, 0 -x
+        # mpo.matrix_offset[2][0] = 0.5  # [3] - location, 0 -x
         # mpo.matrix_basis[2][3] += 8
         # mpo.matrix_basis[0][3] += 3
         mpo.line_width = 10
@@ -417,7 +474,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpo.alpha_highlight = 1.0
         mpo.scale_basis = 0.5
 
-        #mpo.use_draw_value
+        # mpo.use_draw_value
 
         self.roll_wid = mpo
 
@@ -425,7 +482,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mps = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
         # mps = self.gizmos.new("GIZMO_GT_dial_3d")
         mps.target_set_operator("purp.bevseggiz")
-        
+
         mps.use_draw_offset_scale = True
         mps.matrix_basis = ob.matrix_world.normalized()
         #mps.matrix_offset[2][0] = 0.2
@@ -440,13 +497,13 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mps.color_highlight = 0.01, 1.0, 0.01
         mps.alpha_highlight = 1.0
         mps.scale_basis = 0.2
-        #mps.use_draw_value
+        # mps.use_draw_value
 
         self.bevseggizm = mps
 
-        ###connectorsize 
+        # connectorsize
         mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
-        mcsize.target_set_operator("purp.bevseggiz") ###needs operator 
+        mcsize.target_set_operator("purp.coupscalegizmo")  # needs operator
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
@@ -462,53 +519,50 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mcsize.color_highlight = 0.01, 1.0, 0.01
         mcsize.alpha_highlight = 1.0
         mcsize.scale_basis = 2
-        
 
-        self.couplingScale = mcsize 
+        self.couplingScale = mcsize
 
     def refresh(self, context):
         ob = context.object
 
-
-        #oversize 
+        # oversize
         mpr = self.roll_widget
         mpr.matrix_basis = ob.matrix_world.normalized()
         mpr.matrix_offset[2][3] = 2
-        
-        #couplesize
+
+        # couplesize
         mpa = self.roll_widge
         mpa.matrix_basis = ob.matrix_world.normalized()
         mpa.matrix_offset[2][3] = 0
-        
-        
-        #### zScale 
+
+        # zScale
         mph = self.roll_widg
         mph.matrix_basis = ob.matrix_world.normalized()
         mph.scale_basis = 0.5
         mph.matrix_offset[2][3] = 3
 
-
-        #bev offset
+        # bev offset
         mpo = self.roll_wid
         mpo.matrix_basis = ob.matrix_world.normalized()
         mpo.matrix_offset[0][3] = 2
         mpo.matrix_offset[2][3] = 2
-        
+
         mps = self.bevseggizm
-        if context.scene.PUrP.BevelOffset > 0: 
-            #bev segment 
+        if context.scene.PUrP.BevelOffset > 0:
+            # bev segment
             mps.matrix_basis = ob.matrix_world.normalized()
             mps.matrix_offset[0][3] = 3
             mps.matrix_offset[2][3] = 3
             mps.scale_basis = 0.2
-        else: 
+        else:
             mps.scale_basis = 0.0001
 
         mcsize = self.couplingScale
-        mcsize.matrix_basis =  ob.matrix_world.normalized()
+        mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.matrix_offset[2][3] = -0.5
 
 # planar connector gizmos
+
 
 def has_stopper(obj):
     lowestvert = 0
@@ -1165,7 +1219,7 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = ob.modifiers["PUrP_Array_2"].count
 
-        self.init_count = ob.modifiers["PUrP_Array_2"].count
+        self.init_count = ob.modifiers["PUrP_Array_2"].count.copy()
 
         self.execute(context)
 
@@ -1329,7 +1383,8 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = ob.modifiers["PUrP_Solidify"].thickness
 
-        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
+        helpi = str(ob.modifiers["PUrP_Solidify"].thickness)
+        self.init_count = float(helpi)
 
         self.execute(context)
 

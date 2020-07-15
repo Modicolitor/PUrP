@@ -24,6 +24,7 @@ from .gizmos import PP_OT_PlanarLineCountGizmo
 from .gizmos import PP_OT_PlanarLineLengthGizmo
 from .gizmos import PP_OT_PlanarLineDistanceGizmo
 from .gizmos import PP_OT_PlanarThicknessGizmo
+from .gizmos import PP_OT_CoupScaleGizmo
 
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowUpShapeWidget
@@ -32,7 +33,6 @@ from .gizmotshape import PUrP_LineLengthShapeWidget
 from .gizmotshape import PUrP_LineDistanceShapeWidget
 from .gizmotshape import PUrP_ThicknessShapeWidget
 from .gizmotshape import PUrP_CubeShapeWidget
-
 
 
 from .ui import PP_PT_PuzzlePrintMenu
@@ -99,6 +99,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_ApplyPlanarMultiObj,
            PP_OT_ApplyMultiplePlanarToObject,
            PP_OT_OversizeGizmo,
+           PP_OT_CoupScaleGizmo,
            PUrP_SinglCoupGizmo,
            PUrP_PlanarGizmo,
            PP_OT_CouplSizeGizmo,
