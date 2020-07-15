@@ -121,7 +121,7 @@ class PUrP_CornerShapeWidget(Gizmo):
         return {'RUNNING_MODAL'}
 
 
-# vertices pfeil
+# vertices pfeil up
 p0 = Vector((-0.18262259662151337, 6.799549367997315e-08, -1.2501908540725708))
 p1 = Vector((0.1815710812807083, 6.799549367997315e-08, -1.2501908540725708))
 p2 = Vector((-0.18262259662151337, -1.9427282893502706e-08, 0.7498091459274292))
@@ -133,7 +133,7 @@ p7 = Vector((0.4567919075489044, -1.9427282893502706e-08, 0.7498091459274292))
 p8 = Vector((-0.0005257626180537045, -1.9427282893502706e-08, 1.342955231666565))
 
 
-arrow_shape_verts = (
+arrowup_shape_verts = (
     p0, p1, p2,
     p1, p2, p3,
     p2, p3, p4,
@@ -145,7 +145,11 @@ arrow_shape_verts = (
 )
 
 
-class PUrP_ArrowShapeWidget(Gizmo):
+
+
+
+
+class PUrP_ArrowUpShapeWidget(Gizmo):
     bl_idname = "VIEW3D_GT_PURP"
     bl_target_properties = (
         {"id": "scale", "type": 'FLOAT', "array_length": 1},
@@ -176,7 +180,7 @@ class PUrP_ArrowShapeWidget(Gizmo):
     def setup(self):
         if not hasattr(self, "custom_shape"):
             self.custom_shape = self.new_custom_shape(
-                'TRIS', arrow_shape_verts)
+                'TRIS', arrowup_shape_verts)
 
     def invoke(self, context, event):
         self.init_mouse_y = event.mouse_y
@@ -561,3 +565,91 @@ class PUrP_ThicknessShapeWidget(Gizmo):
         # self.target_set_value("offset", value)
         # context.area.header_text_set("My Gizmo: %.4f" % value)
         return {'RUNNING_MODAL'}
+
+
+
+
+
+cube0 = Vector((-0.6875224113464355, -0.6875224113464355, -0.6875224113464355))
+cube1 = Vector((-0.6875224113464355, -0.6875224113464355, 0.6875224113464355))
+cube2 = Vector((-0.6875224113464355, 0.6875224113464355, -0.6875224113464355))
+cube3 = Vector((-0.6875224113464355, 0.6875224113464355, 0.6875224113464355))
+cube4 = Vector((0.6875224113464355, -0.6875224113464355, -0.6875224113464355))
+cube5 = Vector((0.6875224113464355, -0.6875224113464355, 0.6875224113464355))
+cube6 = Vector((0.6875224113464355, 0.6875224113464355, -0.6875224113464355))
+cube7 = Vector((0.6875224113464355, 0.6875224113464355, 0.6875224113464355))
+
+
+
+cube_shape_verts = (
+    cube0, cube1, cube3,
+    cube0, cube2, cube3,
+    cube7, cube2, cube3,
+    cube7, cube2, cube6,
+    cube6, cube5, cube7,
+    cube6, cube5, cube4,
+    cube1, cube5, cube4,
+    cube0, cube1, cube4,
+    cube0, cube2, cube4,
+    cube6, cube2, cube4,
+    cube1, cube3, cube7,
+    cube1, cube5, cube7,
+
+)
+
+
+
+class PUrP_CubeShapeWidget(Gizmo):
+    bl_idname = "VIEW3D_GT_PURP_Cube"
+    bl_target_properties = (
+        {"id": "scale", "type": 'FLOAT', "array_length": 1},
+    )
+
+    __slots__ = (
+        "custom_shape",
+        "init_mouse_y",
+        "init_value",
+    )
+
+    # def matrix_basis():
+
+    def _update_offset_matrix(self):
+        # offset behind the light
+        # print("jaja")
+        #self.matrix_offset.col[3][2] = context.object.matrix_world
+        pass
+
+    def draw(self, context):
+        # self._update_offset_matrix()
+        self.draw_custom_shape(self.custom_shape)
+
+    def draw_select(self, context, select_id):
+        # self._update_offset_matrix()
+        self.draw_custom_shape(self.custom_shape, select_id=select_id)
+
+    def setup(self):
+        if not hasattr(self, "custom_shape"):
+            self.custom_shape = self.new_custom_shape(
+                'TRIS', cube_shape_verts)
+
+    def invoke(self, context, event):
+        self.init_mouse_y = event.mouse_y
+        # self.init_value = self.target_get_value("offset")
+        return {'RUNNING_MODAL'}
+
+    def exit(self, context, cancel):
+        context.area.header_text_set(None)
+        # if cancel:
+        #    self.target_set_value("offset", self.init_value)
+
+    def modal(self, context, event, tweak):
+        delta = (event.mouse_y - self.init_mouse_y) / 10.0
+        # if 'SNAP' in tweak:
+        #    delta = round(delta)
+        # if 'PRECISE' in tweak:
+        #    delta /= 10.0
+        # value = self.init_value - delta
+        # self.target_set_value("offset", value)
+        # context.area.header_text_set("My Gizmo: %.4f" % value)
+        return {'RUNNING_MODAL'}
+

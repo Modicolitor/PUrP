@@ -1,10 +1,11 @@
 import bpy
 from .gizmotshape import PUrP_CornerShapeWidget
-from .gizmotshape import PUrP_ArrowShapeWidget
+from .gizmotshape import PUrP_ArrowUpShapeWidget
 from .gizmotshape import PUrP_linecountShapeWidget
 from .gizmotshape import PUrP_LineLengthShapeWidget
 from .gizmotshape import PUrP_LineDistanceShapeWidget
 from .gizmotshape import PUrP_ThicknessShapeWidget
+from .gizmotshape import PUrP_CubeShapeWidget
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -345,14 +346,14 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         ob = context.object
 
         # matrixWorld = context.object[:]
-        mpr = self.gizmos.new("GIZMO_GT_dial_3d")
+        mpr = self.gizmos.new(PUrP_CubeShapeWidget.bl_idname)
         props = mpr.target_set_operator("object.oversize")
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
 
         mpr.matrix_basis = ob.matrix_world.normalized()
-
+        mpr.use_draw_offset_scale = True
         mpr.line_width = 3
 
         mpr.color = 0.05, 0.2, 0.8
@@ -360,17 +361,22 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         mpr.color_highlight = 0.03, 0.05, 1.0
         mpr.alpha_highlight = 1.0
+        
+        mpr.scale_basis = 0.3
+        #mpr.matrix_offset[2][3] = 1
 
         self.roll_widget = mpr
 
         # couple size gizmot
-        mpa = self.gizmos.new("GIZMO_GT_dial_3d")
+        mpa = self.gizmos.new(PUrP_CubeShapeWidget.bl_idname)
         props = mpa.target_set_operator("object.couplesize")
+        mpa.use_draw_offset_scale = True
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
         # props.release_confirm = True
 
         mpa.matrix_basis = ob.matrix_world.normalized()
+        
         mpa.line_width = 3
 
         mpa.color = 0.2, 0.2, 0.8
@@ -378,29 +384,28 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         mpa.color_highlight = 0.2, 0.03, 0.9
         mpa.alpha_highlight = 1.0
-        mpa.scale_basis = 2
+        mpa.scale_basis = 0.5
         self.roll_widge = mpa
 
         # zscale gizmot
-        mph = self.gizmos.new("GIZMO_GT_arrow_3d")
+        mph = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         mph.target_set_operator("object.zscale")
-
+        
+        mph.use_draw_offset_scale = True
         mph.matrix_basis = ob.matrix_world.normalized()
-        mph.draw_style = 'BOX'
-
-        mph.color = 1.0, 0.03, 0.03
+        mph.color = 0.8, 0.03, 0.03
         mph.alpha = 0.5
-        mph.color_highlight = 1.0, 0.03, 0.04
-        mph.alpha_highlight = 0.5
+        mph.color_highlight = 1.0, 0.05, 0.05
+        mph.alpha_highlight = 1
         self.roll_widg = mph
 
         # Bevel offset gizmot
         mpo = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
         # mpo = self.gizmos.new("GIZMO_GT_dial_3d")
         mpo.target_set_operator("purp.bevoffset")
-
+        mpo.use_draw_offset_scale = True
         mpo.matrix_basis = ob.matrix_world.normalized()
-        mpo.matrix_offset.col[3][0] += 0.5  # [3] - location, 0 -x
+        #mpo.matrix_offset[2][0] = 0.5  # [3] - location, 0 -x
         # mpo.matrix_basis[2][3] += 8
         # mpo.matrix_basis[0][3] += 3
         mpo.line_width = 10
@@ -412,7 +417,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpo.alpha_highlight = 1.0
         mpo.scale_basis = 0.5
 
-        mpo.use_draw_value
+        #mpo.use_draw_value
 
         self.roll_wid = mpo
 
@@ -420,10 +425,11 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mps = self.gizmos.new(PUrP_CornerShapeWidget.bl_idname)
         # mps = self.gizmos.new("GIZMO_GT_dial_3d")
         mps.target_set_operator("purp.bevseggiz")
-
+        
+        mps.use_draw_offset_scale = True
         mps.matrix_basis = ob.matrix_world.normalized()
-        mps.matrix_offset.col[3][0] += 0.2
-        mps.matrix_offset.col[3][2] -= 0.5
+        #mps.matrix_offset[2][0] = 0.2
+        #mps.matrix_offset[2][2] = 0.5
         # mps.matrix_basis[2][3] += 0.8
         # mps.matrix_basis[0][3] += 0.5
         mps.line_width = 10
@@ -434,28 +440,73 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mps.color_highlight = 0.01, 1.0, 0.01
         mps.alpha_highlight = 1.0
         mps.scale_basis = 0.2
-        mps.use_draw_value
+        #mps.use_draw_value
 
         self.bevseggizm = mps
+
+        ###connectorsize 
+        mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
+        mcsize.target_set_operator("purp.bevseggiz") ###needs operator 
+        mcsize.use_draw_offset_scale = True
+        mcsize.matrix_basis = ob.matrix_world.normalized()
+        mcsize.use_draw_value = True
+        #mps.matrix_offset[2][0] = 0.2
+        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_basis[2][3] += 0.8
+        # mps.matrix_basis[0][3] += 0.5
+        mcsize.line_width = 3
+
+        mcsize.color = 0.03, 0.8, 0.03
+        mcsize.alpha = 0.5
+
+        mcsize.color_highlight = 0.01, 1.0, 0.01
+        mcsize.alpha_highlight = 1.0
+        mcsize.scale_basis = 2
+        
+
+        self.couplingScale = mcsize 
 
     def refresh(self, context):
         ob = context.object
 
+
+        #oversize 
         mpr = self.roll_widget
-        mpa = self.roll_widge
-        mph = self.roll_widg
-        mpo = self.roll_wid
-        mps = self.bevseggizm
-
-        mpa.matrix_basis = ob.matrix_world.normalized()
-        mph.matrix_basis = ob.matrix_world.normalized()
         mpr.matrix_basis = ob.matrix_world.normalized()
+        mpr.matrix_offset[2][3] = 2
+        
+        #couplesize
+        mpa = self.roll_widge
+        mpa.matrix_basis = ob.matrix_world.normalized()
+        mpa.matrix_offset[2][3] = 0
+        
+        
+        #### zScale 
+        mph = self.roll_widg
+        mph.matrix_basis = ob.matrix_world.normalized()
+        mph.scale_basis = 0.5
+        mph.matrix_offset[2][3] = 3
 
+
+        #bev offset
+        mpo = self.roll_wid
         mpo.matrix_basis = ob.matrix_world.normalized()
-        mpo.matrix_basis[2][3] += 1
-        mps.matrix_basis = ob.matrix_world.normalized()
-        mps.matrix_basis[2][3] += 1
+        mpo.matrix_offset[0][3] = 2
+        mpo.matrix_offset[2][3] = 2
+        
+        mps = self.bevseggizm
+        if context.scene.PUrP.BevelOffset > 0: 
+            #bev segment 
+            mps.matrix_basis = ob.matrix_world.normalized()
+            mps.matrix_offset[0][3] = 3
+            mps.matrix_offset[2][3] = 3
+            mps.scale_basis = 0.2
+        else: 
+            mps.scale_basis = 0.0001
 
+        mcsize = self.couplingScale
+        mcsize.matrix_basis =  ob.matrix_world.normalized()
+        mcsize.matrix_offset[2][3] = -0.5
 
 # planar connector gizmos
 
@@ -497,7 +548,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # Run an operator using the dial gizmo
         ob = context.object
 
-        mpr = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        mpr = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         props = mpr.target_set_operator("purp.roffsetgiz")
 
         mpr.matrix_basis = ob.matrix_world.normalized()
@@ -509,7 +560,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_trans = mathutils.Matrix.Translation(ob.location)
         mat = mat_trans @ mat_rot1
         mpr.matrix_offset = mat
-        mpr.matrix_offset[0][3] = 1
+        #mpr.matrix_offset[0][3] = 1
 
         #mpr.scale_basis = 0.5
         mpr.line_width = 3
@@ -521,7 +572,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         self.Roffset = mpr
 
         # left offset
-        mpl = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        mpl = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         props = mpl.target_set_operator("purp.loffsetgiz")
         mpl.use_draw_offset_scale = True
         # props.constraint_axis = True, True, True
@@ -549,7 +600,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         self.Loffset = mpl
 
         # zscale
-        mpz = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        mpz = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         props = mpz.target_set_operator("purp.planzscalegiz")
         # props.constraint_axis = True, True, True
         # props.orient_type = 'LOCAL'
@@ -571,7 +622,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # stopper scale
 
         # if has_stopper():
-        mps = self.gizmos.new(PUrP_ArrowShapeWidget.bl_idname)
+        mps = self.gizmos.new(PUrP_ArrowUpShapeWidget.bl_idname)
         props = mps.target_set_operator("purp.stopperheightgiz")
         mps.use_draw_offset_scale = True
         # props.constraint_axis = True, True, True
@@ -711,11 +762,6 @@ class PUrP_PlanarGizmo(GizmoGroup):
         else:
 
             mps = self.stopper
-
-            # mat_rot2 = mathutils.Matrix.Rotation(
-            #    radians(-90.0), 4, 'X')  # rotate
-            #mat_trans = mathutils.Matrix.Translation(ob.location)
-            #mat = mat_trans @ mat_rot2
             mps.matrix_basis = ob.matrix_world.normalized()
             mps.matrix_basis[2][3] = +1.5
             mps.scale_basis = 0.0001
