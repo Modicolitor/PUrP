@@ -611,13 +611,14 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
 
         #mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
+        #mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
         mat = mat_trans @ mat_rot1
         mpr.matrix_offset = mat
         #mpr.matrix_offset[0][3] = 1
-
+        mpr.select_bias = 5
         #mpr.scale_basis = 0.5
-        mpr.line_width = 3
+        mpr.line_width = 50
         mpr.color = 0.05, 0.2, 0.8
         mpr.alpha = 0.5
         mpr.color_highlight = 0.03, 0.05, 1.0
@@ -639,7 +640,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_rot2 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Y')  # rotate
 
         #mat_rot = mat_rot1 @ mat_rot2
-        mat_trans = mathutils.Matrix.Translation(ob.location)
+        mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
         mat = mat_trans @ mat_rot2
         mpl.matrix_offset = mat
         #mpl.matrix_basis[0][3] += 0.4
@@ -779,13 +780,34 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mpthickness.matrix_offset[0][3] = 1
 
         mpthickness.scale_basis = 1
-        mpthickness.line_width = 3
+        mpthickness.line_width = 20
         mpthickness.color = 0.05, 0.2, 0.8
         mpthickness.alpha = 0.5
         mpthickness.color_highlight = 0.03, 0.05, 1.0
         mpthickness.alpha_highlight = 1.0
 
         self.thickness = mpthickness
+
+        # connectorsize
+        mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
+        mcsize.target_set_operator("purp.coupscalegizmo")  # needs operator
+        mcsize.use_draw_offset_scale = True
+        mcsize.matrix_basis = ob.matrix_world.normalized()
+        mcsize.use_draw_value = True
+        #mps.matrix_offset[2][0] = 0.2
+        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_basis[2][3] += 0.8
+        # mps.matrix_basis[0][3] += 0.5
+        mcsize.line_width = 3
+
+        mcsize.color = 0.03, 0.8, 0.03
+        mcsize.alpha = 0.5
+
+        mcsize.color_highlight = 0.01, 1.0, 0.01
+        mcsize.alpha_highlight = 1.0
+        mcsize.scale_basis = 2
+
+        self.couplingScale = mcsize
 
     def refresh(self, context):
         ob = context.object
@@ -850,6 +872,10 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mpthickness.matrix_offset[0][3] = +1
         mpthickness.matrix_offset[1][3] = -1
         mpthickness.scale_basis = 1
+
+        mcsize = self.couplingScale
+        mcsize.matrix_basis = ob.matrix_world.normalized()
+        mcsize.matrix_offset[2][3] = -0.5
 
 
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
