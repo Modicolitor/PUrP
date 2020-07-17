@@ -341,9 +341,10 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         ob = context.object
 
         ob.scale = self.value
-
-        context.scene.PUrP.CoupScale = ob.data.vertices[1].co.x / (
-            3 * PUrP.GlobalScale)
+        # bpy.ops.object.transform_apply(
+        #    location=False, rotation=False, scale=True)
+        PUrP.CoupScale = ob.data.vertices[1].co.x * \
+            self.value[0] / (3 * PUrP.GlobalScale)
         # print(self.value)
         return {'FINISHED'}
 
@@ -353,7 +354,7 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
 
             self.delta = event.mouse_x - self.init_value
             print(
-                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.init_scale {self.init_scale} ")
+                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
             self.value = self.init_scale + \
                 mathutils.Vector(
                     (self.delta / 1000, self.delta / 1000, self.delta / 1000))

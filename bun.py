@@ -783,7 +783,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     bpy.ops.object.transform_apply(
                         location=False, rotation=False, scale=True)
 
-        '''
         Orderbool = False
         for ob in data.objects:
             if "PUrP" in ob.name and "_Order":
@@ -791,7 +790,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 bpy.ops.pup.couplingorder()
                 bpy.ops.pup.couplingorder()
                 break
-        '''
+
         return {'FINISHED'}
 
 

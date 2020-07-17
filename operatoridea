@@ -71,6 +71,11 @@ after applying
 bugs:
 general operator bug:
 
+[] remap active doesn't remap the modifiers
+
+[+] connector scale factor from active to setting --> negativ
+[+] connector scale factor from scale gizmo
+[] connector inlay size changes when scaled
 
 
 [] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
