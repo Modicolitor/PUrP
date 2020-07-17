@@ -1691,7 +1691,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 for child in obj.children:
                     if "diff" in child.name:
                         PUrP.CoupSize = child.scale.x
-                        PUrP.zScale = child.scale.z
+                        PUrP.zScale = child.scale.z / PUrP.CoupSize
                         # double check
                         PUrP.BevelSegments = child.modifiers[0].segments
                         PUrP.BevelOffset = child.modifiers[0].width
@@ -1800,6 +1800,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
     def coneanalysizer(self, context, obj):
         # Cyclvert, and the radius are extrakted; Coupling types
+        PUrP = context.scene.PUrP
 
         upperverts = []
         lowerverts = []
@@ -1817,18 +1818,22 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 # vert on an axis has the radius as co.axis
                 if v.co.x == 0:
                     bRadius = v.co.y
+                    bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                     break
                 if v.co.y == 0:
                     bRadius = v.co.x
+                    bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                     break
         # lower radius
         Cyclvert = len(upperverts)
         for v in lowerverts:
             if v.co.x == 0:
                 aRadius = v.co.y
+                aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
                 break
             if v.co.y == 0:
                 aRadius = v.co.x
+                aRadius = aRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                 break
 
         return Cyclvert, aRadius, bRadius

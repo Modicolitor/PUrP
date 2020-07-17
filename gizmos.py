@@ -178,7 +178,8 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
         context.object.children[1].scale.z = self.value - (
             context.object.children[0].scale.z - context.object.children[1].scale.z)
         context.object.children[0].scale.z = self.value
-        context.scene.PUrP.zScale = self.value
+        PUrP = context.scene.PUrP
+        PUrP.zScale = self.value / PUrP.CoupSize
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -615,6 +616,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
         mat = mat_trans @ mat_rot1
         mpr.matrix_offset = mat
+        mpr.matrix_offset[0][3] = 1.5
         #mpr.matrix_offset[0][3] = 1
         mpr.select_bias = 5
         #mpr.scale_basis = 0.5
@@ -814,7 +816,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # if has_stopper(ob):
         mpr = self.Roffset
         mpr.matrix_basis = ob.matrix_world.normalized()
-        mpr.matrix_offset[0][3] = 1.5
+        #mpr.matrix_offset[0][3] = 1.5
 
         mpl = self.Loffset
         mpl.matrix_basis = ob.matrix_world.normalized()
@@ -896,7 +898,9 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         for v in self.rightestV:
             v.co.x = self.value
 
-        context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x*4 - 1.5
+        PUrP = context.scene.PUrP
+        context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x - \
+            1.5*self.coupfaktor * PUrP.CoupScale
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -935,6 +939,10 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = rightestx  # ???
 
+        PUrP = context.scene.PUrP
+        self.coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+        PUrP.CoupScale = ob.data.vertices[3].co.x / self.coupfaktor
+
         self.execute(context)
 
         context.window_manager.modal_handler_add(self)
@@ -956,10 +964,13 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
+
         for v in self.leftestV:
             v.co.x = self.value
 
-        context.scene.PUrP.OffsetLeft = - ob.data.vertices[1].co.x*4 - 1.5
+        PUrP = context.scene.PUrP
+        PUrP.OffsetLeft = - \
+            ob.data.vertices[1].co.x - 1.5*self.coupfaktor * PUrP.CoupScale
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -998,6 +1009,10 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = leftestx  # ???
 
+        PUrP = context.scene.PUrP
+        self.coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+        PUrP.CoupScale = ob.data.vertices[3].co.x / self.coupfaktor
+
         self.execute(context)
 
         context.window_manager.modal_handler_add(self)
@@ -1018,7 +1033,7 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-
+        PUrP = context.scene.PUrP
         if self.has_stopper:
             if self.valuemiddle >= 0:  # upper limiter
                 for v in self.middleV:

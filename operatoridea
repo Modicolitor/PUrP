@@ -72,9 +72,7 @@ bugs:
 general operator bug:
 
 
-[] COUPscale planar for active to setting and add (scale should not be 1 but coup scale )
 
-[] correct from user scale: Single multiply scale of mainplane with the inlays and apply scale to all 
 
 [] exchange multiple couplings broken
 
@@ -85,27 +83,32 @@ planar stuff
 
 
 gizmos
-[] ********gizmos size absolut or relativ to coup scaling (planar), probaly because not centered but moved.
+
 
 [] thickness gizmo beschränken und feiner
-[] left right offset gizmos not refreshing position
-[]left right offset gizmos give wrong values back to PUrP
 
 
 
-[] planar scale  gizmos
+
 [] color planar gizmos
 
 
 
 mögliche Probleme
-[] gizmos einschränkungen (bevelsegment only when beveldistance > .... ) maybe broken when settings in props not updated 
+
 
 
 
 
 
 resolved bug:
+[+] ********gizmos size absolut or relativ to coup scaling (planar), probaly because not centered but moved.
+[+] left right offset gizmos not refreshing position
+[+]left right offset gizmos give wrong values back to PUrP
+[+] planar scale  gizmos
+[+] COUPscale planar for active to setting and add (scale should not be 1 but coup scale )
+[+] gizmos einschränkungen (bevelsegment only when beveldistance > .... ) maybe broken when settings in props not updated 
+[+] correct from user scale: Single multiply scale of mainplane with the inlays and apply scale to all 
 [+] with puzzle not all vertices moving together with zScale gizmo (not the same height?)
 [+] planar gizmos thickness (Oversize)
 [+] new apply operator: apply Active Planar to several selected objects
