@@ -71,18 +71,10 @@ after applying
 bugs:
 general operator bug:
 
-
+[] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
 
 
 [] exchange multiple couplings broken
-
-in apply 
-
-
-planar stuff 
-
-
-gizmos
 
 
 [] thickness gizmo beschränken und feiner
@@ -95,8 +87,27 @@ gizmos
 
 
 mögliche Probleme
+[] Order System 
+
+Tests
+[] test linux, Mag
+[] Active settings with for global scale influence
+[] using globalsize
+[] move up and down with fremde modifiers 
+[]  Special Apply Operator:does modifier remain? 
 
 
+Publishing: 
+[] Small Website inkl. Documentation
+[] Exampels:
+    [] Wappenhand
+    [] 3d Kontur Puzzle viereckig
+    [] WallTiles
+    [] Puzzle dreieckig
+    [] Lifesize Run protagonist 
+    [] Bewegliche Actionfigure
+    #[] Architecture --> Shorty fragen ob der was designed
+    #[] Landscape
 
 
 
@@ -148,22 +159,3 @@ resolved bug:
 [+] single coupling gizmot
     [+]  bevel options 
 
-Tests
-[] test linux, Mag
-[] Active settings with for global scale influence
-[] using globalsize
-[] move up and down with fremde modifiers 
-[]  Special Apply Operator:does modifier remain? 
-
-
-Publishing: 
-[] Small Website inkl. Documentation
-[] Exampels:
-    [] Wappenhand
-    [] 3d Kontur Puzzle viereckig
-    [] WallTiles
-    [] Puzzle dreieckig
-    [] Lifesize Run protagonist 
-    [] Bewegliche Actionfigure
-    #[] Architecture --> Shorty fragen ob der was designed
-    #[] Landscape

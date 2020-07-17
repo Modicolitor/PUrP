@@ -687,16 +687,23 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
         context = bpy.context
         data = bpy.data
-        CenterObj = context.scene.PUrP.CenterObj
-        PUrP = bpy.context.scene.PUrP
+
+        # muss CenterOBj erst bestimmt werden ???
+        #CenterObj = context.scene.PUrP.CenterObj
+        PUrP = context.scene.PUrP
         CutThickness = PUrP.CutThickness
         GlobalScale = PUrP.GlobalScale
         zScale = PUrP.zScale
         PUrP_name = PUrP.PUrP_name
-        CouplingModes = bpy.context.scene.PUrP.SingleCouplingModes
+        CouplingModes = context.scene.PUrP.SingleCouplingModes
         selected = context.selected_objects[:]
 
         for obj in selected:  # für die selektierten
+            # deselct all
+            for ob in context.selected_objects:
+                ob.select_set(False)
+
+            CenterObj = obj.parent
             if PUrP_name in obj.name:  # eines meiner coupling
 
                 for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
@@ -722,11 +729,14 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         ob.select_set(False)
                     obj.select_set(True)
                     # delete the old planar coupling
+                    print(f"I delete now mainplane in exchange {obj} ")
+                    # delete mainplane before making new planar
                     bpy.ops.object.delete(use_global=False)
 
                     coupModeDivision(CenterObj, oldname)  # generate new planar
                     context.object.matrix_world = trans
-
+                    #obj = context.object
+                    # obj.select_set(True)
                     # context.object.location = loc
                     #  ##planarversion
                 else:  # when it was SingleCoupling, the mainplane is kept
@@ -771,6 +781,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     bpy.ops.object.transform_apply(
                         location=False, rotation=False, scale=True)
 
+        '''
         Orderbool = False
         for ob in data.objects:
             if "PUrP" in ob.name and "_Order":
@@ -778,7 +789,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 bpy.ops.pup.couplingorder()
                 bpy.ops.pup.couplingorder()
                 break
-
+        '''
         return {'FINISHED'}
 
 
