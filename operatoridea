@@ -71,23 +71,18 @@ after applying
 bugs:
 general operator bug:
 
+
+
 [] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
 
 
-[] exchange multiple couplings broken
 
 
-[] thickness gizmo beschränken und feiner
-
-
-
-
-[] color planar gizmos
-
+[] reorganize UI 
 
 
 mögliche Probleme
-[] Order System 
+[] Order System update system that stays out of the way 
 
 Tests
 [] test linux, Mag
@@ -113,6 +108,10 @@ Publishing:
 
 
 resolved bug:
+[+] checker if initialized for gizmos
+[+] color planar gizmos
+[+] thickness gizmo beschränken und feiner
+[x] exchange multiple couplings broken
 [+] ********gizmos size absolut or relativ to coup scaling (planar), probaly because not centered but moved.
 [+] left right offset gizmos not refreshing position
 [+]left right offset gizmos give wrong values back to PUrP

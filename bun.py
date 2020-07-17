@@ -606,7 +606,7 @@ def genPlanar():
     mod.thickness = Oversize
     mod.offset = -1.0
     mod.solidify_mode = "NON_MANIFOLD"
-    mod.nonmanifold_thickness_mode = 'FIXED'
+    mod.nonmanifold_thickness_mode = 'EVEN'
 
     mod.use_even_offset = True
     mod.use_rim = True
@@ -729,7 +729,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         ob.select_set(False)
                     obj.select_set(True)
                     # delete the old planar coupling
-                    print(f"I delete now mainplane in exchange {obj} ")
+                    #print(f"I delete now mainplane in exchange {obj} ")
                     # delete mainplane before making new planar
                     bpy.ops.object.delete(use_global=False)
 
@@ -741,7 +741,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     #  ##planarversion
                 else:  # when it was SingleCoupling, the mainplane is kept
                     if "Plane" not in obj.data.name:
-                        print(f"2obj.data.name {obj.data.name}")
+                        #print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
                         # oldname = obj.name

@@ -389,14 +389,19 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
     @classmethod
     def poll(cls, context):
+
         ob = context.object
+
         if ob != None:
             if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
                 if len(ob.children) > 1:  # flatcut has zero or
-                    # 1 (order) child... excluded from gizmos
-                    # if len(ob.children) != 1 and isnt_order(ob):
-                    # print(f"isnt {isnt_order(ob)}")
-                    return True
+                    try:
+                        test = context.scene.PUrP.GlobalScale
+                        return True
+                    except:
+                        return False
+                return False
+
             return False
 
     def setup(self, context):
@@ -414,10 +419,10 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpr.use_draw_offset_scale = True
         mpr.line_width = 3
 
-        mpr.color = 0.05, 0.2, 0.8
+        mpr.color = 0.03, 0.8, 0.8
         mpr.alpha = 0.5
 
-        mpr.color_highlight = 0.03, 0.05, 1.0
+        mpr.color_highlight = 0.03, 1.0, 1.0
         mpr.alpha_highlight = 1.0
 
         mpr.scale_basis = 0.3
@@ -594,9 +599,14 @@ class PUrP_PlanarGizmo(GizmoGroup):
     @classmethod
     def poll(cls, context):
         ob = context.object
+
         if ob != None:
             if ("PUrP" in ob.name) and ("Planar" in ob.name):
-                return True
+                try:
+                    test = context.scene.PUrP.GlobalScale
+                    return True
+                except:
+                    return False
             return False
 
     def setup(self, context):
@@ -669,9 +679,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpz.scale_basis = 1
         mpz.line_width = 3
-        mpz.color = 0.05, 0.2, 0.8
+        mpz.color = 0.8, 0.05, 0.05
         mpz.alpha = 0.5
-        mpz.color_highlight = 0.03, 0.05, 1.0
+        mpz.color_highlight = 1.0, 0.05, 0.05
         mpz.alpha_highlight = 1.0
 
         self.zScale = mpz
@@ -699,9 +709,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mps.matrix_basis = mat
 
         mps.line_width = 3
-        mps.color = 0.05, 0.2, 0.8
+        mps.color = 0.8, 0.05, 0.05
         mps.alpha = 0.5
-        mps.color_highlight = 0.03, 0.05, 1.0
+        mps.color_highlight = 1.0, 0.05, 0.05
         mps.alpha_highlight = 1.0
 
         self.stopper = mps
@@ -719,9 +729,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpcount.scale_basis = 1
         mpcount.line_width = 3
-        mpcount.color = 0.05, 0.2, 0.8
+        mpcount.color = 0.8, 0.4, 0.1
         mpcount.alpha = 0.5
-        mpcount.color_highlight = 0.03, 0.05, 1.0
+        mpcount.color_highlight = 1, 0.5, 0.1
         mpcount.alpha_highlight = 1.0
 
         self.linecount = mpcount
@@ -739,9 +749,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mplength.scale_basis = 1
         mplength.line_width = 3
-        mplength.color = 0.05, 0.2, 0.8
+        mplength.color = 0.8, 0.4, 0.1
         mplength.alpha = 0.5
-        mplength.color_highlight = 0.03, 0.05, 1.0
+        mplength.color_highlight = 1.0, 0.5, 0.3
         mplength.alpha_highlight = 1.0
 
         self.linelength = mplength
@@ -763,9 +773,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mpdistance.scale_basis = 1
 
         mpdistance.line_width = 3
-        mpdistance.color = 0.05, 0.2, 0.8
+        mpdistance.color = 0.8, 0.4, 0.05
         mpdistance.alpha = 0.5
-        mpdistance.color_highlight = 0.03, 0.05, 1.0
+        mpdistance.color_highlight = 1.0, 0.5, 0.05
         mpdistance.alpha_highlight = 1.0
 
         self.linedistance = mpdistance
@@ -783,9 +793,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         mpthickness.scale_basis = 1
         mpthickness.line_width = 20
-        mpthickness.color = 0.05, 0.2, 0.8
+        mpthickness.color = 0.05, 0.8, 0.8
         mpthickness.alpha = 0.5
-        mpthickness.color_highlight = 0.03, 0.05, 1.0
+        mpthickness.color_highlight = 0.03, 1.0, 1.0
         mpthickness.alpha_highlight = 1.0
 
         self.thickness = mpthickness
@@ -1239,7 +1249,7 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.value + self.delta / 1000
+            self.value = self.init_count + self.delta / 100
 
             self.execute(context)
 
@@ -1260,7 +1270,7 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = ob.modifiers["PUrP_Array_2"].count
 
-        self.init_count = ob.modifiers["PUrP_Array_2"].count.copy()
+        self.init_count = ob.modifiers["PUrP_Array_2"].count
 
         self.execute(context)
 
@@ -1293,7 +1303,7 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.value + self.delta / 1000
+            self.value = self.init_count + self.delta / 100
 
             self.execute(context)
 
@@ -1348,7 +1358,7 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.value + self.delta / 1000
+            self.value = self.init_count + self.delta / 1000
 
             self.execute(context)
 
@@ -1393,9 +1403,12 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
     def execute(self, context):
         ob = context.object
 
-        ob.modifiers["PUrP_Solidify"].thickness = self.value
+        if self.value <= 0:
+            ob.modifiers["PUrP_Solidify"].thickness = 0
+            context.scene.PUrP.Oversize = self.value
+        else:
+            ob.modifiers["PUrP_Solidify"].thickness = self.value
 
-        context.scene.PUrP.Oversize = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -1403,8 +1416,9 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.value + self.delta / 1000
-
+            self.value = self.init_count + self.delta / 1000
+            print(
+                f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1424,8 +1438,10 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = ob.modifiers["PUrP_Solidify"].thickness
 
-        helpi = str(ob.modifiers["PUrP_Solidify"].thickness)
-        self.init_count = float(helpi)
+        #helpi = [str(ob.modifiers["PUrP_Solidify"].thickness)]
+
+        # float(helpi[0])
+        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
 
         self.execute(context)
 
