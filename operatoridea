@@ -74,11 +74,9 @@ general operator bug:
 
 
 [] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
-
-
-
-
 [] reorganize UI 
+
+
 
 
 mögliche Probleme
@@ -108,6 +106,8 @@ Publishing:
 
 
 resolved bug:
+
+[+] planar to single doesnt' transport the coordinates
 [+] checker if initialized for gizmos
 [+] color planar gizmos
 [+] thickness gizmo beschränken und feiner

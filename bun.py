@@ -666,7 +666,8 @@ def newmainPlane(context, CenterObj):
         name=context.object.name, type="BOOLEAN")
     mod.object = data.objects[newname_mainplane]
     mod.operation = 'DIFFERENCE'
-    return newname_mainplane'''
+    '''
+    return newname_mainplane
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
@@ -755,6 +756,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         # name for
                         newname = newmainPlane(
                             context, data.objects[parentname])
+                        data.objects[newname].matrix_world = trans
                         obj = context.object
 
                     # obj.modifiers["PUrP_Solidify"].thickness = CutThickness
