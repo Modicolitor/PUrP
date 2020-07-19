@@ -73,8 +73,10 @@ general operator bug:
 
 [] remap active doesn't remap the modifiers
 
-[+] connector scale factor from active to setting --> negativ
-[+] connector scale factor from scale gizmo
+[] zscale gizmot single scales only the outer inlay
+
+[] active to settings not working with order switched on
+
 [] connector inlay size changes when scaled
 
 
@@ -111,7 +113,8 @@ Publishing:
 
 
 resolved bug:
-
+[+] connector scale factor from active to setting --> negativ
+[+] connector scale factor from scale gizmo
 [+] planar to single doesnt' transport the coordinates
 [+] checker if initialized for gizmos
 [+] color planar gizmos

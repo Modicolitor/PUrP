@@ -100,7 +100,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             icon="PARTICLE_POINT")  # zeige button an
             subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
                             icon="MOD_INSTANCE")
-
+            subcol.operator("object.remapcoups",
+                            text='RemapToActive', icon="FILE_REFRESH")
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
@@ -110,10 +111,10 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.label(text="Modifier Visibility")
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
-            subcol.operator("object.pp_ot_overlapcheck",
-                            text='Check Overlap', icon="HIDE_OFF")
-            subcol.operator("object.remapcoups",
-                            text='RemapToActive', icon="FILE_REFRESH")
+            subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
+            # subcol.operator("object.pp_ot_overlapcheck",
+            #                text='Check Overlap', icon="HIDE_OFF")
+
             subcol.label(text="Modifier Visibility")
             subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
             subcol.prop(PUrP, "BuildplateY", text='Buildplate Y')

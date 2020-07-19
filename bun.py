@@ -1361,7 +1361,7 @@ def moveModdown(Coup, CenterObj):
     CoupModcount = howManyModsCoup(Coup.name, CenterObj)
 
     # list of coupling names connected to the centerobj
-    PUrP_Modsnames, mods = listPUrPMods(CenterObj)
+    PUrP_Modsnames, mods = couplingList(CenterObj)
     CoupList, mods = couplingList(CenterObj)
 
     #####
@@ -1450,12 +1450,12 @@ def listPUrPMods(CenterObj):  # returns list of mod names
     mods = []
     for mod in CenterObj.modifiers:
         if ("PUrP" in mod.name):
-            if ("diff" not in mod.name) and ("union" not in mod.name):
-                namelist.append(mod.name)
-                mods.append(mod)
-            elif ("Planar" in mod.name):
-                namelist.append(mod.name)
-                mods.append(mod)
+            # if ("diff" not in mod.name) and ("union" not in mod.name):
+            #    namelist.append(mod.name)
+            #    mods.append(mod)
+            # elif ("Planar" in mod.name):
+            namelist.append(mod.name)
+            mods.append(mod)
     return namelist, mods
 
 # returns Connectors name- and modifierlists of  a CenterObj
@@ -1538,7 +1538,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
     def execute(self, context):
         Coup = bpy.data.objects[context.object.name]
         CenterObj = Coup.parent
-        PUrP_Modsnames, mods = listPUrPMods(CenterObj)
+        PUrP_Modsnames, mods = couplingList(CenterObj)
         active = context.object
         initialActivename = active.name[:]
 
@@ -1645,31 +1645,40 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
     def execute(self, context):
         PUrP = context.scene.PUrP
         inlaytogglebool = PUrP.InlayToggleBool
-        if inlaytogglebool:
-            names, mods = listPUrPMods
-        else:
-            names, mods = couplingList
+        CenterObj = None
 
-        for mod in mods:
-            if mod.show_viewport == True:
-                mod.show_viewport = False
-            elif mod.show_viewport == False:
-                mod.show_viewport = True
-            else:
-                print('Something Wrong in Visibility Toggle')
-        '''
         for ele in context.selected_objects:
 
-                if "PUrP" in ele.name:  # for selected coupling of PUrP
-                    CenterObj = ele.parent
-                    for mod in CenterObj.modifiers:
-                        if ele.name in mod.name:
-                            if CenterObj.modifiers[mod.name].show_viewport == True:
-                                CenterObj.modifiers[mod.name].show_viewport = False
-                            elif CenterObj.modifiers[mod.name].show_viewport == False:
-                                CenterObj.modifiers[mod.name].show_viewport = True
-                            else:
-                                print('Something Wrong in Visibility Toggle')
+            if "PUrP" in ele.name:  # for selected coupling of PUrP
+                CenterObj = ele.parent
+            else:
+                continue
+
+            if inlaytogglebool:
+                names, mods = listPUrPMods(CenterObj)
+            else:
+                names, mods = couplingList(CenterObj)
+
+            for mod in mods:
+                if ele.name in mod.name:
+                    if "diff" not in mod.name and "union" not in mod.name:
+                        if mod.show_viewport == True:
+                            mod.show_viewport = False
+                        elif mod.show_viewport == False:
+                            mod.show_viewport = True
+                    else:
+                        mod.show_viewport = CenterObj.modifiers[ele.name].show_viewport
+
+        '''
+        
+            for mod in CenterObj.modifiers:
+                if ele.name in mod.name:
+                    if CenterObj.modifiers[mod.name].show_viewport == True:
+                        CenterObj.modifiers[mod.name].show_viewport = False
+                    elif CenterObj.modifiers[mod.name].show_viewport == False:
+                        CenterObj.modifiers[mod.name].show_viewport = True
+                    else:
+                        print('Something Wrong in Visibility Toggle')
             else:
         '''
         return {'FINISHED'}
