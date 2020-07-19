@@ -109,7 +109,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             # data.objects[newname_mainplane].scale *= PUrP.CoupScale * \
             # PUrP.GlobalScale
             # data.objects[newname_mainplane].select_set(True)
-            #context.view_layer.objects.active = data.objects[newname_mainplane]
+            # context.view_layer.objects.active = data.objects[newname_mainplane]
             # bpy.ops.object.transform_apply(
             #    location=False, rotation=False, scale=True)
 
@@ -690,7 +690,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         data = bpy.data
 
         # muss CenterOBj erst bestimmt werden ???
-        #CenterObj = context.scene.PUrP.CenterObj
+        # CenterObj = context.scene.PUrP.CenterObj
         PUrP = context.scene.PUrP
         CutThickness = PUrP.CutThickness
         GlobalScale = PUrP.GlobalScale
@@ -730,19 +730,19 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         ob.select_set(False)
                     obj.select_set(True)
                     # delete the old planar coupling
-                    #print(f"I delete now mainplane in exchange {obj} ")
+                    # print(f"I delete now mainplane in exchange {obj} ")
                     # delete mainplane before making new planar
                     bpy.ops.object.delete(use_global=False)
 
                     coupModeDivision(CenterObj, oldname)  # generate new planar
                     context.object.matrix_world = trans
-                    #obj = context.object
+                    # obj = context.object
                     # obj.select_set(True)
                     # context.object.location = loc
                     #  ##planarversion
                 else:  # when it was SingleCoupling, the mainplane is kept
                     if "Plane" not in obj.data.name:
-                        #print(f"2obj.data.name {obj.data.name}")
+                        # print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
                         # oldname = obj.name
@@ -1361,7 +1361,7 @@ def moveModdown(Coup, CenterObj):
     CoupModcount = howManyModsCoup(Coup.name, CenterObj)
 
     # list of coupling names connected to the centerobj
-    PUrP_Modsnames = listPUrPMods(CenterObj)
+    PUrP_Modsnames, mods = listPUrPMods(CenterObj)
     CoupList, mods = couplingList(CenterObj)
 
     #####
@@ -1447,13 +1447,16 @@ def AllCoupMods(context, Couplist, CenterObj):
 
 def listPUrPMods(CenterObj):  # returns list of mod names
     namelist = []
+    mods = []
     for mod in CenterObj.modifiers:
         if ("PUrP" in mod.name):
             if ("diff" not in mod.name) and ("union" not in mod.name):
                 namelist.append(mod.name)
+                mods.append(mod)
             elif ("Planar" in mod.name):
                 namelist.append(mod.name)
-    return namelist
+                mods.append(mod)
+    return namelist, mods
 
 # returns Connectors name- and modifierlists of  a CenterObj
 
@@ -1535,7 +1538,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
     def execute(self, context):
         Coup = bpy.data.objects[context.object.name]
         CenterObj = Coup.parent
-        PUrP_Modsnames = listPUrPMods(CenterObj)
+        PUrP_Modsnames, mods = listPUrPMods(CenterObj)
         active = context.object
         initialActivename = active.name[:]
 
@@ -1640,18 +1643,35 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        PUrP = context.scene.PUrP
+        inlaytogglebool = PUrP.InlayToggleBool
+        if inlaytogglebool:
+            names, mods = listPUrPMods
+        else:
+            names, mods = couplingList
 
+        for mod in mods:
+            if mod.show_viewport == True:
+                mod.show_viewport = False
+            elif mod.show_viewport == False:
+                mod.show_viewport = True
+            else:
+                print('Something Wrong in Visibility Toggle')
+        '''
         for ele in context.selected_objects:
-            if "PUrP" in ele.name:  # for selected coupling of PUrP
-                CenterObj = ele.parent
-                for mod in CenterObj.modifiers:
-                    if ele.name in mod.name:
-                        if CenterObj.modifiers[mod.name].show_viewport == True:
-                            CenterObj.modifiers[mod.name].show_viewport = False
-                        elif CenterObj.modifiers[mod.name].show_viewport == False:
-                            CenterObj.modifiers[mod.name].show_viewport = True
-                        else:
-                            print('Something Wrong in Visibility Toggle')
+
+                if "PUrP" in ele.name:  # for selected coupling of PUrP
+                    CenterObj = ele.parent
+                    for mod in CenterObj.modifiers:
+                        if ele.name in mod.name:
+                            if CenterObj.modifiers[mod.name].show_viewport == True:
+                                CenterObj.modifiers[mod.name].show_viewport = False
+                            elif CenterObj.modifiers[mod.name].show_viewport == False:
+                                CenterObj.modifiers[mod.name].show_viewport = True
+                            else:
+                                print('Something Wrong in Visibility Toggle')
+            else:
+        '''
         return {'FINISHED'}
 
 
