@@ -125,17 +125,24 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        PUrP = context.scene.PUrP
+        children = context.object.children
+        if len(children) == 2:
+            children[1].scale.x = self.valuex1
+            children[1].scale.y = self.valuey1
+            children[1].scale.z = self.valuez1
+            children[0].scale.x = self.valuex0
+            children[0].scale.y = self.valuey0
+            children[0].scale.z = self.valuez0
+        else:
+            children[2].scale.x = self.valuex1
+            children[2].scale.y = self.valuey1
+            children[2].scale.z = self.valuez1
+            children[1].scale.x = self.valuex0
+            children[1].scale.y = self.valuey0
+            children[1].scale.z = self.valuez0
 
-        # - (context.object.children[0].scale.x - context.object.children[1].scale.x )
-        context.object.children[1].scale.x = self.valuex1
-        # - (context.object.children[0].scale.y - context.object.children[1].scale.y )
-        context.object.children[1].scale.y = self.valuey1
-        # - (context.object.children[0].scale.z - context.object.children[1].scale.z )
-        context.object.children[1].scale.z = self.valuez1
-        context.object.children[0].scale.x = self.valuex0
-        context.object.children[0].scale.y = self.valuey0
-        context.object.children[0].scale.z = self.valuez0
-        context.scene.PUrP.CoupSize = self.valuex0
+        PUrP.CoupSize = self.valuex0
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -170,23 +177,35 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-        # self.window_width = context.window.width
-        self.init_scale_x0 = context.object.children[0].scale.x
-        self.init_scale_y0 = context.object.children[0].scale.y
-        self.init_scale_z0 = context.object.children[0].scale.z
-        self.init_scale_y1 = context.object.children[1].scale.y
-        self.init_scale_z1 = context.object.children[1].scale.z
-        self.init_scale_x1 = context.object.children[1].scale.x
+        children = context.object.children
+        if len(children) == 2:
+            self.init_scale_x0 = context.object.children[0].scale.x
+            self.init_scale_y0 = context.object.children[0].scale.y
+            self.init_scale_z0 = context.object.children[0].scale.z
+            self.init_scale_y1 = context.object.children[1].scale.y
+            self.init_scale_z1 = context.object.children[1].scale.z
+            self.init_scale_x1 = context.object.children[1].scale.x
+            self.valuex1 = context.object.children[1].scale.x
+            self.valuey1 = context.object.children[1].scale.y
+            self.valuez1 = context.object.children[1].scale.z
+            self.valuex0 = context.object.children[0].scale.x
+            self.valuey0 = context.object.children[0].scale.y
+            self.valuez0 = context.object.children[0].scale.z
+        else:
+            self.init_scale_x0 = context.object.children[1].scale.x
+            self.init_scale_y0 = context.object.children[1].scale.y
+            self.init_scale_z0 = context.object.children[1].scale.z
+            self.init_scale_y1 = context.object.children[2].scale.y
+            self.init_scale_z1 = context.object.children[2].scale.z
+            self.init_scale_x1 = context.object.children[2].scale.x
+            self.valuex1 = context.object.children[2].scale.x
+            self.valuey1 = context.object.children[2].scale.y
+            self.valuez1 = context.object.children[2].scale.z
+            self.valuex0 = context.object.children[1].scale.x
+            self.valuey0 = context.object.children[1].scale.y
+            self.valuez0 = context.object.children[1].scale.z
 
         self.init_value = event.mouse_x
-
-        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.valuex1 = context.object.children[1].scale.x
-        self.valuey1 = context.object.children[1].scale.y
-        self.valuez1 = context.object.children[1].scale.z
-        self.valuex0 = context.object.children[0].scale.x
-        self.valuey0 = context.object.children[0].scale.y
-        self.valuez0 = context.object.children[0].scale.z
 
         self.execute(context)
 

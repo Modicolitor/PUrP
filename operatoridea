@@ -73,10 +73,8 @@ general operator bug:
 
 
 
-[] single oversize gizmot beschränken
+
 [] connector inlay size changes when scaled
-
-
 [] flatcut gizmot
 [] cone cylinder gizmos: radius, upper radius, 
 
@@ -113,6 +111,8 @@ Publishing:
 
 
 resolved bug:
+[+] single oversize gizmot beschränken
+
 [+] active to settings not working with order switched on
 [+] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
 [+] remap active doesn't remap the modifiers
