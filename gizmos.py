@@ -29,17 +29,38 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
     def execute(self, context):
         children = context.object.children
-        context.object.children[1].scale.x = self.valuex
-        context.object.children[1].scale.y = self.valuey
-        context.object.children[1].scale.z = self.valuez
-        context.scene.PUrP.Oversize = (
-            children[0].scale.x - children[1].scale.x)/2
+        PUrP = context.scene.PUrP
+        if len(children) == 2:
+            if self.valuey < children[0].scale.y:
+                children[1].scale.x = self.valuex
+                children[1].scale.y = self.valuey
+                children[1].scale.z = self.valuez
+                PUrP.Oversize = (
+                    children[0].scale.x - children[1].scale.x)/2
+            elif self.valuey >= children[0].scale.y:
+                children[1].scale.x = children[0].scale.y
+                children[1].scale.y = children[0].scale.y
+                children[1].scale.z = children[0].scale.y
+                PUrP.Oversize = 0
+
+        elif len(children) == 3:
+            if self.valuey < children[1].scale.y:
+                children[2].scale.x = self.valuex
+                children[2].scale.y = self.valuey
+                children[2].scale.z = self.valuez
+                context.scene.PUrP.Oversize = (
+                    children[1].scale.x - children[2].scale.x)/2
+            elif self.valuey >= children[1].scale.y:
+                children[2].scale.x = children[1].scale.y
+                children[2].scale.y = children[1].scale.y
+                children[2].scale.z = children[1].scale.y
+                PUrP.Oversize = 0
         return {'FINISHED'}
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
             # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
-            self.delta = event.mouse_x - self.init_value
+            self.delta = event.mouse_y - self.init_value
             # else:
             #    self.delta =  self.init_value
 
@@ -62,15 +83,27 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         # self.window_width = context.window.width
-        self.init_scale_x = context.object.children[1].scale.x
-        self.init_scale_y = context.object.children[1].scale.y
-        self.init_scale_z = context.object.children[1].scale.z
-        self.init_value = event.mouse_x
+        children = context.object.children
+
+        if len(children) == 2:
+            self.init_scale_x = children[1].scale.x
+            self.init_scale_y = children[1].scale.y
+            self.init_scale_z = children[1].scale.z
+            self.valuex = children[1].scale.x
+            self.valuey = children[1].scale.y
+            self.valuez = children[1].scale.z
+
+        else:
+            self.init_scale_x = children[2].scale.x
+            self.init_scale_y = children[2].scale.y
+            self.init_scale_z = children[2].scale.z
+            self.valuex = children[2].scale.x
+            self.valuey = children[2].scale.y
+            self.valuez = children[2].scale.z
+
+        self.init_value = event.mouse_y
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.valuex = context.object.children[1].scale.x
-        self.valuey = context.object.children[1].scale.y
-        self.valuez = context.object.children[1].scale.z
 
         self.execute(context)
 
