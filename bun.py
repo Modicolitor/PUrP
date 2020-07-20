@@ -1669,18 +1669,6 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
                     else:
                         mod.show_viewport = CenterObj.modifiers[ele.name].show_viewport
 
-        '''
-        
-            for mod in CenterObj.modifiers:
-                if ele.name in mod.name:
-                    if CenterObj.modifiers[mod.name].show_viewport == True:
-                        CenterObj.modifiers[mod.name].show_viewport = False
-                    elif CenterObj.modifiers[mod.name].show_viewport == False:
-                        CenterObj.modifiers[mod.name].show_viewport = True
-                    else:
-                        print('Something Wrong in Visibility Toggle')
-            else:
-        '''
         return {'FINISHED'}
 
 

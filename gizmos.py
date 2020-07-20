@@ -175,9 +175,15 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        context.object.children[1].scale.z = self.value - (
-            context.object.children[0].scale.z - context.object.children[1].scale.z)
-        context.object.children[0].scale.z = self.value
+        if len(context.object.children) == 2:
+            context.object.children[1].scale.z = self.value - (
+                context.object.children[0].scale.z - context.object.children[1].scale.z)
+            context.object.children[0].scale.z = self.value
+        else:
+            context.object.children[2].scale.z = self.value - (
+                context.object.children[1].scale.z - context.object.children[2].scale.z)
+            context.object.children[1].scale.z = self.value
+
         PUrP = context.scene.PUrP
         PUrP.zScale = self.value / PUrP.CoupSize
         return {'FINISHED'}
