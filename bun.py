@@ -1726,13 +1726,21 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         if "SingleConnector" in obj.name:
             PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
             PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
+            
 
-            if len(obj.children) == 0:
+            ## more code because of order
+            if len(obj.children) == 0 or len(obj.children) == 1: 
                 PUrP.SingleCouplingModes = "3"
-            elif zSym(obj.children[0]):
-                PUrP.SingleCouplingModes = "1"
-            else:
-                PUrP.SingleCouplingModes = "2"
+            elif len(obj.children) == 2:
+                if zSym(obj.children[0]):
+                    PUrP.SingleCouplingModes = "1"
+                else:
+                    PUrP.SingleCouplingModes = "2"
+            elif len(obj.children) == 2:
+                if zSym(obj.children[1]):
+                    PUrP.SingleCouplingModes = "1"
+                else:
+                    PUrP.SingleCouplingModes = "2"
 
             if len(obj.children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")

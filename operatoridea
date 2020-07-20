@@ -72,17 +72,17 @@ bugs:
 general operator bug:
 
 
-[] active to settings not working with order switched on
+
 [] single oversize gizmot beschränken
 [] connector inlay size changes when scaled
 
 
-[] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
+
 [] reorganize UI 
 
-
+[] 
 []flatcut gizmot
-
+[] cone cylinder gizmos: radius, upper radius, 
 
 
 mögliche Probleme
@@ -114,6 +114,8 @@ Publishing:
 
 
 resolved bug:
+[+] active to settings not working with order switched on
+[+] toogle visibility works toggles main off while inlay gets switched on, check if overlap toggles on or sets visibility
 [+] remap active doesn't remap the modifiers
 [+] zscale gizmot single scales only the outer inlay when Order active
 [+] connector scale factor from active to setting --> negativ
