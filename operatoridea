@@ -71,9 +71,6 @@ after applying
 bugs:
 general operator bug:
 
-[] remap active doesn't remap the modifiers
-
-
 
 [] active to settings not working with order switched on
 [] single oversize gizmot beschränken
@@ -92,6 +89,8 @@ mögliche Probleme
 [] Order System update system that stays out of the way 
 
 Tests
+[] apply all had a bad day try again 
+
 [] test linux, Mag
 [] Active settings with for global scale influence
 [] using globalsize
@@ -115,6 +114,7 @@ Publishing:
 
 
 resolved bug:
+[+] remap active doesn't remap the modifiers
 [+] zscale gizmot single scales only the outer inlay when Order active
 [+] connector scale factor from active to setting --> negativ
 [+] connector scale factor from scale gizmo

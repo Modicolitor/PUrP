@@ -101,7 +101,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
                             icon="MOD_INSTANCE")
             subcol.operator("object.remapcoups",
-                            text='RemapToActive', icon="FILE_REFRESH")
+                            text='Remap To Active', icon="FILE_REFRESH")
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")

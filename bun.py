@@ -1080,7 +1080,8 @@ def centerObjDecider(context, CenterObj):
 def applySingleCoup(context, Coup, CenterObj):
     # context = bpy.context
     data = bpy.data
-    PUrP_name = bpy.context.scene.PUrP.PUrP_name
+    PUrP = context.scene.PUrP
+    #PUrP_name = PUrP.PUrP_name
 
     obj = Coup
     oriCoupname = Coup.name[:]
@@ -1157,6 +1158,15 @@ def applySingleCoup(context, Coup, CenterObj):
             applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
         # deleConnector (later propably with checkbox)
 
+        '''for ele in context.selected_objects:
+            :
+            ele.select_set(False)
+        obj.select_set(True)
+        for child in obj.children:
+            child.select_set(True)
+
+        bpy.ops.object.delete(use_global=False, confirm=False)'''
+
         # sort the couplings to the new Daughters
         objects = bpy.data.objects
         DOneCoupList = []
@@ -1173,6 +1183,24 @@ def applySingleCoup(context, Coup, CenterObj):
                 coup.parent = DaughterTwo
                 DTwoCoupList.append(coup)
             else:
+                coup.parent = None
+                bpy.ops.object.text_add(
+                    enter_editmode=False, location=(0, 0, 0))
+                SingalText = context.object
+                SingalText.name = coup.name + "_Order"
+
+                SingalText.location.z += 0.5 * PUrP.GlobalScale
+                SingalText.scale = mathutils.Vector(
+                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+                SingalText.data.body = "UNMAPED"
+                SingalText.data.extrude = 0.05
+                SingalText.show_in_front = True
+                SingalText.display_type = 'WIRE'
+                SingalText.hide_select = True
+                SingalText.parent = coup
+                SingalText.matrix_world = coup.matrix_world
+                SingalText.rotation_euler.x = 1.5708
+                SingalText.location.x -= 0.3
                 print(f"coup {coup.name} was false with both daughters")
 
         # all modifiers of all couplings which are identified as overlapping
@@ -1185,10 +1213,12 @@ def applySingleCoup(context, Coup, CenterObj):
         for mod in DaughterOne.modifiers:
             if mod not in DOneAllMods:
                 DaughterOne.modifiers.remove(mod)
+                DORemovedMod = True
 
         for mod in DaughterTwo.modifiers:
             if mod not in DTwoAllMods:
                 DaughterTwo.modifiers.remove(mod)
+                DTRemovedMod = True
 
         # delete Coupling
         context.view_layer.objects.active = obj
@@ -1441,6 +1471,7 @@ def AllCoupMods(context, Couplist, CenterObj):
     AllMods = []
     for coup in Couplist:
         allmodsOcoup = CoupModifiers(context, coup, CenterObj)
+        print(f"append coup {coup} mods {allmodsOcoup} ")
         AllMods.extend(allmodsOcoup)
     return AllMods
 
@@ -1924,13 +1955,9 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
         for ob in data.objects:
             if "PUrP" in ob.name and "_Order" in ob.name:  # gibt es objecte mit order -- > dann lösche nur
                 Orderbool = False
-
-                # bpy.ops.pup.couplingorder()
-                # bpy.ops.pup.couplingorder()
                 break
 
         if Orderbool:
-
             # garbage run
             removePUrPOrder()
             # new numbers
@@ -1979,44 +2006,77 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
     bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
-        print("remap")
+
         selected = context.selected_objects[:]
         active = context.object
         CenterObj = active
         if "SingleConnector" in active.name or "Planar" in active.name:
-            print("finish remap")
+            print("Active Object ")
+            self.report({'WARNING'}, "Active object is a connector!")
             return {'FINISHED'}
         elif not CenterObj.PUrPCobj:
             self.report({'WARNING'}, 'Active was never a Centerobject before')
 
         PUrP = context.scene.PUrP
-
+        print(f'CenterObj {CenterObj}')
         CenterObj.PUrPCobj = True
 
-        # reparent
+        # remove from original parent
 
         for coup in selected:
             if coup != CenterObj:
-                if "PUrP" in coup.name:
-                    print(f"coup {coup.name}")
-                    Couplist = []
-                    # only the one in the list in this case
-                    Couplist.append(coup)
-                    print(f"parent {coup.parent}")
+                # collect all coup mods of the selected to delete from potential parent
+                if coup.parent != None:
+
+                    if "PUrP" in coup.name:
+                        Couplist = []
+                        # only the one in the list in this case
+                        Couplist.append(coup)
+
                     AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
-                    print(f"a allcoupsmods remap {AllCoupmods}")
                     for mod in AllCoupmods:
-
-                        # make new in CenterObj
-                        newmod = CenterObj.modifiers.new(mod.name, mod.type)
-                        newmod.operation = mod.operation
-                        newmod.object = mod.object
-
                         # remove in parent
-
                         coup.parent.modifiers.remove(mod)
 
-                    coup.parent = CenterObj
+                if "SingleConnector" in coup.name:
+                    mod = CenterObj.modifiers.new(
+                        name=coup.name, type="BOOLEAN")
+                    mod.object = coup
+                    mod.operation = 'DIFFERENCE'
+                    mod.show_viewport = True
+
+                    # inlay modifiers
+                    for child in coup.children:
+                        if "Order" not in child.name and "fix" not in child.name:
+                            mod = CenterObj.modifiers.new(
+                                name=child.name, type="BOOLEAN")
+                            mod.object = child
+                            mod.show_viewport = False
+                            if "_diff" in child.name:
+                                mod.operation = 'DIFFERENCE'
+                            elif '_union' in child.name:
+                                mod.operation = 'UNION'
+                elif "PlanarConnector" in coup.name:
+                    mod = CenterObj.modifiers.new(
+                        name=coup.name, type="BOOLEAN")
+                    mod.object = coup
+                    mod.operation = 'DIFFERENCE'
+                    mod.show_viewport = True
+
+                matrix_w = coup.matrix_world
+
+                coup.parent = CenterObj
+                coup.matrix_world = matrix_w
+                # remove remap sign
+                for se in context.selected_objects:
+                    se.select_set(False)
+
+                for child in coup.children:
+                    if child.type == 'FONT':
+                        print("child")
+                        child.hide_select = False
+                        child.select_set(True)
+                bpy.ops.object.delete(use_global=False)
 
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
@@ -2040,9 +2100,9 @@ class PP_OT_MakeBuildVolume(bpy.types.Operator):
         BuildVol = context.object
         BuildVol.name = "PUrP_BuildVolume"
 
-        BuildVol.scale[0] = BuildplateX/2  # cube is 2m
-        BuildVol.scale[1] = BuildplateY/2
-        BuildVol.scale[2] = BuildplateZ/2
+        BuildVol.scale[0] = BuildplateX/2 * PUrP.GlobalScale  # cube is 2m
+        BuildVol.scale[1] = BuildplateY/2 * PUrP.GlobalScale
+        BuildVol.scale[2] = BuildplateZ/2 * PUrP.GlobalScale
 
         BuildVol.display_type = 'WIRE'
         bpy.ops.object.transform_apply(
