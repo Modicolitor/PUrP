@@ -71,14 +71,14 @@ after applying
 bugs:
 general operator bug:
 
-
-
-
-[] connector inlay size changes when scaled
+[] connector inlay size changes when scaled with blenders scale --> ignore
 [] flatcut gizmot
 [] cone cylinder gizmos: radius, upper radius, 
 
 [] reorganize UI 
+
+
+[] test oversize with different globalscale
 
 
 

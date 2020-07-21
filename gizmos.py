@@ -6,6 +6,8 @@ from .gizmotshape import PUrP_LineLengthShapeWidget
 from .gizmotshape import PUrP_LineDistanceShapeWidget
 from .gizmotshape import PUrP_ThicknessShapeWidget
 from .gizmotshape import PUrP_CubeShapeWidget
+from .gizmotshape import PUrP_ConeShapeWidget
+from .gizmotshape import PUrP_CylinderShapeWidget
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -179,31 +181,31 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
     def invoke(self, context, event):
         children = context.object.children
         if len(children) == 2:
-            self.init_scale_x0 = context.object.children[0].scale.x
-            self.init_scale_y0 = context.object.children[0].scale.y
-            self.init_scale_z0 = context.object.children[0].scale.z
-            self.init_scale_y1 = context.object.children[1].scale.y
-            self.init_scale_z1 = context.object.children[1].scale.z
-            self.init_scale_x1 = context.object.children[1].scale.x
-            self.valuex1 = context.object.children[1].scale.x
-            self.valuey1 = context.object.children[1].scale.y
-            self.valuez1 = context.object.children[1].scale.z
-            self.valuex0 = context.object.children[0].scale.x
-            self.valuey0 = context.object.children[0].scale.y
-            self.valuez0 = context.object.children[0].scale.z
+            self.init_scale_x0 = children[0].scale.x
+            self.init_scale_y0 = children[0].scale.y
+            self.init_scale_z0 = children[0].scale.z
+            self.init_scale_y1 = children[1].scale.y
+            self.init_scale_z1 = children[1].scale.z
+            self.init_scale_x1 = children[1].scale.x
+            self.valuex1 = children[1].scale.x
+            self.valuey1 = children[1].scale.y
+            self.valuez1 = children[1].scale.z
+            self.valuex0 = children[0].scale.x
+            self.valuey0 = children[0].scale.y
+            self.valuez0 = children[0].scale.z
         else:
-            self.init_scale_x0 = context.object.children[1].scale.x
-            self.init_scale_y0 = context.object.children[1].scale.y
-            self.init_scale_z0 = context.object.children[1].scale.z
-            self.init_scale_y1 = context.object.children[2].scale.y
-            self.init_scale_z1 = context.object.children[2].scale.z
-            self.init_scale_x1 = context.object.children[2].scale.x
-            self.valuex1 = context.object.children[2].scale.x
-            self.valuey1 = context.object.children[2].scale.y
-            self.valuez1 = context.object.children[2].scale.z
-            self.valuex0 = context.object.children[1].scale.x
-            self.valuey0 = context.object.children[1].scale.y
-            self.valuez0 = context.object.children[1].scale.z
+            self.init_scale_x0 = children[1].scale.x
+            self.init_scale_y0 = children[1].scale.y
+            self.init_scale_z0 = children[1].scale.z
+            self.init_scale_y1 = children[2].scale.y
+            self.init_scale_z1 = children[2].scale.z
+            self.init_scale_x1 = children[2].scale.x
+            self.valuex1 = children[2].scale.x
+            self.valuey1 = children[2].scale.y
+            self.valuez1 = children[2].scale.z
+            self.valuex0 = children[1].scale.x
+            self.valuey0 = children[1].scale.y
+            self.valuez0 = children[1].scale.z
 
         self.init_value = event.mouse_x
 
@@ -439,6 +441,136 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
+    '''Change the cylinder Radius or the lower radius of the cone'''
+    bl_idname = "purp.lowerradiusgizmo"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        ob = context.object
+
+        for num, v in enumerate(self.lowerverts):
+            v.co.x = self.init_posx[num] * self.value
+            v.co.y = self.init_posy[num] * self.value
+
+        INvalue = -self.ob.data.vertices[0].co.y + \
+            PUrP.Oversize*PUrP.GlobalScale
+
+        INvalueZ = self.ob.data.vertices[0].co.z - \
+            PUrP.Oversize*PUrP.GlobalScale
+        print(f"value {self.value} invalue {INvalue}")
+
+        for num, v in enumerate(self.INlowerverts):
+            v.co.x = self.init_INposx[num] * INvalue
+            v.co.y = self.init_INposy[num] * INvalue
+            v.co.z = self.init_INposz[num] * INvalueZ
+
+        a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(context, ob)
+        # print(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        #ob = context.object
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_x - self.init_mouse
+            self.value = 1.0 + self.delta / 1000
+
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            # bpy.ops.object.transform_apply(
+            #    location=False, rotation=False, scale=True)
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for num, v in enumerate(self.lowerverts):
+                v.co.x = self.init_posx[num]
+                v.co.y = self.init_posy[num]
+
+            for num, v in enumerate(self.INlowerverts):
+                v.co.x = self.init_INposx[num]
+                v.co.y = self.init_INposy[num]
+                v.co.z = self.init_INposz[num]
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.ob = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
+
+        PUrP = context.scene.PUrP
+
+        self.upperverts, self.lowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+            context, self.ob)
+
+        self.INupperverts, self.INlowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+            context, self.obin)
+
+        if "Cylinder" in self.ob.data.name:
+            self.lowerverts += self.upperverts
+            self.INlowerverts += self.INupperverts
+
+        self.init_posx = []
+        self.init_posy = []
+        for v in self.lowerverts:
+            self.init_posx.append(v.co.x)
+            self.init_posy.append(v.co.y)
+
+        self.init_INposx = []
+        self.init_INposy = []
+        self.init_INposz = []
+        for v in self.lowerverts:
+            self.init_INposx.append(v.co.x)
+            self.init_INposy.append(v.co.y)
+            self.init_INposz.append(v.co.z)
+
+        self.init_mouse = event.mouse_x
+        self.value = 1.0
+
+        self.execute(context)
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+    def coneanalysizer(self, context, ob):
+        # Cyclvert, and the radius are extrakted; Coupling types
+        PUrP = context.scene.PUrP
+
+        upperverts = []
+        lowerverts = []
+        for vert in ob.data.vertices:
+            if vert.co.z > 0:
+                upperverts.append(vert)
+            elif vert.co.z <= 0:
+                lowerverts.append(vert)
+        # upperverts information
+        if len(upperverts) == 1:  # hard tip
+            bRadius = 0.0
+        else:  # soft tip
+            bRadius = -ob.data.vertices[1].co.y
+            bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
+        # lower radius
+
+        aRadius = -ob.data.vertices[0].co.y
+        aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
+
+        return upperverts, lowerverts, aRadius, bRadius
+
+
 class PUrP_SinglCoupGizmo(GizmoGroup):
     bl_idname = "OBJECT_GGT_test_camera"
     bl_label = "Object Camera Test Widget"
@@ -568,7 +700,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         # connectorsize
         mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
-        mcsize.target_set_operator("purp.coupscalegizmo")  # needs operator
+        mcsize.target_set_operator("purp.coupscalegizmo")
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
@@ -586,6 +718,48 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mcsize.scale_basis = 2
 
         self.couplingScale = mcsize
+
+        # for cylinder or cone when lowradius adjustment
+        lowradius = self.gizmos.new(PUrP_CylinderShapeWidget.bl_idname)
+        lowradius.target_set_operator("purp.lowerradiusgizmo")
+        lowradius.use_draw_offset_scale = True
+        lowradius.matrix_basis = ob.matrix_world.normalized()
+        lowradius.use_draw_value = True
+
+        lowradius.matrix_offset[0][3] -= 3
+        lowradius.matrix_offset[2][3] += 1.6
+        # mps.matrix_basis[0][3] += 0.5
+        lowradius.line_width = 3
+
+        lowradius.color = 0.4, 0.8, 0.03
+        lowradius.alpha = 0.5
+
+        lowradius.color_highlight = 0.01, 1.0, 0.01
+        lowradius.alpha_highlight = 1.0
+        lowradius.scale_basis = 0.4
+
+        self.lowRadius = lowradius
+
+        # for cone when upperradius adjustment
+        upradius = self.gizmos.new(PUrP_ConeShapeWidget.bl_idname)
+        upradius.target_set_operator("purp.coupscalegizmo")
+        upradius.use_draw_offset_scale = True
+        upradius.matrix_basis = ob.matrix_world.normalized()
+        upradius.use_draw_value = True
+
+        upradius.matrix_offset[0][3] -= 3
+        upradius.matrix_offset[2][3] += 3
+        # mps.matrix_basis[0][3] += 0.5
+        upradius.line_width = 3
+
+        upradius.color = 0.4, 0.8, 0.03
+        upradius.alpha = 0.5
+
+        upradius.color_highlight = 0.5, 1.0, 0.04
+        upradius.alpha_highlight = 1.0
+        upradius.scale_basis = 0.4
+
+        self.upRadius = upradius
 
     def refresh(self, context):
         ob = context.object
@@ -626,6 +800,11 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.matrix_offset[2][3] = -0.5
 
+        lowradius = self.lowRadius
+        lowradius.matrix_basis = ob.matrix_world.normalized()
+
+        upradius = self.upRadius
+        upradius.matrix_basis = ob.matrix_world.normalized()
 # planar connector gizmos
 
 

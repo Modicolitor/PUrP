@@ -1724,12 +1724,14 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         obj = context.object
 
         if "SingleConnector" in obj.name:
+            bpy.ops.object.transform_apply(
+                location=False, rotation=False, scale=True)
+
             PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
             PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
-            
 
-            ## more code because of order
-            if len(obj.children) == 0 or len(obj.children) == 1: 
+            # more code because of order
+            if len(obj.children) == 0 or len(obj.children) == 1:
                 PUrP.SingleCouplingModes = "3"
             elif len(obj.children) == 2:
                 if zSym(obj.children[0]):
