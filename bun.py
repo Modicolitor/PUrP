@@ -181,40 +181,17 @@ def coupModeDivision(CenterObj, newname_mainplane):
 
 
 def oversizeToPrim(ob0, ob1):
-    '''applies the oversize to the primitves ob0 is the bigger object (diff) ob1 the smaller'''
+    '''applies the oversize to the primitves; ob0 is the bigger object (diff) ob1 the smaller'''
     PUrP = bpy.context.scene.PUrP
     Oversize = PUrP.Oversize
-    zScale = PUrP.zScale
-    size = PUrP.CoupSize
+    #zScale = PUrP.zScale
+    #size = PUrP.CoupSize
 
-    ob0.scale = mathutils.Vector((size, size, size))
-    ob1.scale = mathutils.Vector((size, size, size))
-
-    # ob1.scale.z *= zScale
-    ob0.scale.z *= zScale
-
-    print(f"ob0 {ob0.name} dimensions z {ob0.dimensions.z}")
-
-    oversizeDim = (ob0.scale.x - 2 * Oversize)
-    if "fix" in ob0.name or "fix" in ob1.name:
-        oversizeDimz = (ob0.scale.z - 2 * Oversize)  # mf
-    else:
-        oversizeDimz = (ob0.scale.z - Oversize)  # stick
-
-    # should be ob1.dimensions but somehow don't work
-    print(f"ob0 {ob0} ob1 {ob1} dimension z {ob0.dimensions.z} oversize {Oversize} gleichung{(ob0.dimensions.z - 2 * Oversize)}")
-
-    # should be ob1.dimensions but somehow don't work
-    print(f"ob0 {ob0} ob1 {ob1} dimension x {ob0.dimensions.x} oversize {Oversize} gleichung{(ob0.dimensions.x - 2 * Oversize)}")
-
-    ob1.scale.x = oversizeDim
-    print(f"dimensions x {ob1.scale.x}")
-    ob1.scale.y = oversizeDim
-    print(f"dimensions y {ob1.scale.y}")
-    ob1.scale.z = oversizeDimz
-    print(f"dimensions z {ob1.scale.z}")
-    # ob1.scale.z *= zScale
-    # ob0.scale.z *= zScale - oversizeDim
+    for v in ob1.data.vertices:
+        P1 = ob0.data.vertices[v.index].co
+        v.co.x -= Oversize*P1[0]
+        v.co.y -= Oversize*P1[1]
+        v.co.z -= Oversize*P1[2]
 
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd):
@@ -305,13 +282,8 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     scalefactor = PUrP.GlobalScale * PUrP.CoupScale
     obj.scale *= scalefactor
     context.view_layer.objects.active = obj
+    obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-
-    # apply oversize
-    if nameadd == "_diff":
-        context.object.scale.x += PUrP.Oversize
-        context.object.scale.y += PUrP.Oversize
-        context.object.scale.z += PUrP.Oversize
 
     # make name relative to the Couplingmainplain
     context.object.name = str(newname_mainplane) + str(nameadd)
