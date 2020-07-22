@@ -302,6 +302,8 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
 
     scalefactor = PUrP.GlobalScale * PUrP.CoupScale
     obj.scale *= scalefactor
+    context.object.scale.z *= PUrP.zScale
+
     context.view_layer.objects.active = obj
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -311,7 +313,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context.object.parent = bpy.data.objects[newname_mainplane]
 
     # print(f"zscale should affect obj {context.object.name}")
-    # context.object.scale.z *= PUrP.zScale
+    # 
     mod = context.object.modifiers.new(
         name=context.object.name + "Bevel", type="BEVEL")  # bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset
