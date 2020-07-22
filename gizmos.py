@@ -8,6 +8,11 @@ from .gizmotshape import PUrP_ThicknessShapeWidget
 from .gizmotshape import PUrP_CubeShapeWidget
 from .gizmotshape import PUrP_ConeShapeWidget
 from .gizmotshape import PUrP_CylinderShapeWidget
+
+
+from .bun import oversizeToPrim
+from .bun import applyScalRot
+
 from bpy.types import (
     Operator,
     GizmoGroup,
@@ -128,21 +133,20 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        children = context.object.children
-        if len(children) == 2:
-            children[1].scale.x = self.valuex1
-            children[1].scale.y = self.valuey1
-            children[1].scale.z = self.valuez1
-            children[0].scale.x = self.valuex0
-            children[0].scale.y = self.valuey0
-            children[0].scale.z = self.valuez0
-        else:
-            children[2].scale.x = self.valuex1
-            children[2].scale.y = self.valuey1
-            children[2].scale.z = self.valuez1
-            children[1].scale.x = self.valuex0
-            children[1].scale.y = self.valuey0
-            children[1].scale.z = self.valuez0
+        #children = context.object.children
+
+        self.obout.scale.x = self.valuex0
+        self.obout.scale.y = self.valuey0
+        self.obout.scale.z = self.valuez0
+
+        # applyScalRot(self.obout)
+        # applyScalRot(self.obin)
+
+        oversizeToPrim(self.obout, self.obin)
+
+        #children[1].scale.x = self.valuex1
+        #children[1].scale.y = self.valuey1
+        #children[1].scale.z = self.valuez1
 
         PUrP.CoupSize = self.valuex0
         return {'FINISHED'}
@@ -159,8 +163,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             self.valuey1 = self.init_scale_y1 + self.delta/1000
             self.valuez1 = self.init_scale_z1 + self.delta/1000
 
-            self.valuex0 = self.init_scale_x0 + self.delta / \
-                1000  # - self.window_width/2 #(HD Screen 800)
+            self.valuex0 = self.init_scale_x0 + self.delta/1000
             self.valuey0 = self.init_scale_y0 + self.delta/1000
             self.valuez0 = self.init_scale_z0 + self.delta/1000
 
@@ -180,32 +183,25 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         children = context.object.children
-        if len(children) == 2:
-            self.init_scale_x0 = children[0].scale.x
-            self.init_scale_y0 = children[0].scale.y
-            self.init_scale_z0 = children[0].scale.z
-            self.init_scale_y1 = children[1].scale.y
-            self.init_scale_z1 = children[1].scale.z
-            self.init_scale_x1 = children[1].scale.x
-            self.valuex1 = children[1].scale.x
-            self.valuey1 = children[1].scale.y
-            self.valuez1 = children[1].scale.z
-            self.valuex0 = children[0].scale.x
-            self.valuey0 = children[0].scale.y
-            self.valuez0 = children[0].scale.z
-        else:
-            self.init_scale_x0 = children[1].scale.x
-            self.init_scale_y0 = children[1].scale.y
-            self.init_scale_z0 = children[1].scale.z
-            self.init_scale_y1 = children[2].scale.y
-            self.init_scale_z1 = children[2].scale.z
-            self.init_scale_x1 = children[2].scale.x
-            self.valuex1 = children[2].scale.x
-            self.valuey1 = children[2].scale.y
-            self.valuez1 = children[2].scale.z
-            self.valuex0 = children[1].scale.x
-            self.valuey0 = children[1].scale.y
-            self.valuez0 = children[1].scale.z
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
+
+        self.init_scale_x0 = self.obout.scale.x
+        self.init_scale_y0 = self.obout.scale.y
+        self.init_scale_z0 = self.obout.scale.z
+        self.init_scale_y1 = self.obin.scale.y
+        self.init_scale_z1 = self.obin.scale.z
+        self.init_scale_x1 = self.obin.scale.x
+        self.valuex1 = self.obin.scale.x
+        self.valuey1 = self.obin.scale.y
+        self.valuez1 = self.obin.scale.z
+        self.valuex0 = self.obout.scale.x
+        self.valuey0 = self.obout.scale.y
+        self.valuez0 = self.obout.scale.z
 
         self.init_value = event.mouse_x
 
@@ -403,6 +399,12 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         ob.scale = self.value
         # bpy.ops.object.transform_apply(
         #    location=False, rotation=False, scale=True)
+
+        applyScalRot(self.obout)
+        applyScalRot(self.obin)
+
+        oversizeToPrim(self.obout, self.obin)
+
         PUrP.CoupScale = ob.data.vertices[1].co.x * \
             self.value[0] / (3 * PUrP.GlobalScale)
         # print(self.value)
@@ -431,6 +433,14 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
+
         ob = context.object
         self.init_scale = ob.scale.copy()
         self.init_value = event.mouse_x
@@ -461,7 +471,7 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         for num, v in enumerate(self.lowerverts):
             v.co.x = self.init_posx[num] * self.value
             v.co.y = self.init_posy[num] * self.value
-
+        '''
         INvalue = -self.ob.data.vertices[0].co.y + \
             PUrP.Oversize*PUrP.GlobalScale
 
@@ -473,6 +483,9 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
             v.co.x = self.init_INposx[num] * INvalue
             v.co.y = self.init_INposy[num] * INvalue
             v.co.z = self.init_INposz[num] * INvalueZ
+        '''
+
+        oversizeToPrim(self.ob, self.obin)
 
         a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(context, ob)
         # print(self.value)

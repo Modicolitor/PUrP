@@ -205,15 +205,26 @@ def oversizeToPrim(ob0, ob1):
         P2Norm = P2Dim.normalized() 
         #print(f"P1 {P1} Pur {Pur}")
 
-        v.co.x = Pur[0] - shift *P2Norm[0]
-        v.co.y = Pur[1] - shift *P2Norm[1]
+        v.co.x = Pur[0] - shift * P2Norm[0]
+        v.co.y = Pur[1] - shift * P2Norm[1]
+
         
         if v in lowerverts:
-            v.co.z +=  Oversize
+            v.co.z = Pur[2] + Oversize
         elif v in upperverts:
-            v.co.z -= Oversize
+            v.co.z = Pur[2] - Oversize
         
+def applyScalRot(obj):
+    mat = obj.matrix_world
+    #trans = 
+    trans = mathutils.Matrix.Translation(mathutils.Vector((obj.matrix_world[0][3],obj.matrix_world[1][3],obj.matrix_world[2][3])))
+    #mat = mat_trans @ mat_rot1
+    me = obj.data
 
+    for v in me.vertices:
+        v.co = v.co@mat
+    mat.identity()
+    mat @= trans
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context = bpy.context
