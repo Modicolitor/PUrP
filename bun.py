@@ -1,6 +1,7 @@
 import bpy
 import mathutils
-from math import radians
+from math import radians, sqrt
+import numpy as np
 from bpy.types import Scene, Image, Object
 import random
 import os
@@ -186,12 +187,32 @@ def oversizeToPrim(ob0, ob1):
     Oversize = PUrP.Oversize
     #zScale = PUrP.zScale
     #size = PUrP.CoupSize
+    upperverts = []
+    lowerverts = []
+    for v in ob1.data.vertices:
+        if v.co[2] > 0:
+            upperverts.append(v)
+        else:
+            lowerverts.append(v)
+
+    shift = sqrt(2) * Oversize 
 
     for v in ob1.data.vertices:
-        P1 = ob0.data.vertices[v.index].co
-        v.co.x -= Oversize*P1[0]
-        v.co.y -= Oversize*P1[1]
-        v.co.z -= Oversize*P1[2]
+        Pur = ob0.data.vertices[v.index].co
+        
+        #P1 = Pur.normalized() 
+        P2Dim = mathutils.Vector((Pur[0],Pur[1]))
+        P2Norm = P2Dim.normalized() 
+        #print(f"P1 {P1} Pur {Pur}")
+
+        v.co.x = Pur[0] - shift *P2Norm[0]
+        v.co.y = Pur[1] - shift *P2Norm[1]
+        
+        if v in lowerverts:
+            v.co.z +=  Oversize
+        elif v in upperverts:
+            v.co.z -= Oversize
+        
 
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd):
