@@ -1455,7 +1455,7 @@ def moveModdown(Coup, CenterObj):
         bpy.context.view_layer.objects.active = Coup
 
 
-# takes a coupling name and the CenterObj and returns how modifiers beelong to the coupling
+# takes a coupling name and the CenterObj and returns how many modifiers beelong to the coupling
 def howManyModsCoup(Coup_name, CenterObj):
     count = 0
     for mod in CenterObj.modifiers:
@@ -1731,6 +1731,14 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         obj = context.object
 
         if "SingleConnector" in obj.name:
+            children = obj.children
+            # order correction
+            for child in children:
+                if "diff" in child.name:
+                    self.obout = child
+                elif "fix" in child.name or "union" in child.name:
+                    self.obin = child
+
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
 
@@ -1738,49 +1746,45 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
 
             # more code because of order
-            if len(obj.children) == 0 or len(obj.children) == 1:
+            if len(children) == 0 or len(children) == 1:
                 PUrP.SingleCouplingModes = "3"
-            elif len(obj.children) == 2:
-                if zSym(obj.children[0]):
+            elif len(children) == 2:
+                if zSym(self.obout):
                     PUrP.SingleCouplingModes = "1"
                 else:
                     PUrP.SingleCouplingModes = "2"
-            elif len(obj.children) == 2:
-                if zSym(obj.children[1]):
+            elif len(children) == 2:
+                if zSym(self.obout):
                     PUrP.SingleCouplingModes = "1"
                 else:
                     PUrP.SingleCouplingModes = "2"
 
-            if len(obj.children) != 0:  # nicht flatcut
+            if len(children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")
-                if "Cube" in obj.children[0].data.name:
+                if "Cube" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '1'
-                elif "Cylinder" in obj.children[0].data.name:
+                elif "Cylinder" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '2'
                     # PUrP.CylVert = len(obj.data.vertices)/2
                     PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(  # cylinder is a special case of cone
-                        context, obj.children[0])
-                elif "Cone" in obj.children[0].data.name:
+                        context, self.obout)
+                elif "Cone" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '3'
                     # PUrP.CylVert = len(obj.data.vertices) - 1
                     PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
-                        context, obj.children[0])
-                for child in obj.children:
-                    if "diff" in child.name:
-                        PUrP.CoupSize = child.scale.x
-                        PUrP.zScale = child.scale.z / PUrP.CoupSize
-                        # double check
-                        PUrP.BevelSegments = child.modifiers[0].segments
-                        PUrP.BevelOffset = child.modifiers[0].width
-                        diffchild = child
-                    elif "fix" in child.name or "union" in child.name:
-                        PUrP.Oversize = (diffchild.scale.x -
-                                         child.scale.x)/2  # double check
-
-                '''('1','Stick',''),
-                    ('2','Male-Female', ''),
-                #    ('3','FlatCut',''),
-                #    ('4','Planar',''),'''
+                        context, self.obout)
+                # for child in obj.children:
+                    # if "diff" in child.name:
+                PUrP.CoupSize = self.obout.scale.x
+                PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
+                # double check
+                PUrP.BevelSegments = self.obout.modifiers[0].segments
+                PUrP.BevelOffset = self.obout.modifiers[0].width
+                diffchild = child
+                # elif "fix" in child.name or "union" in child.name:
+                outpoint = self.obout.data.vertices[0].co.y
+                inpoint = self.obin.data.vertices[0].co.y
+                PUrP.Oversize = abs(outpoint) - abs(inpoint)
 
         elif "PlanarConnector" in obj.name:
             PUrP.SingleCouplingModes = "4"
@@ -1891,6 +1895,12 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         if len(upperverts) == 1:  # hard tip
             bRadius = 0.0
         else:  # soft tip
+            bRadius = obj.data.vertices[1].co.y
+
+        aRadius = obj.data.vertices[0].co.y
+        Cyclvert = len(lowerverts)
+
+        '''
             for v in upperverts:
                 # vert on an axis has the radius as co.axis
                 if v.co.x == 0:
@@ -1902,7 +1912,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                     break
         # lower radius
-        Cyclvert = len(upperverts)
+        
         for v in lowerverts:
             if v.co.x == 0:
                 aRadius = v.co.y
@@ -1912,7 +1922,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 aRadius = v.co.x
                 aRadius = aRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                 break
-
+            '''
         return Cyclvert, aRadius, bRadius
 
 
