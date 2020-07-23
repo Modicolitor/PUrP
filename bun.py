@@ -182,42 +182,42 @@ def coupModeDivision(CenterObj, newname_mainplane):
 
 
 def oversizeToPrim(ob0, ob1):
-    '''applies the oversize to the primitves; ob0 is the bigger object (diff) ob1 the smaller'''
+    '''applies the oversize to the primitves; ob0 is the bigger object (diff) ob1 the smaller (fix, union)'''
     PUrP = bpy.context.scene.PUrP
     Oversize = PUrP.Oversize
-    #zScale = PUrP.zScale
-    #size = PUrP.CoupSize
+
     upperverts = []
     lowerverts = []
-    for v in ob1.data.vertices:
+    for v in ob0.data.vertices:
         if v.co[2] > 0:
-            upperverts.append(v)
+            upperverts.append(v.index)
         else:
-            lowerverts.append(v)
+            lowerverts.append(v.index)
 
-    shift = sqrt(2) * Oversize 
+    shift = sqrt(2) * Oversize
 
     for v in ob1.data.vertices:
         Pur = ob0.data.vertices[v.index].co
-        
-        #P1 = Pur.normalized() 
-        P2Dim = mathutils.Vector((Pur[0],Pur[1]))
-        P2Norm = P2Dim.normalized() 
+
+        #P1 = Pur.normalized()
+        P2Dim = mathutils.Vector((Pur[0], Pur[1]))
+        P2Norm = P2Dim.normalized()
         #print(f"P1 {P1} Pur {Pur}")
 
         v.co.x = Pur[0] - shift * P2Norm[0]
         v.co.y = Pur[1] - shift * P2Norm[1]
 
-        
-        if v in lowerverts:
+        if v.index in lowerverts:
             v.co.z = Pur[2] + Oversize
-        elif v in upperverts:
+        elif v.index in upperverts:
             v.co.z = Pur[2] - Oversize
-        
+
+
 def applyScalRot(obj):
     mat = obj.matrix_world
-    #trans = 
-    trans = mathutils.Matrix.Translation(mathutils.Vector((obj.matrix_world[0][3],obj.matrix_world[1][3],obj.matrix_world[2][3])))
+    # trans =
+    trans = mathutils.Matrix.Translation(mathutils.Vector(
+        (obj.matrix_world[0][3], obj.matrix_world[1][3], obj.matrix_world[2][3])))
     #mat = mat_trans @ mat_rot1
     me = obj.data
 
@@ -225,6 +225,7 @@ def applyScalRot(obj):
         v.co = v.co@mat
     mat.identity()
     mat @= trans
+
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context = bpy.context
@@ -324,7 +325,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context.object.parent = bpy.data.objects[newname_mainplane]
 
     # print(f"zscale should affect obj {context.object.name}")
-    # 
+    #
     mod = context.object.modifiers.new(
         name=context.object.name + "Bevel", type="BEVEL")  # bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset

@@ -19,6 +19,7 @@ from bpy.types import (
 )
 import mathutils
 from math import radians
+import copy
 
 
 class PP_OT_OversizeGizmo(bpy.types.Operator):
@@ -37,77 +38,46 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
     def execute(self, context):
         children = context.object.children
         PUrP = context.scene.PUrP
-        if len(children) == 2:
-            if self.valuey < children[0].scale.y:
-                children[1].scale.x = self.valuex
-                children[1].scale.y = self.valuey
-                children[1].scale.z = self.valuez
-                PUrP.Oversize = (
-                    children[0].scale.x - children[1].scale.x)/2
-            elif self.valuey >= children[0].scale.y:
-                children[1].scale.x = children[0].scale.y
-                children[1].scale.y = children[0].scale.y
-                children[1].scale.z = children[0].scale.y
-                PUrP.Oversize = 0
 
-        elif len(children) == 3:
-            if self.valuey < children[1].scale.y:
-                children[2].scale.x = self.valuex
-                children[2].scale.y = self.valuey
-                children[2].scale.z = self.valuez
-                context.scene.PUrP.Oversize = (
-                    children[1].scale.x - children[2].scale.x)/2
-            elif self.valuey >= children[1].scale.y:
-                children[2].scale.x = children[1].scale.y
-                children[2].scale.y = children[1].scale.y
-                children[2].scale.z = children[1].scale.y
-                PUrP.Oversize = 0
+        if self.valueos > 0:
+            PUrP.Oversize = self.valueos
+            applyScalRot(self.obin)
+            oversizeToPrim(self.obout, self.obin)
+
+        else:
+            PUrP.Oversize = 0
+            applyScalRot(self.obin)
+            oversizeToPrim(self.obout, self.obin)
         return {'FINISHED'}
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-            # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
             self.delta = event.mouse_y - self.init_value
-            # else:
-            #    self.delta =  self.init_value
+            self.valueos = self.init_oversize + self.delta/1000
 
-            self.valuex = self.init_scale_x + self.delta / \
-                1000  # - self.window_width/2 #(HD Screen 800)
-            self.valuey = self.init_scale_y + self.delta/1000
-            self.valuez = self.init_scale_z + self.delta/1000
-
-            # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            context.object.children[1].scale.x = self.init_scale_x
-            context.object.children[1].scale.y = self.init_scale_y
-            context.object.chilrend[1].scale.z = self.init_scale_z
+            PUrP.Oversize = self.init_oversize
+            applyScalRot(self.obin)
+            oversizeToPrim(self.obout, self.obin)
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-        # self.window_width = context.window.width
+        PUrP = context.scene.PUrP
         children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
 
-        if len(children) == 2:
-            self.init_scale_x = children[1].scale.x
-            self.init_scale_y = children[1].scale.y
-            self.init_scale_z = children[1].scale.z
-            self.valuex = children[1].scale.x
-            self.valuey = children[1].scale.y
-            self.valuez = children[1].scale.z
-
-        else:
-            self.init_scale_x = children[2].scale.x
-            self.init_scale_y = children[2].scale.y
-            self.init_scale_z = children[2].scale.z
-            self.valuex = children[2].scale.x
-            self.valuey = children[2].scale.y
-            self.valuez = children[2].scale.z
-
+        self.valueos = PUrP.Oversize
+        self.init_oversize = copy.copy(PUrP.Oversize)
         self.init_value = event.mouse_y
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
@@ -139,14 +109,10 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         self.obout.scale.y = self.valuey0
         self.obout.scale.z = self.valuez0
 
-        # applyScalRot(self.obout)
-        # applyScalRot(self.obin)
-
-        oversizeToPrim(self.obout, self.obin)
-
-        #children[1].scale.x = self.valuex1
-        #children[1].scale.y = self.valuey1
-        #children[1].scale.z = self.valuez1
+        # intermediate response, will be overwriten in confirm
+        self.obin.scale.x = self.valuex1
+        self.obin.scale.y = self.valuey1
+        self.obin.scale.z = self.valuez1
 
         PUrP.CoupSize = self.valuex0
         return {'FINISHED'}
@@ -170,14 +136,18 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
+            applyScalRot(self.obout)
+            applyScalRot(self.obin)
+
+            oversizeToPrim(self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            context.object.children[0].scale.x = self.init_scale_x0
-            context.object.children[0].scale.y = self.init_scale_y0
-            context.object.chilrend[0].scale.z = self.init_scale_z0
-            context.object.children[1].scale.x = self.init_scale_x1
-            context.object.children[1].scale.y = self.init_scale_y1
-            context.object.chilrend[1].scale.z = self.init_scale_z1
+            self.obout.scale.x = self.init_scale_x0
+            self.obout.scale.y = self.init_scale_y0
+            self.obout.scale.z = self.init_scale_z0
+            self.obin.scale.x = self.init_scale_x1
+            self.obin.scale.y = self.init_scale_y1
+            self.obin.scale.z = self.init_scale_z1
             return {'CANCELLED'}
         return {'RUNNING_MODAL'}
 
