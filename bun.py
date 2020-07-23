@@ -194,7 +194,7 @@ def oversizeToPrim(ob0, ob1):
         else:
             lowerverts.append(v.index)
 
-    shift = sqrt(2) * Oversize
+    shift = Oversize * sqrt(2)
 
     for v in ob1.data.vertices:
         Pur = ob0.data.vertices[v.index].co

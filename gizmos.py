@@ -195,14 +195,9 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        if len(context.object.children) == 2:
-            context.object.children[1].scale.z = self.value - (
-                context.object.children[0].scale.z - context.object.children[1].scale.z)
-            context.object.children[0].scale.z = self.value
-        else:
-            context.object.children[2].scale.z = self.value - (
-                context.object.children[1].scale.z - context.object.children[2].scale.z)
-            context.object.children[1].scale.z = self.value
+
+        self.obout.scale.z = self.value
+        self.obin.scale.z = self.value
 
         PUrP = context.scene.PUrP
         PUrP.zScale = self.value / PUrP.CoupSize
@@ -210,31 +205,36 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-            # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
-            self.delta = event.mouse_y - self.init_value
-            # else:
-            #    self.delta =  self.init_value
 
-            self.value = self.init_scale_z + self.delta / \
-                1000  # - self.window_width/2 #(HD Screen 800)
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.init_scale_z + self.delta/1000
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
+            applyScalRot(self.obout)
+            applyScalRot(self.obin)
+
+            oversizeToPrim(self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            context.object.chilrend[0].location.z = self.init_scale_z
-            context.object.chilrend[1].location.z = self.init_scale_z
+            self.obout.location.z = self.init_scale_z
+            self.obin.location.z = self.init_scale_z
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-        self.init_scale_z = context.object.children[0].scale.z
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
 
+        self.init_scale_z = self.obout.scale.z
         self.init_value = event.mouse_y
-
-        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = context.object.children[0].scale.z
+        self.value = self.obout.scale.z
 
         self.execute(context)
 
@@ -257,9 +257,8 @@ class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
 
     def execute(self, context):
 
-        children = context.object.children
-        children[1].modifiers[0].width = self.value
-        children[0].modifiers[0].width = self.value
+        self.obin.modifiers[0].width = self.value
+        self.obout.modifiers[0].width = self.value
         context.scene.PUrP.BevelOffset = self.value
         return {'FINISHED'}
 
@@ -274,20 +273,24 @@ class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            children[0].modifiers[0].width = self.init_width
-            children[1].modifiers[0].width = self.init_width
+            self.obout.modifiers[0].width = self.init_width
+            self.obin.modifiers[0].width = self.init_width
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
         children = context.object.children
-        self.init_width = children[0].modifiers[0].width
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
 
+        self.init_width = self.obout.modifiers[0].width
         self.init_value = event.mouse_y
-
-        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = children[0].modifiers[0].width
+        self.value = self.obout.modifiers[0].width
 
         self.execute(context)
 
@@ -309,16 +312,12 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-
-        children = context.object.children
-        children[1].modifiers[0].segments = int(self.value)
-        children[0].modifiers[0].segments = int(self.value)
+        self.obin.modifiers[0].segments = int(self.value)
+        self.obout.modifiers[0].segments = int(self.value)
         context.scene.PUrP.BevelSegments = int(self.value)
-        # print(self.value)
         return {'FINISHED'}
 
     def modal(self, context, event):
-        children = context.object.children
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
@@ -328,20 +327,24 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            children[0].modifiers[0].segments = self.init_segments
-            children[1].modifiers[0].segments = self.init_segments
+            self.obout.modifiers[0].segments = self.init_segments
+            self.obin.modifiers[0].segments = self.init_segments
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
         children = context.object.children
-        self.init_segments = children[0].modifiers[0].segments
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
 
+        self.init_segments = self.obout.modifiers[0].segments
         self.init_value = event.mouse_y
-
-        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = children[0].modifiers[0].segments
+        self.value = self.obout.modifiers[0].segments
 
         self.execute(context)
 
@@ -436,29 +439,15 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        ob = context.object
 
         for num, v in enumerate(self.lowerverts):
             v.co.x = self.init_posx[num] * self.value
             v.co.y = self.init_posy[num] * self.value
-        '''
-        INvalue = -self.ob.data.vertices[0].co.y + \
-            PUrP.Oversize*PUrP.GlobalScale
 
-        INvalueZ = self.ob.data.vertices[0].co.z - \
-            PUrP.Oversize*PUrP.GlobalScale
-        print(f"value {self.value} invalue {INvalue}")
+        oversizeToPrim(self.obout, self.obin)
 
-        for num, v in enumerate(self.INlowerverts):
-            v.co.x = self.init_INposx[num] * INvalue
-            v.co.y = self.init_INposy[num] * INvalue
-            v.co.z = self.init_INposz[num] * INvalueZ
-        '''
-
-        oversizeToPrim(self.ob, self.obin)
-
-        a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(context, ob)
-        # print(self.value)
+        a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+            context, self.obout)
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -492,19 +481,19 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         # order correction
         for child in children:
             if "diff" in child.name:
-                self.ob = child
+                self.obout = child
             elif "fix" in child.name or "union" in child.name:
                 self.obin = child
 
         PUrP = context.scene.PUrP
 
         self.upperverts, self.lowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
-            context, self.ob)
+            context, self.obout)
 
         self.INupperverts, self.INlowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
             context, self.obin)
 
-        if "Cylinder" in self.ob.data.name:
+        if "Cylinder" in self.obout.data.name:
             self.lowerverts += self.upperverts
             self.INlowerverts += self.INupperverts
 
@@ -521,6 +510,107 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
             self.init_INposx.append(v.co.x)
             self.init_INposy.append(v.co.y)
             self.init_INposz.append(v.co.z)
+
+        self.init_mouse = event.mouse_x
+        self.value = 1.0
+
+        self.execute(context)
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+    def coneanalysizer(self, context, ob):
+        # Cyclvert, and the radius are extrakted; Coupling types
+        PUrP = context.scene.PUrP
+
+        upperverts = []
+        lowerverts = []
+        for vert in ob.data.vertices:
+            if vert.co.z > 0:
+                upperverts.append(vert)
+            elif vert.co.z <= 0:
+                lowerverts.append(vert)
+        # upperverts information
+        if len(upperverts) == 1:  # hard tip
+            bRadius = 0.0
+        else:  # soft tip
+            bRadius = -ob.data.vertices[1].co.y
+            bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
+        # lower radius
+
+        aRadius = -ob.data.vertices[0].co.y
+        aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
+
+        return upperverts, lowerverts, aRadius, bRadius
+
+
+class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
+    '''Change the cylinder Radius or the lower radius of the cone'''
+    bl_idname = "purp.upperradiusgizmo"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+
+        for num, v in enumerate(self.upperverts):
+            v.co.x = self.init_posx[num] * self.value
+            v.co.y = self.init_posy[num] * self.value
+
+        oversizeToPrim(self.obout, self.obin)
+
+        a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+            context, self.obout)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        #ob = context.object
+        if event.type == 'MOUSEMOVE':  # Apply
+            self.delta = event.mouse_x - self.init_mouse
+            self.value = 1.0 + self.delta / 1000
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            for num, v in enumerate(self.upperverts):
+                v.co.x = self.init_posx[num]
+                v.co.y = self.init_posy[num]
+
+            oversizeToPrim(self.obout, self.obin)
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
+
+        PUrP = context.scene.PUrP
+
+        self.upperverts, self.lowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+            context, self.obout)
+
+        if "Cylinder" in self.obout.data.name:
+            self.upperverts += self.lowerverts
+
+        self.init_posx = []
+        self.init_posy = []
+        for v in self.upperverts:
+            self.init_posx.append(v.co.x)
+            self.init_posy.append(v.co.y)
 
         self.init_mouse = event.mouse_x
         self.value = 1.0
@@ -725,7 +815,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         # for cone when upperradius adjustment
         upradius = self.gizmos.new(PUrP_ConeShapeWidget.bl_idname)
-        upradius.target_set_operator("purp.coupscalegizmo")
+        upradius.target_set_operator("purp.upperradiusgizmo")
         upradius.use_draw_offset_scale = True
         upradius.matrix_basis = ob.matrix_world.normalized()
         upradius.use_draw_value = True
