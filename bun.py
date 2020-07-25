@@ -194,23 +194,42 @@ def oversizeToPrim(ob0, ob1):
         else:
             lowerverts.append(v.index)
 
-    shift = Oversize * sqrt(2)
+    shift = Oversize  # * sqrt(2)
 
-    for v in ob1.data.vertices:
-        Pur = ob0.data.vertices[v.index].co
+    # cube is spezial case but why
+    if "Cube" not in ob0.data.name:
+        for v in ob1.data.vertices:
+            Pur = ob0.data.vertices[v.index].co
 
-        #P1 = Pur.normalized()
-        P2Dim = mathutils.Vector((Pur[0], Pur[1]))
-        P2Norm = P2Dim.normalized()
-        #print(f"P1 {P1} Pur {Pur}")
+            #P1 = Pur.normalized()
+            P2Dim = mathutils.Vector((Pur[0], Pur[1]))
 
-        v.co.x = Pur[0] - shift * P2Norm[0]
-        v.co.y = Pur[1] - shift * P2Norm[1]
+            P2Norm = P2Dim.normalized()
+            print(f"P2Dim {P2Dim} Pur {P2Norm}")
 
-        if v.index in lowerverts:
-            v.co.z = Pur[2] + Oversize
-        elif v.index in upperverts:
-            v.co.z = Pur[2] - Oversize
+            v.co.x = Pur[0] - shift * P2Norm[0]
+            v.co.y = Pur[1] - shift * P2Norm[1]
+
+            if v.index in lowerverts:
+                v.co.z = Pur[2] + Oversize
+            elif v.index in upperverts:
+                v.co.z = Pur[2] - Oversize
+    else:
+        for v in ob1.data.vertices:
+            Pur = ob0.data.vertices[v.index].co
+            if v.co.x > 0:
+                v.co.x -= Oversize
+            else:
+                v.co.x += Oversize
+            if v.co.y > 0:
+                v.co.y -= Oversize
+            else:
+                v.co.y += Oversize
+
+            if v.index in lowerverts:
+                v.co.z = Pur[2] + Oversize
+            elif v.index in upperverts:
+                v.co.z = Pur[2] - Oversize
 
 
 def applyScalRot(obj):
