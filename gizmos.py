@@ -535,11 +535,11 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         if len(upperverts) == 1:  # hard tip
             bRadius = 0.0
         else:  # soft tip
-            bRadius = -ob.data.vertices[1].co.y
+            bRadius = abs(ob.data.vertices[1].co.y)
             bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
         # lower radius
 
-        aRadius = -ob.data.vertices[0].co.y
+        aRadius = abs(ob.data.vertices[0].co.y)
         aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
 
         return upperverts, lowerverts, aRadius, bRadius
@@ -636,11 +636,11 @@ class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
         if len(upperverts) == 1:  # hard tip
             bRadius = 0.0
         else:  # soft tip
-            bRadius = -ob.data.vertices[1].co.y
+            bRadius = abs(ob.data.vertices[1].co.y)
             bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
         # lower radius
 
-        aRadius = -ob.data.vertices[0].co.y
+        aRadius = abs(ob.data.vertices[0].co.y)
         aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
 
         return upperverts, lowerverts, aRadius, bRadius
@@ -838,6 +838,13 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
     def refresh(self, context):
         ob = context.object
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
 
         # oversize
         mpr = self.roll_widget
@@ -877,9 +884,17 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         lowradius = self.lowRadius
         lowradius.matrix_basis = ob.matrix_world.normalized()
-
         upradius = self.upRadius
         upradius.matrix_basis = ob.matrix_world.normalized()
+        if "Cone" in self.obout.data.name:
+
+            lowradius.scale_basis = 0.4
+            upradius.scale_basis = 0.4
+        else:
+            lowradius.scale_basis = 0.0
+            upradius.scale_basis = 0.0
+
+
 # planar connector gizmos
 
 
