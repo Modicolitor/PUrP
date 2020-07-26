@@ -41,12 +41,12 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
         if self.valueos > 0:
             PUrP.Oversize = self.valueos
-            applyScalRot(self.obin)
+            # applyScalRot(self.obin)
             oversizeToPrim(self.obout, self.obin)
 
         else:
             PUrP.Oversize = 0
-            applyScalRot(self.obin)
+            # applyScalRot(self.obin)
             oversizeToPrim(self.obout, self.obin)
         return {'FINISHED'}
 
@@ -57,6 +57,8 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
+            applyScalRot(self.obin)
+            oversizeToPrim(self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             PUrP.Oversize = self.init_oversize

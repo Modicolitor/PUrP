@@ -215,8 +215,22 @@ def oversizeToPrim(ob0, ob1):
             elif v.index in upperverts:
                 v.co.z = Pur[2] - Oversize
     else:
-        for v in ob1.data.vertices:
-            Pur = ob0.data.vertices[v.index].co
+        v = ob1.data.vertices
+        w = ob0.data.vertices
+        print(f"used cube branch oversize {Oversize}")
+        v[0].co = w[0].co + mathutils.Vector((Oversize, Oversize, Oversize))
+        v[1].co = w[1].co + mathutils.Vector((Oversize, Oversize, -Oversize))
+        v[2].co = w[2].co + mathutils.Vector((Oversize, -Oversize, Oversize))
+        v[3].co = w[3].co + mathutils.Vector((Oversize, -Oversize, -Oversize))
+        v[4].co = w[4].co + mathutils.Vector((-Oversize, Oversize, Oversize))
+        v[5].co = w[5].co + mathutils.Vector((-Oversize, Oversize, -Oversize))
+        v[6].co = w[6].co + mathutils.Vector((-Oversize, -Oversize, Oversize))
+        v[7].co = w[7].co + mathutils.Vector((-Oversize, -Oversize, -Oversize))
+
+        # for v in ob1.data.vertices:
+        #    Pur = ob0.data.vertices[v.index].co
+
+        '''
             if v.co.x > 0:
                 v.co.x -= Oversize
             else:
@@ -230,6 +244,7 @@ def oversizeToPrim(ob0, ob1):
                 v.co.z = Pur[2] + Oversize
             elif v.index in upperverts:
                 v.co.z = Pur[2] - Oversize
+            '''
 
 
 def applyScalRot(obj):
