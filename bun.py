@@ -155,7 +155,7 @@ def coupModeDivision(CenterObj, newname_mainplane):
 
         # add positiv object
         ob1 = genPrimitive(CenterObj, newname_mainplane, '_union')
-        oversizeToPrim(ob0, ob1)
+        oversizeToPrim(context, singcoupmode(context, "2", None), ob0, ob1)
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":  # stick
@@ -164,7 +164,7 @@ def coupModeDivision(CenterObj, newname_mainplane):
 
         ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix')
 
-        oversizeToPrim(ob0, ob1)
+        oversizeToPrim(context, singcoupmode(context, "1", None), ob0, ob1)
 
         newMain = data.objects[newname_mainplane]
 
@@ -181,10 +181,35 @@ def coupModeDivision(CenterObj, newname_mainplane):
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
 
-def oversizeToPrim(ob0, ob1):
-    '''applies the oversize to the primitves; ob0 is the bigger object (diff) ob1 the smaller (fix, union)'''
-    PUrP = bpy.context.scene.PUrP
-    Oversize = PUrP.Oversize
+def singcoupmode(context, Number, coup):
+    if Number != None:
+        if Number == "1":
+            return "STICK"
+        elif Number == "2":
+            return "MF"
+        elif Number == "3":
+            return "FLAT"
+
+    if coup != None:
+        children = coup.children
+        if len(children) == 0 or len(children) == 1:
+            return "FLAT"
+        elif len(children) == 2 or len(children) == 3:
+            for child in children:
+                if "diff" in child.name:
+                    obout = child
+                # elif "fix" in child.name or "union" in child.name:
+                #    obin = child
+            if zSym(obout):
+                return "STICK"
+            else:
+                return "MF"
+
+
+def oversizeToPrim(context, mode, ob0, ob1):
+    '''applies the oversize to the primitves; ob0 is the bigger object (diff) ob1 the smaller (fix, union), mode can be "STICK" "MF" "'''
+    PUrP = context.scene.PUrP
+    Oversize = PUrP.Oversize * PUrP.GlobalScale
 
     upperverts = []
     lowerverts = []
@@ -197,11 +222,12 @@ def oversizeToPrim(ob0, ob1):
     shift = Oversize  # * sqrt(2)
 
     # cube is spezial case but why
+
     if "Cube" not in ob0.data.name:
         for v in ob1.data.vertices:
             Pur = ob0.data.vertices[v.index].co
 
-            #P1 = Pur.normalized()
+            # P1 = Pur.normalized()
             P2Dim = mathutils.Vector((Pur[0], Pur[1]))
 
             P2Norm = P2Dim.normalized()
@@ -210,41 +236,41 @@ def oversizeToPrim(ob0, ob1):
             v.co.x = Pur[0] - shift * P2Norm[0]
             v.co.y = Pur[1] - shift * P2Norm[1]
 
-            if v.index in lowerverts:
-                v.co.z = Pur[2] + Oversize
-            elif v.index in upperverts:
+            if v.index in upperverts:
                 v.co.z = Pur[2] - Oversize
+            elif v.index in lowerverts and mode != "MF":
+                v.co.z = Pur[2] + Oversize
     else:
         v = ob1.data.vertices
         w = ob0.data.vertices
-        print(f"used cube branch oversize {Oversize}")
-        v[0].co = w[0].co + mathutils.Vector((Oversize, Oversize, Oversize))
-        v[1].co = w[1].co + mathutils.Vector((Oversize, Oversize, -Oversize))
-        v[2].co = w[2].co + mathutils.Vector((Oversize, -Oversize, Oversize))
-        v[3].co = w[3].co + mathutils.Vector((Oversize, -Oversize, -Oversize))
-        v[4].co = w[4].co + mathutils.Vector((-Oversize, Oversize, Oversize))
-        v[5].co = w[5].co + mathutils.Vector((-Oversize, Oversize, -Oversize))
-        v[6].co = w[6].co + mathutils.Vector((-Oversize, -Oversize, Oversize))
-        v[7].co = w[7].co + mathutils.Vector((-Oversize, -Oversize, -Oversize))
 
-        # for v in ob1.data.vertices:
-        #    Pur = ob0.data.vertices[v.index].co
+        v[1].co = w[1].co + \
+            mathutils.Vector((Oversize, Oversize, -Oversize))
+        v[3].co = w[3].co + \
+            mathutils.Vector((Oversize, -Oversize, -Oversize))
+        v[5].co = w[5].co + \
+            mathutils.Vector((-Oversize, Oversize, -Oversize))
+        v[7].co = w[7].co + \
+            mathutils.Vector((-Oversize, -Oversize, -Oversize))
 
-        '''
-            if v.co.x > 0:
-                v.co.x -= Oversize
-            else:
-                v.co.x += Oversize
-            if v.co.y > 0:
-                v.co.y -= Oversize
-            else:
-                v.co.y += Oversize
-
-            if v.index in lowerverts:
-                v.co.z = Pur[2] + Oversize
-            elif v.index in upperverts:
-                v.co.z = Pur[2] - Oversize
-            '''
+        if mode != "MF":
+            v[0].co = w[0].co + \
+                mathutils.Vector((Oversize, Oversize, Oversize))
+            v[2].co = w[2].co + \
+                mathutils.Vector((Oversize, -Oversize, Oversize))
+            v[4].co = w[4].co + \
+                mathutils.Vector((-Oversize, Oversize, Oversize))
+            v[6].co = w[6].co + \
+                mathutils.Vector((-Oversize, -Oversize, Oversize))
+        else:
+            v[0].co = w[0].co + \
+                mathutils.Vector((Oversize, Oversize, 0))
+            v[2].co = w[2].co + \
+                mathutils.Vector((Oversize, -Oversize, 0))
+            v[4].co = w[4].co + \
+                mathutils.Vector((-Oversize, Oversize, 0))
+            v[6].co = w[6].co + \
+                mathutils.Vector((-Oversize, -Oversize, 0))
 
 
 def applyScalRot(obj):
@@ -252,7 +278,7 @@ def applyScalRot(obj):
     # trans =
     trans = mathutils.Matrix.Translation(mathutils.Vector(
         (obj.matrix_world[0][3], obj.matrix_world[1][3], obj.matrix_world[2][3])))
-    #mat = mat_trans @ mat_rot1
+    # mat = mat_trans @ mat_rot1
     me = obj.data
 
     for v in me.vertices:
@@ -1122,7 +1148,7 @@ def applySingleCoup(context, Coup, CenterObj):
     # context = bpy.context
     data = bpy.data
     PUrP = context.scene.PUrP
-    #PUrP_name = PUrP.PUrP_name
+    # PUrP_name = PUrP.PUrP_name
 
     obj = Coup
     oriCoupname = Coup.name[:]
@@ -1782,12 +1808,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             # more code because of order
             if len(children) == 0 or len(children) == 1:
                 PUrP.SingleCouplingModes = "3"
-            elif len(children) == 2:
-                if zSym(self.obout):
-                    PUrP.SingleCouplingModes = "1"
-                else:
-                    PUrP.SingleCouplingModes = "2"
-            elif len(children) == 2:
+            elif len(children) == 2 or len(children) == 3:
                 if zSym(self.obout):
                     PUrP.SingleCouplingModes = "1"
                 else:

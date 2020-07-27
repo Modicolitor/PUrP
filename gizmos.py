@@ -12,6 +12,7 @@ from .gizmotshape import PUrP_CylinderShapeWidget
 
 from .bun import oversizeToPrim
 from .bun import applyScalRot
+from .bun import singcoupmode
 
 from bpy.types import (
     Operator,
@@ -42,12 +43,14 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
         if self.valueos > 0:
             PUrP.Oversize = self.valueos
             # applyScalRot(self.obin)
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
 
         else:
             PUrP.Oversize = 0
             # applyScalRot(self.obin)
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -58,12 +61,14 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             applyScalRot(self.obin)
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             PUrP.Oversize = self.init_oversize
             applyScalRot(self.obin)
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
@@ -141,7 +146,8 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             applyScalRot(self.obout)
             applyScalRot(self.obin)
 
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             self.obout.scale.x = self.init_scale_x0
@@ -216,7 +222,8 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
             applyScalRot(self.obout)
             applyScalRot(self.obin)
 
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             self.obout.location.z = self.init_scale_z
@@ -378,7 +385,8 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         applyScalRot(self.obout)
         applyScalRot(self.obin)
 
-        oversizeToPrim(self.obout, self.obin)
+        oversizeToPrim(context, singcoupmode(
+            context, None, context.object), self.obout, self.obin)
 
         PUrP.CoupScale = ob.data.vertices[1].co.x * \
             self.value[0] / (3 * PUrP.GlobalScale)
@@ -446,7 +454,8 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
             v.co.x = self.init_posx[num] * self.value
             v.co.y = self.init_posy[num] * self.value
 
-        oversizeToPrim(self.obout, self.obin)
+        oversizeToPrim(context, singcoupmode(
+            context, None, context.object), self.obout, self.obin)
 
         a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
             context, self.obout)
@@ -565,7 +574,8 @@ class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
             v.co.x = self.init_posx[num] * self.value
             v.co.y = self.init_posy[num] * self.value
 
-        oversizeToPrim(self.obout, self.obin)
+        oversizeToPrim(context, singcoupmode(
+            context, None, context.object), self.obout, self.obin)
 
         a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
             context, self.obout)
@@ -585,7 +595,8 @@ class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
                 v.co.x = self.init_posx[num]
                 v.co.y = self.init_posy[num]
 
-            oversizeToPrim(self.obout, self.obin)
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
 
             return {'CANCELLED'}
 

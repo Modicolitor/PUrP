@@ -71,6 +71,10 @@ after applying
 bugs:
 general operator bug:
 
+[] oversize mode devision, update in all functions
+[] correct oversize to prim for MF
+
+[] coupmodedivision context
 [] connector inlay size changes when scaled with blenders scale --> ignore
 [] flatcut gizmot
 [] cone cylinder gizmos: radius, upper radius, 
