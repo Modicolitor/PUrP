@@ -905,8 +905,142 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
             lowradius.scale_basis = 0.0
             upradius.scale_basis = 0.0
 
+        if len(children) == 0:
+            mpr.scale_basis = 0.0
+            mpa.scale_basis = 0.0
+            mph.scale_basis = 0.0
+            mpo.scale_basis = 0.0
+            mps.scale_basis = 0.0
+            #mcsize.scale_basis = 0.0
+            lowradius.scale_basis = 0.0
+            upradius.scale_basis = 0.0
 
-# planar connector gizmos
+
+# flatcut gizmot
+
+
+class PUrP_FlatCoupGizmo(GizmoGroup):
+    bl_idname = "OBJECT_FLAT_coup_camera"
+    bl_label = "Object Camera Test Widget"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'WINDOW'
+    bl_options = {'3D', 'PERSISTENT'}
+
+    @classmethod
+    def poll(cls, context):
+
+        ob = context.object
+
+        if ob != None:
+            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
+                if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
+                    try:
+                        test = context.scene.PUrP.GlobalScale
+                        return True
+                    except:
+                        return False
+                return False
+
+            return False
+
+    def setup(self, context):
+        ob = context.object
+
+        mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
+        mcsize.target_set_operator("purp.flatcoupscalegizmo")  # needs operator
+        mcsize.use_draw_offset_scale = True
+        mcsize.matrix_basis = ob.matrix_world.normalized()
+        mcsize.use_draw_value = True
+        mcsize.line_width = 3
+        mcsize.matrix_offset[2][3] = -0.5
+
+        mcsize.color = 0.03, 0.8, 0.03
+        mcsize.alpha = 0.5
+
+        mcsize.color_highlight = 0.01, 1.0, 0.01
+        mcsize.alpha_highlight = 1.0
+        mcsize.scale_basis = 2
+
+        self.couplingScale = mcsize
+
+    def refresh(self, context):
+        ob = context.object
+        mcsize = self.couplingScale
+        mcsize.matrix_basis = ob.matrix_world
+
+        # planar connector gizmos
+
+
+class PP_OT_FlatCoupScaleGizmo(bpy.types.Operator):
+    '''Change the beveloffset of the coupling'''
+    bl_idname = "purp.flatcoupscalegizmo"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        ob = context.object
+
+        ob.scale = self.value
+        # bpy.ops.object.transform_apply(
+        #    location=False, rotation=False, scale=True)
+
+        # applyScalRot(self.obout)
+        # applyScalRot(self.obin)
+
+        # oversizeToPrim(context, singcoupmode(
+        #    context, None, context.object), self.obout, self.obin)
+
+        PUrP.CoupScale = ob.data.vertices[1].co.x * \
+            self.value[0] / (3 * PUrP.GlobalScale)
+        # print(self.value)
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        ob = context.object
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_x - self.init_value
+            self.value = self.init_scale + \
+                mathutils.Vector(
+                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            bpy.ops.object.transform_apply(
+                location=False, rotation=False, scale=True)
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.scale = self.init_scale
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        '''
+        children = context.object.children
+        # order correction
+        for child in children:
+            if "diff" in child.name:
+                self.obout = child
+            elif "fix" in child.name or "union" in child.name:
+                self.obin = child
+        '''
+        ob = context.object
+        self.init_scale = ob.scale.copy()
+        self.init_value = event.mouse_x
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.scale
+        self.execute(context)
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 
 def has_stopper(obj):

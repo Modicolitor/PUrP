@@ -71,13 +71,9 @@ after applying
 bugs:
 general operator bug:
 
-[] oversize mode devision, update in all functions
-[] correct oversize to prim for MF
-
-[] coupmodedivision context
 [] connector inlay size changes when scaled with blenders scale --> ignore
-[] flatcut gizmot
-[] cone cylinder gizmos: radius, upper radius, 
+
+[] plainthickness gizmo
 
 [] reorganize UI 
 
@@ -115,6 +111,11 @@ Publishing:
 
 
 resolved bug:
+[+] flatcut gizmot
+[+] correct oversize to prim for MF
+[+] oversize mode devision, update in all functions
+[+] cone cylinder gizmos: radius, upper radius, 
+[+] coupmodedivision context
 [+] single oversize gizmot beschränken
 
 [+] active to settings not working with order switched on

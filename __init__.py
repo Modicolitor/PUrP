@@ -27,6 +27,8 @@ from .gizmos import PP_OT_PlanarThicknessGizmo
 from .gizmos import PP_OT_CoupScaleGizmo
 from .gizmos import PP_OT_LowerRadiusGizmo
 from .gizmos import PP_OT_UpperRadiusGizmo
+from .gizmos import PUrP_FlatCoupGizmo
+from .gizmos import PP_OT_FlatCoupScaleGizmo
 
 from .gizmotshape import PUrP_CornerShapeWidget
 from .gizmotshape import PUrP_ArrowUpShapeWidget
@@ -105,6 +107,8 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_CoupScaleGizmo,
            PP_OT_LowerRadiusGizmo,
            PP_OT_UpperRadiusGizmo,
+           PUrP_FlatCoupGizmo,
+           PP_OT_FlatCoupScaleGizmo,
            PUrP_SinglCoupGizmo,
            PUrP_PlanarGizmo,
            PP_OT_CouplSizeGizmo,
