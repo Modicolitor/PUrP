@@ -1878,10 +1878,10 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
 
         if self.value <= 0:
             ob.modifiers["PUrP_Solidify"].thickness = 0
-            context.scene.PUrP.Oversize = self.value
+            context.scene.PUrP.Oversize = 0
         else:
             ob.modifiers["PUrP_Solidify"].thickness = self.value
-
+            context.scene.PUrP.Oversize = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
