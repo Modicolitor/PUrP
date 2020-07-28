@@ -73,7 +73,6 @@ general operator bug:
 
 [] connector inlay size changes when scaled with blenders scale --> ignore
 
-[] plainthickness gizmo
 
 [] reorganize UI 
 
@@ -111,6 +110,7 @@ Publishing:
 
 
 resolved bug:
+[+] plainthickness gizmo
 [+] flatcut gizmot
 [+] correct oversize to prim for MF
 [+] oversize mode devision, update in all functions

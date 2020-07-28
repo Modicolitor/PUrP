@@ -657,6 +657,61 @@ class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
         return upperverts, lowerverts, aRadius, bRadius
 
 
+class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
+    '''Change the Oversize (Thickness) of the planar connector'''
+    bl_idname = "purp.singthicknessgiz"
+    bl_label = "couplsize"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        ob = context.object
+
+        if self.value <= 0:
+            ob.modifiers["PUrP_Solidify"].thickness = 0
+            #context.scene.PUrP.Oversize = 0
+        else:
+            ob.modifiers["PUrP_Solidify"].thickness = self.value
+            #context.scene.PUrP.Oversize = self.value
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_y - self.init_value
+            self.value = self.init_count + self.delta / 1000
+            print(
+                f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
+            self.execute(context)
+
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.modifiers["PUrP_Solidify"].thickness = self.init_count
+
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        ob = context.object
+        self.init_value = event.mouse_y
+        self.value = ob.modifiers["PUrP_Solidify"].thickness
+        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
+
+        self.execute(context)
+
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
 class PUrP_SinglCoupGizmo(GizmoGroup):
     bl_idname = "OBJECT_GGT_test_camera"
     bl_label = "Object Camera Test Widget"
@@ -847,6 +902,31 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         self.upRadius = upradius
 
+        mpthickness = self.gizmos.new(PUrP_ThicknessShapeWidget.bl_idname)
+        props = mpthickness.target_set_operator("purp.singthicknessgiz")
+        mpthickness.use_draw_offset_scale = True
+        mpthickness.matrix_basis = ob.matrix_world.normalized()
+        mpthickness.use_draw_value = True
+        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
+        mat = mat_trans @ mat_rot1
+        mpthickness.matrix_offset = mat
+
+        #mps.matrix_offset[2][0] = 0.2
+        #mps.matrix_offset[2][2] = 0.5
+        mpthickness.matrix_offset[2][3] -= 0.5
+        # mps.matrix_basis[0][3] += 0.5
+        mpthickness.line_width = 3
+
+        mpthickness.color = 0.03, 0.8, 0.03
+        mpthickness.alpha = 0.5
+
+        mpthickness.color_highlight = 0.01, 1.0, 0.01
+        mpthickness.alpha_highlight = 1.0
+        mpthickness.scale_basis = 2
+
+        self.thickness = mpthickness
+
     def refresh(self, context):
         ob = context.object
         children = context.object.children
@@ -915,6 +995,8 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
             lowradius.scale_basis = 0.0
             upradius.scale_basis = 0.0
 
+        mpthickness = self.thickness
+        mpthickness.matrix_basis = ob.matrix_world
 
 # flatcut gizmot
 
@@ -963,11 +1045,38 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
 
         self.couplingScale = mcsize
 
+        mpthickness = self.gizmos.new(PUrP_ThicknessShapeWidget.bl_idname)
+        props = mpthickness.target_set_operator("purp.singthicknessgiz")
+        mpthickness.use_draw_offset_scale = True
+        mpthickness.matrix_basis = ob.matrix_world.normalized()
+        mpthickness.use_draw_value = True
+        mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'X')  # rotate
+        mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
+        mat = mat_trans @ mat_rot1
+        mpthickness.matrix_offset = mat
+
+        #mps.matrix_offset[2][0] = 0.2
+        #mps.matrix_offset[2][2] = 0.5
+        mpthickness.matrix_offset[2][3] -= 0.5
+        # mps.matrix_basis[0][3] += 0.5
+        mpthickness.line_width = 3
+
+        mpthickness.color = 0.03, 0.8, 0.03
+        mpthickness.alpha = 0.5
+
+        mpthickness.color_highlight = 0.01, 1.0, 0.01
+        mpthickness.alpha_highlight = 1.0
+        mpthickness.scale_basis = 2
+
+        self.thickness = mpthickness
+
     def refresh(self, context):
         ob = context.object
         mcsize = self.couplingScale
         mcsize.matrix_basis = ob.matrix_world
 
+        mpthickness = self.thickness
+        mpthickness.matrix_basis = ob.matrix_world
         # planar connector gizmos
 
 

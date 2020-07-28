@@ -48,7 +48,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     BuildplateZ = bpy.props.FloatProperty(
         name="Buildplate Z-Dimensions", default=19, min=0.0)
     CoupScale = bpy.props.FloatProperty(
-        name="Connector Scale", default=1)
+        name="Connector Scale", default=1, min=0.0)
     PlanarCorScale = bpy.props.FloatProperty(
         name="PlanarKorrekturBG", default=1)
 
