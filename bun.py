@@ -98,7 +98,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         # loc = mathutils.Vector((0,0,0))
         # print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
-        coupModeDivision(CenterObj, newname_mainplane)
+        coupModeDivision(context, CenterObj, newname_mainplane)
 
         # cursorloc.x -= CenterObj.location.x
         # cursorloc.y -= CenterObj.location.y
@@ -136,9 +136,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         return{"FINISHED"}
 
 
-def coupModeDivision(CenterObj, newname_mainplane):
+def coupModeDivision(context, CenterObj, newname_mainplane):
     data = bpy.data
-    context = bpy.context
+
     PUrP = bpy.context.scene.PUrP
     # Oversize = PUrP.Oversize
     # zScale = PUrP.zScale
@@ -788,7 +788,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 # when  new object planar types oder das ursprüngliche object planar ist
                 if CouplingModes == "4":
 
-                    print(f"obj.data.name {obj.data.name}")
+                    #print(f"obj.data.name {obj.data.name}")
                     loc = obj.location.copy()
                     trans = obj.matrix_world.copy()
                     oldname = obj.name
@@ -801,7 +801,13 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     # delete mainplane before making new planar
                     bpy.ops.object.delete(use_global=False)
 
-                    coupModeDivision(CenterObj, oldname)  # generate new planar
+                    # report stupidity
+                    if PUrP.SingleCouplingModes == "1" and C.scene.PUrP.SingleCouplingTypes == "3":
+                        self.report(
+                            {'WARNING'}, "Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
+
+                    # generate new planar
+                    coupModeDivision(context, CenterObj, oldname)
                     context.object.matrix_world = trans
                     # obj = context.object
                     # obj.select_set(True)
@@ -833,7 +839,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     mod.object = obj
                     mod.operation = 'DIFFERENCE'
                     # obj.scale = mathutils.Vector((1, 1, 1))
-                    coupModeDivision(CenterObj, obj.name)
+                    coupModeDivision(context, CenterObj, obj.name)
                     # print(f"obj at rescale {obj}")
                     scalefactor = PUrP.GlobalScale * PUrP.CoupScale
                     obj.data.vertices[0].co = mathutils.Vector(

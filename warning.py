@@ -8,7 +8,7 @@ def noCutthroughWarn(self, context):
 
 def coneTrouble(self, context):
     self.layout.label(
-        text="This seems to be impractical, but if you have a greater vision I won't stop you")
+        text="Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
 
 
 #bpy.context.window_manager.popup_menu(noCutthroughWarn, title="Error", icon='ERROR')
