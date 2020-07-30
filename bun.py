@@ -275,12 +275,12 @@ def oversizeToPrim(context, mode, ob0, ob1):
 
 def applyScalRot(obj):
     mat = obj.matrix_world
-    # trans =
+    # translation/ location vector
     trans = mathutils.Matrix.Translation(mathutils.Vector(
         (obj.matrix_world[0][3], obj.matrix_world[1][3], obj.matrix_world[2][3])))
-    # mat = mat_trans @ mat_rot1
-    me = obj.data
 
+    # ob data
+    me = obj.data
     for v in me.vertices:
         v.co = v.co@mat
     mat.identity()
@@ -788,7 +788,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 # when  new object planar types oder das ursprüngliche object planar ist
                 if CouplingModes == "4":
 
-                    #print(f"obj.data.name {obj.data.name}")
+                    # print(f"obj.data.name {obj.data.name}")
                     loc = obj.location.copy()
                     trans = obj.matrix_world.copy()
                     oldname = obj.name
@@ -1150,6 +1150,46 @@ def centerObjDecider(context, CenterObj):
                                 # Cobj.modifiers.remove(mid)
 
 
+def SideOfPlane(context, coup, CenterObj):
+
+    matrix = coup.matrix_world
+    couptmpdata = coup.data.copy()
+    # generate copy at origin
+    coup_tmp = bpy.data.objects.new(name="tmp", object_data=couptmpdata)
+    coup_tmp.parent = CenterObj
+    context.scene.collection.objects.link(coup_tmp)
+
+    for ob in context.selected_objects:
+        ob.select_set(False)
+
+    coup_tmp.select_set(True)
+    context.view_layer.objects.active = coup_tmp
+    coup_tmp.matrix_world = matrix
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+
+    # cube verts gerade unten, ungerade oben
+    test = 0
+    DirecDistance = 0
+    while DirecDistance == 0:
+
+        CouplingNormal = coup_tmp.data.vertices[0].normal
+        print(f"CouplingNormal {CouplingNormal}")
+
+        direction = CouplingNormal.dot(
+            CenterObj.data.vertices[test].co@CenterObj.matrix_world)
+        # print(f"direction {direction} CenterObj.data.vertices[n].co {CenterObj.data.vertices[test].co}")
+
+        planedistanceorigin = CouplingNormal.dot(
+            coup_tmp.data.vertices[0].co@coup_tmp.matrix_world)
+        # print(f"planedistance {planedistance} coup_tmp.data.vertices[0].co {coup_tmp.data.vertices[0].co} plane.data.vertices[0].co@plane.matrix_world {plane.data.vertices[0].co@plane.matrix_world}")
+
+        DirecDistance = direction - planedistanceorigin
+        #print(f"difference {difference}")
+    bpy.data.objects.remove(coup_tmp)
+
+    return DirecDistance
+
+
 def applySingleCoup(context, Coup, CenterObj):
     # context = bpy.context
     data = bpy.data
@@ -1192,53 +1232,35 @@ def applySingleCoup(context, Coup, CenterObj):
         bpy.ops.object.transform_apply(
             location=False, rotation=True, scale=True)
 
-        CouplingNormal = obj.data.vertices[0].normal
-        ctl = False
-        n = 0
-        Daughtertwo_side = "NULL"
-        while ctl == False:
+        CouplingNormal = obj.data.vertices[0].normal.normalized()
+        # TESTARRIA
+        # for v in DaughterOne.data.vertices:
+        #    direction = CouplingNormal.dot(
+        #       v.co) - CouplingNormal.dot(obj.data.vertices[0].co)
+        # print(f"directon test  {v.index} direction {direction}")
 
-            # geo = mathutils.geometry.distance_point_to_plane(pt, plane_co, plane_no)
-            geo = mathutils.geometry
+        direction = SideOfPlane(context, obj, DaughterOne)
 
-            direction = CouplingNormal.dot(
-                DaughterOne.data.vertices[n].co) - CouplingNormal.dot(obj.data.vertices[0].co)
-            print(f"that's the direction value {direction}")
-            if direction == 0:  # actual vector geometry part
-                n += 1
-                print("vertice number" + str(n))
+        if direction < 0:
+            # print('Object auf der Positiven Seite')
+            DaughterOne_side = "POSITIV"
+            DaughterTwo_side = "NEGATIV"
+            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
+        elif direction > 0:
+            # print('negativ seite')
+            DaughterOne_side = "NEGATIV"
+            DaughterTwo_side = "POSITIV"
+            applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
 
-            elif direction < 0:
+        else:
+            print('Probleme with side detection')
 
-                ctl = True
-                print('Object auf der Positiven Seite')
-                DaughterOne_side = "POSITIV"
-                DaughterTwo_side = "NEGATIV"
-                applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
-            elif direction > 0:
-                ctl = True
-                print('negativ seite')
-                DaughterOne_side = "NEGATIV"
-                DaughterTwo_side = "POSITIV"
-                applyRemoveCouplMods(DaughterOne, obj, DaughterOne_side)
-
-            else:
-                print('Probleme with side detection')
         if DaughterTwo == None:
             bpy.context.window_manager.popup_menu(
                 noCutthroughWarn, title="Error", icon='ERROR')  # raise error message
         else:
             applyRemoveCouplMods(DaughterTwo, obj, DaughterTwo_side)
         # deleConnector (later propably with checkbox)
-
-        '''for ele in context.selected_objects:
-            :
-            ele.select_set(False)
-        obj.select_set(True)
-        for child in obj.children:
-            child.select_set(True)
-
-        bpy.ops.object.delete(use_global=False, confirm=False)'''
 
         # sort the couplings to the new Daughters
         objects = bpy.data.objects
@@ -1820,6 +1842,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 else:
                     PUrP.SingleCouplingModes = "2"
 
+            scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
+
             if len(children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")
                 if "Cube" in self.obout.data.name:
@@ -1827,17 +1851,28 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 elif "Cylinder" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '2'
                     # PUrP.CylVert = len(obj.data.vertices)/2
-                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(  # cylinder is a special case of cone
+                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius, upverts = self.coneanalysizer(  # cylinder is a special case of cone
                         context, self.obout)
+                    if PUrP.SingleCouplingModes == "1":
+                        PUrP.zScale = upverts[0].co.z/scalefactor
+                    else:
+                        PUrP.zScale = upverts[0].co.z/(2*scalefactor)
                 elif "Cone" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '3'
                     # PUrP.CylVert = len(obj.data.vertices) - 1
-                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius, upverts = self.coneanalysizer(
                         context, self.obout)
+
+                    # 1 bei stick, 2 bei MF
+                    if PUrP.SingleCouplingModes == "1":
+                        PUrP.zScale = upverts[0].co.z/scalefactor
+                    else:
+                        PUrP.zScale = upverts[0].co.z/(2*scalefactor)
+
                 # for child in obj.children:
                     # if "diff" in child.name:
                 PUrP.CoupSize = self.obout.scale.x
-                PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
+                #PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
                 # double check
                 PUrP.BevelSegments = self.obout.modifiers[0].segments
                 PUrP.BevelOffset = self.obout.modifiers[0].width
@@ -1973,7 +2008,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                     break
         # lower radius
-        
+
         for v in lowerverts:
             if v.co.x == 0:
                 aRadius = v.co.y
@@ -1984,7 +2019,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 aRadius = aRadius / (PUrP.GlobalScale * PUrP.CoupScale)
                 break
             '''
-        return Cyclvert, aRadius, bRadius
+        return Cyclvert, aRadius, bRadius, upperverts
 
 
 def zSym(obj):

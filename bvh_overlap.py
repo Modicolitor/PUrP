@@ -15,8 +15,7 @@ def bvhOverlap(context, coup, CenterObj):
 
     for ob in context.selected_objects:
         ob.select_set(False)
-    # coup.select_set(False)
-    # CenterObj.select_set(False)
+
     coup_tmp.select_set(True)
     context.view_layer.objects.active = coup_tmp
     coup_tmp.matrix_world = matrix

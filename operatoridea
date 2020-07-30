@@ -71,14 +71,10 @@ after applying
 bugs:
 general operator bug:
 
-[] connector inlay size changes when scaled with blenders scale --> ignore
 
-
+[] inlaysize in add/exchange
 [] reorganize UI 
-
-
 [] test oversize with different globalscale
-
 [] zScale Active to Setting und Gizmot to setting überarbeiten 
 
 mögliche Probleme
@@ -110,6 +106,7 @@ Publishing:
 
 
 resolved bug:
+[+] MF sometimes fails (3 Beine Niklas)
 [+] plainthickness gizmo
 [+] flatcut gizmot
 [+] correct oversize to prim for MF
