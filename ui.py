@@ -95,11 +95,13 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             icon="MOD_DYNAMICPAINT")  # zeige button an
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
+            subcol.prop(PUrP, "KeepCoup", text="Keep Connector")
             subcol.label(text="Special Apply Methods")
             subcol.operator("object.applyplanarmultiobj", text='Planar To Multiple Objects',
                             icon="PARTICLE_POINT")  # zeige button an
             subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
                             icon="MOD_INSTANCE")
+
             subcol.operator("object.remapcoups",
                             text='Remap To Active', icon="FILE_REFRESH")
             subcol.label(text="Coupling Order")

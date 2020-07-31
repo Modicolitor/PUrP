@@ -71,17 +71,13 @@ after applying
 bugs:
 general operator bug:
 
-[] Radius respect Scalefactors
-[] CoupSize Gizmo with absolut values 
-[] apply has problemes with strangers Modifiers 
-[] option keep Connector after apply as unmapped 
-[] Connector scale Planar from active to setting
-[+] inlaysize in add/exchange
-[] reorganize UI 
-[] test oversize with different globalscale
-[] zScale Active to Setting und Gizmot to setting überarbeiten 
 
-[] planar solidify complex + constrainted looks best
+[] apply has problemes with strangers Modifiers 
+[] apply delete other modifiers/booleans after own stack
+[] remap large planar arrays to multiple children of former apply
+[] reorganize UI 
+
+
 
 mögliche Probleme
 [] Order System update system that stays out of the way 
@@ -112,6 +108,13 @@ Publishing:
 
 
 resolved bug:
+[+] option keep Connector after apply as unmapped 
+[+] planar solidify complex + constrainted looks best
+[+] Radius respect Scalefactors
+[+] CoupSize Gizmo with absolut values 
+[+] inlaysize in add/exchange
+[+] test oversize with different globalscale
+[+] zScale Active to Setting und Gizmot to setting überarbeiten 
 [+] MF sometimes fails (3 Beine Niklas)
 [+] plainthickness gizmo
 [+] flatcut gizmot

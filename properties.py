@@ -51,6 +51,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Connector Scale", default=1, min=0.0)
     PlanarCorScale = bpy.props.FloatProperty(
         name="PlanarKorrekturBG", default=1)
+    KeepCoup = bpy.props.BoolProperty(
+        name="Keep Connector", default=False)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

@@ -985,17 +985,54 @@ def applyRemoveCouplMods(daughter, connector, side):
     #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
 
 
-def removeCoupling(Coupl):
+def in_collection(context, ob):
+    data = bpy.data
+    collection = None
+    for col in data.collections:
+        #print(f"col {col}")
+        for o in col.objects:
+            #print(f"o {o}")
+            if o == ob:
+                collection = col
+               # print(f"ob {ob} col {col}")
+        #        break
+        # if collection != None:
+        #    break
+    return collection
+
+
+def removeCoupling(context, Coupl):
     '''removes objects related to the coupling after apllying or when it is a fixed '''
     print(f"Delete now Coupling {Coupl.name}")
+
     data = bpy.data
-    context = bpy.context
+    PUrP = context.scene.PUrP
+    keep = PUrP.KeepCoup
     active = context.view_layer.objects.active
+
     Coupl_children = Coupl.children[:]
+    ChildCopies = []
+    ChildNames = []
     for child in Coupl_children:
+        # make a copy of the inlays to reconnect and keep them later is Keep Bool is set
+
+        if keep:
+            # make a copy of the inlays
+            matrix = child.matrix_world
+            childtmpdata = child.data.copy()
+            child_tmp = bpy.data.objects.new(
+                name="tmp", object_data=childtmpdata)
+
+            col = in_collection(context, Coupl)
+            col.objects.link(child_tmp)
+            child_tmp.parent = Coupl
+            child_tmp.matrix_world = matrix
+            child_tmp.display_type = 'WIRE'
+            ChildCopies.append(child_tmp)
+            ChildNames.append(child.name)
+
         if "fix" not in child.name:  # alle normalen couplings die applied sind
             child.hide_select = False
-
             for ob in context.selected_objects:
                 ob.select_set(False)
             child.select_set(True)
@@ -1003,12 +1040,14 @@ def removeCoupling(Coupl):
             bpy.ops.object.delete(use_global=False)
         elif 'fix' in child.name:
             child.hide_select = False
-            active = child
+            #active = child
+
+            # apply bevel and stuff
             for mod in child.modifiers:
                 print(f"fix stick active {active} mod {mod.name}")
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
-
+            child.name = Coupl.parent.name
             child.display_type = 'SOLID'
             # child.location = mathutils.Vector((0,0,0))
             globloc = Coupl.matrix_world
@@ -1024,8 +1063,15 @@ def removeCoupling(Coupl):
         for mod in ob.modifiers:
             if Coupl.name in mod.name:
                 ob.modifiers.remove(mod)
-    Coupl.select_set(True)
-    bpy.ops.object.delete(use_global=False)
+
+    if keep:
+        for num, coup in enumerate(ChildCopies):
+            coup.name = ChildNames[num]
+        Coupl.parent = None
+        unmapped_signal(context, Coupl)
+    else:
+        Coupl.select_set(True)
+        bpy.ops.object.delete(use_global=False)
 
 
 '''
@@ -1190,6 +1236,29 @@ def SideOfPlane(context, coup, CenterObj):
     return DirecDistance
 
 
+def unmapped_signal(context, coup):
+    PUrP = context.scene.PUrP
+
+    bpy.ops.object.text_add(
+        enter_editmode=False, location=(0, 0, 0))
+    SingalText = context.object
+    SingalText.name = coup.name + "_Order"
+
+    SingalText.location.z += 0.5 * PUrP.GlobalScale
+    SingalText.scale = mathutils.Vector(
+        (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+    SingalText.data.body = "UNMAPED"
+    SingalText.data.extrude = 0.05
+    SingalText.show_in_front = True
+    SingalText.display_type = 'WIRE'
+    SingalText.hide_select = True
+    SingalText.parent = coup
+    SingalText.matrix_world = coup.matrix_world
+    SingalText.rotation_euler.x = 1.5708
+    SingalText.location.x -= 0.3
+    print(f"coup {coup.name} was false with both daughters")
+
+
 def applySingleCoup(context, Coup, CenterObj):
     # context = bpy.context
     data = bpy.data
@@ -1279,24 +1348,7 @@ def applySingleCoup(context, Coup, CenterObj):
                 DTwoCoupList.append(coup)
             else:
                 coup.parent = None
-                bpy.ops.object.text_add(
-                    enter_editmode=False, location=(0, 0, 0))
-                SingalText = context.object
-                SingalText.name = coup.name + "_Order"
-
-                SingalText.location.z += 0.5 * PUrP.GlobalScale
-                SingalText.scale = mathutils.Vector(
-                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
-                SingalText.data.body = "UNMAPED"
-                SingalText.data.extrude = 0.05
-                SingalText.show_in_front = True
-                SingalText.display_type = 'WIRE'
-                SingalText.hide_select = True
-                SingalText.parent = coup
-                SingalText.matrix_world = coup.matrix_world
-                SingalText.rotation_euler.x = 1.5708
-                SingalText.location.x -= 0.3
-                print(f"coup {coup.name} was false with both daughters")
+                unmapped_signal(coup)
 
         # all modifiers of all couplings which are identified as overlapping
         DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)
@@ -1317,7 +1369,8 @@ def applySingleCoup(context, Coup, CenterObj):
 
         # delete Coupling
         context.view_layer.objects.active = obj
-        removeCoupling(obj)
+
+        removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
         return Daughters
 
@@ -1348,7 +1401,7 @@ def applySingleCoup(context, Coup, CenterObj):
                     Daughter.modifiers.remove(mod)
 
         print(f" before remove multi daughters obj {obj.name} coup Coup.name")
-        removeCoupling(obj)
+        removeCoupling(context, obj)
         Daughters = CenterObjDaughters
         return Daughters
 
@@ -2300,7 +2353,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
             bpy.ops.object.editmode_toggle()
 
         # delete planar coupling
-        removeCoupling(coup)
+        removeCoupling(context, coup)
 
         return {'FINISHED'}
 
@@ -2337,7 +2390,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
 
             # context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
-            removeCoupling(coup)
+            removeCoupling(context, coup)
 
         CenterObj.select_set(True)
         bpy.ops.object.editmode_toggle()
