@@ -372,7 +372,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
                 print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
 
-    scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+    scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
     obj.scale *= scalefactor
     context.object.scale.z *= PUrP.zScale
 
@@ -673,9 +673,9 @@ def genPlanar():
     mod.thickness = Oversize
     mod.offset = -1.0
     mod.solidify_mode = "NON_MANIFOLD"
-    mod.nonmanifold_thickness_mode = 'EVEN'
+    mod.nonmanifold_thickness_mode = 'CONSTRAINTS'
 
-    mod.use_even_offset = True
+   # mod.use_even_offset = True
     mod.use_rim = True
 
     # boolean _diff at parent object
@@ -1832,6 +1832,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
             PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
             PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
+            yv0 = self.obout.data.vertices[0].co.y
 
             # more code because of order
             if len(children) == 0 or len(children) == 1:
@@ -1842,24 +1843,39 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 else:
                     PUrP.SingleCouplingModes = "2"
 
-            scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
+            scalefactor = PUrP.GlobalScale * PUrP.CoupScale  # * PUrP.CoupSize
+            yv0 = self.obout.data.vertices[0].co.y
 
             if len(children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")
                 if "Cube" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '1'
+
+                    PUrP.CoupSize = 2 * abs(yv0) / scalefactor
+
+                    scalefactor *= PUrP.CoupSize
+                    zv1 = self.obout.data.vertices[1].co.z
+                    if PUrP.SingleCouplingModes == "1":
+                        PUrP.zScale = 2*zv1 / scalefactor
+                    else:
+                        PUrP.zScale = zv1 / scalefactor
                 elif "Cylinder" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '2'
+                    PUrP.CoupSize = abs(yv0) / (scalefactor)
+                    scalefactor *= PUrP.CoupSize
+
                     # PUrP.CylVert = len(obj.data.vertices)/2
-                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius, upverts = self.coneanalysizer(  # cylinder is a special case of cone
+                    PUrP.CylVert, PUrP.aRadius, brad, upverts = self.coneanalysizer(  # cylinder is a special case of cone
                         context, self.obout)
                     if PUrP.SingleCouplingModes == "1":
-                        PUrP.zScale = upverts[0].co.z/scalefactor
+                        PUrP.zScale = 2*upverts[0].co.z/scalefactor
                     else:
-                        PUrP.zScale = upverts[0].co.z/(2*scalefactor)
+                        PUrP.zScale = upverts[0].co.z/(scalefactor)
                 elif "Cone" in self.obout.data.name:
                     PUrP.SingleCouplingTypes = '3'
-                    # PUrP.CylVert = len(obj.data.vertices) - 1
+                    PUrP.CoupSize = abs(yv0) / (scalefactor)
+                    scalefactor *= PUrP.CoupSize
+
                     PUrP.CylVert, PUrP.aRadius, PUrP.bRadius, upverts = self.coneanalysizer(
                         context, self.obout)
 
@@ -1871,7 +1887,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
                 # for child in obj.children:
                     # if "diff" in child.name:
-                PUrP.CoupSize = self.obout.scale.x
+
                 #PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
                 # double check
                 PUrP.BevelSegments = self.obout.modifiers[0].segments

@@ -110,18 +110,28 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        #children = context.object.children
+        ob = context.object
 
         self.obout.scale.x = self.valuex0
-        self.obout.scale.y = self.valuey0
-        self.obout.scale.z = self.valuez0
+        self.obout.scale.y = self.valuex0
+        self.obout.scale.z = self.valuex0
 
-        # intermediate response, will be overwriten in confirm
-        self.obin.scale.x = self.valuex1
-        self.obin.scale.y = self.valuey1
-        self.obin.scale.z = self.valuez1
+        self.obin.scale.x = self.valuex0
+        self.obin.scale.y = self.valuex0
+        self.obin.scale.z = self.valuex0
 
-        PUrP.CoupSize = self.valuex0
+        # applyScalRot(self.obout)
+        singcoupmod = singcoupmode(context, None, context.object)
+        #oversizeToPrim(context, singcoupmode, self.obout, self.obin)
+
+        scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+        if singcoupmod == 'MF':
+            vert = self.obout.data.vertices[0].co@self.obout.matrix_world
+            PUrP.CoupSize = 2 * abs(vert[2])/scalefactor
+        else:
+            vert = self.obout.data.vertices[0].co@self.obout.matrix_world
+            PUrP.CoupSize = 2 * abs(vert[2])/scalefactor
+
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -131,14 +141,14 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             # else:
             #    self.delta =  self.init_value
 
-            self.valuex1 = self.init_scale_x1 + self.delta / \
-                1000  # - self.window_width/2 #(HD Screen 800)
-            self.valuey1 = self.init_scale_y1 + self.delta/1000
-            self.valuez1 = self.init_scale_z1 + self.delta/1000
+            # self.valuex1 = self.init_scale_x1 + self.delta / \
+            #    1000  # - self.window_width/2 #(HD Screen 800)
+            #self.valuey1 = self.init_scale_y1 + self.delta/1000
+            #self.valuez1 = self.init_scale_z1 + self.delta/1000
 
             self.valuex0 = self.init_scale_x0 + self.delta/1000
-            self.valuey0 = self.init_scale_y0 + self.delta/1000
-            self.valuez0 = self.init_scale_z0 + self.delta/1000
+            #self.valuey0 = self.init_scale_y0 + self.delta/1000
+            #self.valuez0 = self.init_scale_z0 + self.delta/1000
 
             # print(f"MouspositionX: {self.value}")
             self.execute(context)
@@ -151,15 +161,23 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             self.obout.scale.x = self.init_scale_x0
-            self.obout.scale.y = self.init_scale_y0
-            self.obout.scale.z = self.init_scale_z0
-            self.obin.scale.x = self.init_scale_x1
-            self.obin.scale.y = self.init_scale_y1
-            self.obin.scale.z = self.init_scale_z1
+            self.obout.scale.y = self.init_scale_x0
+            self.obout.scale.z = self.init_scale_x0
+            applyScalRot(self.obout)
+            applyScalRot(self.obin)
+
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
+            #self.obin.scale.x = self.init_scale_x1
+            #self.obin.scale.y = self.init_scale_y1
+            #self.obin.scale.z = self.init_scale_z1
             return {'CANCELLED'}
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
+        ob = context.object
+        PUrP = context.scene.PUrP
+        PUrP.Coupscale = ob.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
         children = context.object.children
         # order correction
         for child in children:
@@ -169,17 +187,12 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
                 self.obin = child
 
         self.init_scale_x0 = self.obout.scale.x
-        self.init_scale_y0 = self.obout.scale.y
-        self.init_scale_z0 = self.obout.scale.z
-        self.init_scale_y1 = self.obin.scale.y
-        self.init_scale_z1 = self.obin.scale.z
-        self.init_scale_x1 = self.obin.scale.x
-        self.valuex1 = self.obin.scale.x
-        self.valuey1 = self.obin.scale.y
-        self.valuez1 = self.obin.scale.z
+        #self.init_scale_y0 = self.obout.scale.y
+        #self.init_scale_z0 = self.obout.scale.z
+
         self.valuex0 = self.obout.scale.x
-        self.valuey0 = self.obout.scale.y
-        self.valuez0 = self.obout.scale.z
+        #self.valuey0 = self.obout.scale.y
+        #self.valuez0 = self.obout.scale.z
 
         self.init_value = event.mouse_x
 
