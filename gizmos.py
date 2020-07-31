@@ -125,12 +125,15 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         #oversizeToPrim(context, singcoupmode, self.obout, self.obin)
 
         scalefactor = PUrP.GlobalScale * PUrP.CoupScale
-        if singcoupmod == 'MF':
+        if "Cube" in self.obout.data.name:
             vert = self.obout.data.vertices[0].co@self.obout.matrix_world
-            PUrP.CoupSize = 2 * abs(vert[2])/scalefactor
+            PUrP.CoupSize = 2 * abs(vert[1])/scalefactor
         else:
             vert = self.obout.data.vertices[0].co@self.obout.matrix_world
-            PUrP.CoupSize = 2 * abs(vert[2])/scalefactor
+            # print(vert)
+            #inter = 2 * abs(vert[1])/scalefactor
+            # print(inter)
+            PUrP.CoupSize = abs(vert[1])/scalefactor
 
         return {'FINISHED'}
 

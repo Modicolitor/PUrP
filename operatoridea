@@ -71,6 +71,7 @@ after applying
 bugs:
 general operator bug:
 
+[] Radius respect Scalefactors
 [] CoupSize Gizmo with absolut values 
 [] apply has problemes with strangers Modifiers 
 [] option keep Connector after apply as unmapped 

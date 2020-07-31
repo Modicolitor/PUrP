@@ -1865,8 +1865,10 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     scalefactor *= PUrP.CoupSize
 
                     # PUrP.CylVert = len(obj.data.vertices)/2
-                    PUrP.CylVert, PUrP.aRadius, brad, upverts = self.coneanalysizer(  # cylinder is a special case of cone
+                    PUrP.CylVert, ARadius, brad, upverts = self.coneanalysizer(  # cylinder is a special case of cone
                         context, self.obout)
+
+                    PUrP.aRadius = ARadius / scalefactor
                     if PUrP.SingleCouplingModes == "1":
                         PUrP.zScale = 2*upverts[0].co.z/scalefactor
                     else:
@@ -1876,9 +1878,11 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     PUrP.CoupSize = abs(yv0) / (scalefactor)
                     scalefactor *= PUrP.CoupSize
 
-                    PUrP.CylVert, PUrP.aRadius, PUrP.bRadius, upverts = self.coneanalysizer(
+                    PUrP.CylVert, ARadius, BRadius, upverts = self.coneanalysizer(
                         context, self.obout)
 
+                    PUrP.aRadius = ARadius / scalefactor
+                    PUrP.bRadius = BRadius / scalefactor
                     # 1 bei stick, 2 bei MF
                     if PUrP.SingleCouplingModes == "1":
                         PUrP.zScale = upverts[0].co.z/scalefactor
@@ -1896,7 +1900,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 # elif "fix" in child.name or "union" in child.name:
                 outpoint = self.obout.data.vertices[0].co.y
                 inpoint = self.obin.data.vertices[0].co.y
-                PUrP.Oversize = abs(outpoint) - abs(inpoint)
+                PUrP.Oversize = (abs(outpoint) - abs(inpoint)
+                                 ) / PUrP.GlobalScale
 
         elif "PlanarConnector" in obj.name:
             PUrP.SingleCouplingModes = "4"
