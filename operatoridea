@@ -72,12 +72,14 @@ bugs:
 general operator bug:
 
 
-[] apply has problemes with strangers Modifiers 
-[] apply delete other modifiers/booleans after own stack
+
+
+
 [] remap large planar arrays to multiple children of former apply
+[] Operator Single to several CenterObj 
 [] reorganize UI 
 
-
+[] gizmot problem fragen
 
 mögliche Probleme
 [] Order System update system that stays out of the way 
@@ -108,6 +110,8 @@ Publishing:
 
 
 resolved bug:
+[+] apply has problemes with strangers Modifiers 
+[+] apply delete other modifiers/booleans after own stack
 [+] option keep Connector after apply as unmapped 
 [+] planar solidify complex + constrainted looks best
 [+] Radius respect Scalefactors

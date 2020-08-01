@@ -1359,13 +1359,17 @@ def applySingleCoup(context, Coup, CenterObj):
 
         for mod in DaughterOne.modifiers:
             if mod not in DOneAllMods:
-                DaughterOne.modifiers.remove(mod)
-                DORemovedMod = True
+                if "PUrP_" in mod.name:
+                    print(f"ReMV {mod.name} from DaughterOne")
+                    DaughterOne.modifiers.remove(mod)
+                    #DORemovedMod = True
 
         for mod in DaughterTwo.modifiers:
             if mod not in DTwoAllMods:
-                DaughterTwo.modifiers.remove(mod)
-                DTRemovedMod = True
+                if "PUrP_" in mod.name:
+                    print(f"ReMV {mod.name} from DaughterTwo")
+                    DaughterTwo.modifiers.remove(mod)
+                    #DTRemovedMod = True
 
         # delete Coupling
         context.view_layer.objects.active = obj
