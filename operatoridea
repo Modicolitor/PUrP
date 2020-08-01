@@ -76,7 +76,7 @@ general operator bug:
 
 
 [] remap large planar arrays to multiple children of former apply
-[] Operator Single to several CenterObj 
+[] Operator Single to several CenterObj [] ignore mainplaine option
 [] reorganize UI 
 
 
@@ -112,6 +112,7 @@ Publishing:
 
 
 resolved bug:
+[+] bvh overlap missed all modifier settings
 [+] apply has problemes with strangers Modifiers 
 [+] apply delete other modifiers/booleans after own stack
 [+] option keep Connector after apply as unmapped 

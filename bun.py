@@ -866,6 +866,19 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
         return {'FINISHED'}
 
+# returns a list of
+
+
+def otherparents(context, coup):
+    data = bpy.data
+    parents = []
+    for ob in data.objects:
+        if ob != coup.parent:
+            for mod in ob.modifiers:
+                if coup.name in mod.name:
+                    parents.append(ob)
+    return parents
+
 
 class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label = "ApplyCouplings"
@@ -882,15 +895,11 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        #    applyCouplings()
-        # def applyCouplings():
-        context = bpy.context
+
         data = bpy.data
         selected = context.selected_objects[:]
-        # CenterObj = context.scene.PUrP.CenterObj
-        PUrP_name = bpy.context.scene.PUrP.PUrP_name
-        ############
-        # presort selected according to modifer order
+
+        PUrP_name = context.scene.PUrP.PUrP_name
 
         # how many parents (different connectors can have different CenterObj)
         Centerobjs = []
@@ -898,9 +907,14 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
             if obj.parent not in Centerobjs:
                 Centerobjs.append(obj.parent)
 
+            # case planar cuts several objects but only has one parent
+            if "Planar" in obj.name:
+                Centerobjs += otherparents(context, obj)
         # start conditions: connectors selected
         # sort selected by modifier order
+
         for CenterObj in Centerobjs:
+            # sort coups in modifier order
             coupssorted = []
             Connectornamelist, modlist = couplingList(CenterObj)
             for coup in Connectornamelist:
@@ -1074,72 +1088,6 @@ def removeCoupling(context, Coupl):
         bpy.ops.object.delete(use_global=False)
 
 
-'''
-Daughtercollection = []
-
-def CenterObjCollector():
-    data = bpy.data
-    global Daughtercollection
-    list(set(Daughtercollection))
-    PUrP = bpy.context.scene.PUrP
-    PUrP_name = PUrP.PUrP_name
-
-    # if len(Daughtercollection) == 0:
-    test = False
-    print (f"DaughterCollection content {Daughtercollection}")
-    for Daughter in Daughtercollection:
-        for mod in Daughter.modifiers:
-            if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):
-                if bmesh_check_intersect_objects(data.objects[mod.name], Daughter):
-                    print(
-                        f"intersect in Collector True for {mod.name} and {Daughter}")
-
-                    test = True
-                    continue
-
-        if test:
-            print(f"Test is for {Daughter}")
-            applyCenterObj(Daughter)
-        else:
-            Daughtercollection.remove(Daughter)
-
-
-    if len(Daughtercollection) != 0:
-        CenterObjCollector()
-
-
-def applyCenterObj(CenterObj):
-    global Daughtercollection
-    context = bpy.context
-    data = bpy.data
-    PUrP = context.scene.PUrP
-    PUrP_name = PUrP.PUrP_name
-
-    print('frisch in appyl centerObj {CenterObj}')
-
-    # n = 0
-    # test = True
-    modifiers = CenterObj.modifiers[:]
-
-    for mod in modifiers:
-    # while test == True:
-        print(f'nächste Runde für mod {mod.name} in CenterObj {CenterObj}')
-        # if (len(CenterObj.modifiers) != 0) and (len(CenterObj.modifiers)-1 >= n):
-        if (PUrP_name in mod.name) and ("diff" not in mod.name) and ("union" not in mod.name):
-            print('nächste Runde')
-            # try:
-            # if PUrP_name in CenterObj.modifiers[n].name:
-            # mod_name = CenterObj.modifiers[n].name
-            if bmesh_check_intersect_objects(data.objects[mod.name], CenterObj):
-                print("Intersection test is positiv")
-                Daughters = applySingleCoup(
-                    context, data.objects[mod.name], CenterObj)
-                print(f"Daughters send to collection {Daughters}")
-                Daughtercollection.append(Daughters)
-
- '''
-
-
 def centerObjDecider(context, CenterObj):
     PUrP = context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
@@ -1285,10 +1233,14 @@ def applySingleCoup(context, Coup, CenterObj):
     bpy.ops.object.editmode_toggle()
 
     # remember both objects
-    CenterObjDaughters = context.selected_objects[:]
 
+    CenterObjDaughters = context.selected_objects[:]
+    if context.object not in CenterObjDaughters:
+        CenterObjDaughters.append(context.object)
+
+    print(f'CenterObjDaugters are {CenterObjDaughters}')
     if len(CenterObjDaughters) <= 2:
-        print(f'CenterObjDaugters are {CenterObjDaughters}')
+        #print(f'CenterObjDaugters are {CenterObjDaughters}')
         DaughterOne = context.active_object
         DaughterTwo = None
         for ob in CenterObjDaughters:  # setze das ob für zweite Tochter
@@ -1390,7 +1342,7 @@ def applySingleCoup(context, Coup, CenterObj):
 
         for Daughter in CenterObjDaughters:
             DCoupList = []
-
+            print(f"Apply sortDaughter {Daughter}")
             for coupname in oriCoupNames:
                 coup = objects[coupname]
                 if bvhOverlap(context, coup, Daughter):
@@ -1400,6 +1352,7 @@ def applySingleCoup(context, Coup, CenterObj):
             # all modifiers of all couplings which are identified as overlapping
             DAllMods = AllCoupMods(context, DCoupList, Daughter)
 
+            # remove all modifiers of Objects which are not intersecting anymore
             for mod in Daughter.modifiers:
                 if mod not in DAllMods:
                     Daughter.modifiers.remove(mod)
