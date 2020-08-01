@@ -892,7 +892,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         ############
         # presort selected according to modifer order
 
-        # how many parents (connectors can have different CenterObj)
+        # how many parents (different connectors can have different CenterObj)
         Centerobjs = []
         for obj in selected:
             if obj.parent not in Centerobjs:
@@ -989,9 +989,9 @@ def in_collection(context, ob):
     data = bpy.data
     collection = None
     for col in data.collections:
-        #print(f"col {col}")
+        # print(f"col {col}")
         for o in col.objects:
-            #print(f"o {o}")
+            # print(f"o {o}")
             if o == ob:
                 collection = col
                # print(f"ob {ob} col {col}")
@@ -1040,7 +1040,7 @@ def removeCoupling(context, Coupl):
             bpy.ops.object.delete(use_global=False)
         elif 'fix' in child.name:
             child.hide_select = False
-            #active = child
+            # active = child
 
             # apply bevel and stuff
             for mod in child.modifiers:
@@ -1230,7 +1230,7 @@ def SideOfPlane(context, coup, CenterObj):
         # print(f"planedistance {planedistance} coup_tmp.data.vertices[0].co {coup_tmp.data.vertices[0].co} plane.data.vertices[0].co@plane.matrix_world {plane.data.vertices[0].co@plane.matrix_world}")
 
         DirecDistance = direction - planedistanceorigin
-        #print(f"difference {difference}")
+        # print(f"difference {difference}")
     bpy.data.objects.remove(coup_tmp)
 
     return DirecDistance
@@ -1362,14 +1362,14 @@ def applySingleCoup(context, Coup, CenterObj):
                 if "PUrP_" in mod.name:
                     print(f"ReMV {mod.name} from DaughterOne")
                     DaughterOne.modifiers.remove(mod)
-                    #DORemovedMod = True
+                    # DORemovedMod = True
 
         for mod in DaughterTwo.modifiers:
             if mod not in DTwoAllMods:
                 if "PUrP_" in mod.name:
                     print(f"ReMV {mod.name} from DaughterTwo")
                     DaughterTwo.modifiers.remove(mod)
-                    #DTRemovedMod = True
+                    # DTRemovedMod = True
 
         # delete Coupling
         context.view_layer.objects.active = obj
@@ -1949,7 +1949,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 # for child in obj.children:
                     # if "diff" in child.name:
 
-                #PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
+                # PUrP.zScale = self.obout.scale.z / PUrP.CoupSize
                 # double check
                 PUrP.BevelSegments = self.obout.modifiers[0].segments
                 PUrP.BevelOffset = self.obout.modifiers[0].width
@@ -2004,52 +2004,10 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
 
-            coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-            PUrP.CoupScale = obj.data.vertices[3].co.x / coupfaktor
-
-            PUrP.OffsetRight = obj.data.vertices[0].co.x - \
-                1.5*coupfaktor * PUrP.CoupScale
-
-            PUrP.OffsetLeft = - \
-                obj.data.vertices[1].co.x - 1.5*coupfaktor * PUrP.CoupScale
-
             #
-
+            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+                context, obj)
             # Stopperbool test
-            lowestvert = 0
-            for vert in obj.data.vertices:  # find lowest z coordinate
-                if vert.co.z <= lowestvert:
-                    lowestvert = vert.co.z
-
-            lowestlist = []
-            lowestexample = obj.data.vertices[0]
-            for vert in obj.data.vertices:  # collect all verts with lowest co.z values
-                if vert.co.z == lowestvert:
-                    lowestlist.append(vert.co.z)
-                    lowestexample = vert  # example for stopperheight evaluation
-
-            PUrP.StopperBool = False
-            if len(lowestlist) == 4:  # with 4 verts its a stopper
-                PUrP.StopperBool = True
-
-            # for stopper height such den kürzesten abstand bei gleichen x
-            smallestdistance = 50
-            distance = []
-            for vert in obj.data.vertices:
-                if vert.co.x == lowestexample.co.x:
-                    if vert.co.y == lowestexample.co.y:
-                        if vert.co.z != lowestexample.co.z:
-                            # collect distances to vert
-                            distance.append(vert.co.z - lowestexample.co.z)
-                            print(f"distance {vert.co.z - lowestexample.co.z}")
-            distance.sort()
-            PUrP.StopperHeight = distance[0]
-
-            # zscale top vert at co.z = 0
-            if PUrP.StopperBool == True:
-                PUrP.zScale = -lowestexample.co.z - distance[0]
-            else:
-                PUrP.zScale = distance[0]
 
         return {'FINISHED'}
 
@@ -2098,6 +2056,65 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 break
             '''
         return Cyclvert, aRadius, bRadius, upperverts
+
+
+def planaranalysizer(context, Coup):
+    PUrP = context.scene.PUrP
+
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+
+    v3c = Coup.data.vertices[3].co@Coup.matrix_world
+    PUrP.CoupScale = v3c[0] / coupfaktor
+
+    v0c = Coup.data.vertices[0].co@Coup.matrix_world
+    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    v1c = Coup.data.vertices[1].co@Coup.matrix_world
+    OffsetLeft = - v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    ###zscale and StopperHeight
+    lowestvert = 0
+    for vert in Coup.data.vertices:  # find lowest z coordinate
+        vco = vert.co@Coup.matrix_world
+        if vco[2] <= lowestvert:
+            lowestvert = vco[2]
+
+    lowestlist = []
+    lowestexample = Coup.data.vertices[0]
+    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
+        vco = vert.co@Coup.matrix_world
+        if vco[2] == lowestvert:
+            lowestlist.append(vco[2])
+            lowestexample = vert  # example for stopperheight evaluation
+
+    lowestexampleco = lowestexample.co@Coup.matrix_world
+    PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        PUrP.StopperBool = True
+
+    # for stopper height such den kürzesten abstand bei gleichen x
+    #smallestdistance = 50
+    distance = []
+
+    for vert in Coup.data.vertices:
+        vco = vert.co@Coup.matrix_world
+        if vco[0] == lowestexampleco[0]:
+            if vco[1] == lowestexampleco[1]:
+                if vco[2] != lowestexampleco[2]:
+                    # collect distances to vert
+                    distance.append(
+                        vco[2] - lowestexampleco[2])
+                    #print(f"distance {vert.co.z - lowestexample.co.z}")
+    distance.sort()
+    StopperHeight = distance[0]
+
+    # zscale top vert at co.z = 0
+    if PUrP.StopperBool == True:
+        zScale = -lowestexampleco[2] - distance[0]
+    else:
+        zScale = distance[0]
+
+    return OffsetRight, OffsetLeft, zScale, StopperHeight
 
 
 def zSym(obj):

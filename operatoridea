@@ -78,7 +78,7 @@ general operator bug:
 [] remap large planar arrays to multiple children of former apply
 [] Operator Single to several CenterObj 
 [] reorganize UI 
-
+[] test oversize planar with global scale 
 [] gizmot problem fragen
 
 mögliche Probleme
@@ -86,7 +86,7 @@ mögliche Probleme
 
 Tests
 [] apply all had a bad day try again 
-
+[] operator descriptions
 [] test linux, Mag
 [] Active settings with for global scale influence
 [] using globalsize

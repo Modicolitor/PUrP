@@ -13,6 +13,7 @@ from .gizmotshape import PUrP_CylinderShapeWidget
 from .bun import oversizeToPrim
 from .bun import applyScalRot
 from .bun import singcoupmode
+from .bun import planaranalysizer
 
 from bpy.types import (
     Operator,
@@ -403,9 +404,16 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
 
         oversizeToPrim(context, singcoupmode(
             context, None, context.object), self.obout, self.obin)
+        print(f" obname {ob.name}")
+        if "Planar" in ob.name:
+            print(1)
+            coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+            PUrP.CoupScale = abs(ob.data.vertices[3].co.x) / coupfaktor
 
-        PUrP.CoupScale = ob.data.vertices[1].co.x * \
-            self.value[0] / (3 * PUrP.GlobalScale)
+        else:
+            print(2)
+            PUrP.CoupScale = ob.data.vertices[1].co.x * \
+                self.value[0] / (3 * PUrP.GlobalScale)
         # print(self.value)
         return {'FINISHED'}
 
@@ -1030,7 +1038,7 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
         ob = context.object
 
         if ob != None:
-            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
+            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" and "Planar" not in ob.name):
                 if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
                     try:
                         test = context.scene.PUrP.GlobalScale
@@ -1097,7 +1105,7 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
 
 
 class PP_OT_FlatCoupScaleGizmo(bpy.types.Operator):
-    '''Change the beveloffset of the coupling'''
+    '''Change Connector Size'''
     bl_idname = "purp.flatcoupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1400,7 +1408,8 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
         # connectorsize
         mcsize = self.gizmos.new("GIZMO_GT_dial_3d")
-        mcsize.target_set_operator("purp.coupscalegizmo")  # needs operator
+        mcsize.target_set_operator("purp.planarcoupscalegizmo")
+
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
@@ -2043,5 +2052,71 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
 
         self.execute(context)
 
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
+    '''Change the Connector Scale '''
+    bl_idname = "purp.planarcoupscalegizmo"
+    bl_label = "couplscale"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" and "Single" not in context.object.name):
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        ob = context.object
+
+        ob.scale = self.value
+        print(self.value)
+
+        coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+        vx3 = ob.data.vertices[3].co@ob.matrix_world
+        PUrP.CoupScale = abs(vx3[0]) / coupfaktor
+        PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+            context, ob)
+
+        return {'FINISHED'}
+
+    def modal(self, context, event):
+        ob = context.object
+        if event.type == 'MOUSEMOVE':  # Apply
+
+            self.delta = event.mouse_x - self.init_value
+            print(
+                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
+            self.value = self.init_scale + \
+                mathutils.Vector(
+                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':  # Confirm
+            bpy.ops.object.transform_apply(
+                location=False, rotation=False, scale=True)
+            # applyScalRot(self.obout)
+            # applyScalRot(self.obin)
+            # oversizeToPrim(context, singcoupmode(
+            #    context, None, context.object), self.obout, self.obin)
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
+            ob.scale = self.init_scale
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        print("Hallo invoke")
+        ob = context.object
+        self.init_scale = ob.scale.copy()
+        self.init_value = event.mouse_x
+        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+        self.value = ob.scale
+        self.execute(context)
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}

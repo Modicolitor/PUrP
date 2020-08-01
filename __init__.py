@@ -24,6 +24,7 @@ from .gizmos import PP_OT_PlanarLineCountGizmo
 from .gizmos import PP_OT_PlanarLineLengthGizmo
 from .gizmos import PP_OT_PlanarLineDistanceGizmo
 from .gizmos import PP_OT_PlanarThicknessGizmo
+from .gizmos import PP_OT_PlanarCoupScaleGizmo
 from .gizmos import PP_OT_CoupScaleGizmo
 from .gizmos import PP_OT_LowerRadiusGizmo
 from .gizmos import PP_OT_UpperRadiusGizmo
@@ -118,6 +119,7 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_PlanarLoffsetGizmo,
            PP_OT_PlanarzScaleGizmo,
            PP_OT_PlanarStopperHeightGizmo,
+           PP_OT_PlanarCoupScaleGizmo,
            PP_OT_BevelOffsetGizmo,
            PP_OT_BevelSegmentGizmo,
            PP_OT_zScaleGizmo,
