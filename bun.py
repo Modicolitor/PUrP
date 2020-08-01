@@ -1301,7 +1301,7 @@ def applySingleCoup(context, Coup, CenterObj):
         bpy.ops.object.transform_apply(
             location=False, rotation=True, scale=True)
 
-        CouplingNormal = obj.data.vertices[0].normal.normalized()
+        #CouplingNormal = obj.data.vertices[0].normal.normalized()
         # TESTARRIA
         # for v in DaughterOne.data.vertices:
         #    direction = CouplingNormal.dot(
@@ -1348,7 +1348,7 @@ def applySingleCoup(context, Coup, CenterObj):
                 DTwoCoupList.append(coup)
             else:
                 coup.parent = None
-                unmapped_signal(coup)
+                unmapped_signal(context, coup)
 
         # all modifiers of all couplings which are identified as overlapping
         DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)

@@ -78,6 +78,8 @@ general operator bug:
 [] remap large planar arrays to multiple children of former apply
 [] Operator Single to several CenterObj 
 [] reorganize UI 
+
+
 [] test oversize planar with global scale 
 [] gizmot problem fragen
 

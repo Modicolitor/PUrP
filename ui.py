@@ -114,8 +114,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
             subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
-            # subcol.operator("object.pp_ot_overlapcheck",
-            #                text='Check Overlap', icon="HIDE_OFF")
+            subcol.operator("object.pp_ot_overlapcheck",
+                            text='Check Overlap', icon="HIDE_OFF")
 
             subcol.label(text="Modifier Visibility")
             subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
