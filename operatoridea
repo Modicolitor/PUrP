@@ -72,13 +72,13 @@ bugs:
 general operator bug:
 
 [] apply all Problems 
-   [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack)
+   [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
    [] utf8 byte error hard to reproduce
 
 [] single add coup lands away from cursor
 [] 90° rotated planar shows Coupscale gizmot problems in analyzer (Stopperheight error)
 
-[] remap large planar arrays to multiple children of former apply
+
 [] Operator Single to several CenterObj [] ignore mainplaine option
 [] reorganize UI 
 
@@ -114,6 +114,7 @@ Publishing:
 
 
 resolved bug:
+[+] remap large planar arrays to multiple children of former apply 
 [+] bvh overlap missed all modifier settings
 [+] apply has problemes with strangers Modifiers 
 [+] apply delete other modifiers/booleans after own stack
