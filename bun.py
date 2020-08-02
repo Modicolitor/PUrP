@@ -8,6 +8,7 @@ import os
 # from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
+# import copy
 
 
 # from .properties import PUrPropertyGroup
@@ -880,6 +881,17 @@ def otherparents(context, coup):
     return parents
 
 
+def centerObjList(context, coup):
+    data = bpy.data
+    parents = []
+    for ob in data.objects:
+        for mod in ob.modifiers:
+            if coup.name in mod.name:
+                if ob not in parents:
+                    parents.append(ob)
+    return parents
+
+
 class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label = "ApplyCouplings"
     bl_idname = "apl.coup"
@@ -898,7 +910,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
         data = bpy.data
         selected = context.selected_objects[:]
-
+        PUrP = context.scene.PUrP
         PUrP_name = context.scene.PUrP.PUrP_name
 
         # how many parents (different connectors can have different CenterObj)
@@ -909,14 +921,20 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
             # case planar cuts several objects but only has one parent
             if "Planar" in obj.name:
-                Centerobjs += otherparents(context, obj)
+                Centerobjs.extend(otherparents(context, obj))
         # start conditions: connectors selected
         # sort selected by modifier order
-
+        print(f" Centerobj in apply {Centerobjs}")
+        # UrKeep = copy.copy(PUrP.KeepCoup)
+        # print(f"UrKeep {UrKeep}")
         for CenterObj in Centerobjs:
+            # PUrP.KeepCoup = True
+            # print(f"UrKeep per CenterObj {UrKeep}")
             # sort coups in modifier order
             coupssorted = []
             Connectornamelist, modlist = couplingList(CenterObj)
+            print(
+                f"Connectornamelist {Connectornamelist} for centerobj {CenterObj}")
             for coup in Connectornamelist:
                 coup = data.objects[coup]  # name to object
                 if coup in selected:
@@ -925,8 +943,20 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
             for obj in coupssorted:
                 print(f"Coup will be send to apply {obj.name}")
                 if PUrP_name in obj.name:
-                    CenterObj = obj.parent
-                    applySingleCoup(context, obj, CenterObj)
+                    if "Planar" in obj.name:
+                        if obj.parent != CenterObj:
+                            obj.parent = CenterObj
+                        CenterObj = obj.parent
+                        if len(centerObjList(context, obj)) > 1:
+                            print("ast eins")
+                            applySingleCoup(context, obj, CenterObj, False)
+                        else:
+                            print("ast zwei")
+                            applySingleCoup(context, obj, CenterObj, True)
+                    else:
+                        # non planar branch, only one CenterObj allowed
+                        CenterObj = obj.parent
+                        applySingleCoup(context, obj, CenterObj, True)
 
         data = bpy.data
         Orderbool = False
@@ -1159,7 +1189,8 @@ def SideOfPlane(context, coup, CenterObj):
     coup_tmp.select_set(True)
     context.view_layer.objects.active = coup_tmp
     coup_tmp.matrix_world = matrix
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+    bpy.ops.object.transform_apply(
+        location=True, rotation=True, scale=False)
 
     # cube verts gerade unten, ungerade oben
     test = 0
@@ -1207,7 +1238,7 @@ def unmapped_signal(context, coup):
     print(f"coup {coup.name} was false with both daughters")
 
 
-def applySingleCoup(context, Coup, CenterObj):
+def applySingleCoup(context, Coup, CenterObj, delete):
     # context = bpy.context
     data = bpy.data
     PUrP = context.scene.PUrP
@@ -1240,7 +1271,7 @@ def applySingleCoup(context, Coup, CenterObj):
 
     print(f'CenterObjDaugters are {CenterObjDaughters}')
     if len(CenterObjDaughters) <= 2:
-        #print(f'CenterObjDaugters are {CenterObjDaughters}')
+        # print(f'CenterObjDaugters are {CenterObjDaughters}')
         DaughterOne = context.active_object
         DaughterTwo = None
         for ob in CenterObjDaughters:  # setze das ob für zweite Tochter
@@ -1253,7 +1284,7 @@ def applySingleCoup(context, Coup, CenterObj):
         bpy.ops.object.transform_apply(
             location=False, rotation=True, scale=True)
 
-        #CouplingNormal = obj.data.vertices[0].normal.normalized()
+        # CouplingNormal = obj.data.vertices[0].normal.normalized()
         # TESTARRIA
         # for v in DaughterOne.data.vertices:
         #    direction = CouplingNormal.dot(
@@ -1324,9 +1355,10 @@ def applySingleCoup(context, Coup, CenterObj):
                     # DTRemovedMod = True
 
         # delete Coupling
-        context.view_layer.objects.active = obj
 
-        removeCoupling(context, obj)
+        context.view_layer.objects.active = obj
+        if delete:
+            removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
         return Daughters
 
@@ -1357,8 +1389,11 @@ def applySingleCoup(context, Coup, CenterObj):
                 if mod not in DAllMods:
                     Daughter.modifiers.remove(mod)
 
-        print(f" before remove multi daughters obj {obj.name} coup Coup.name")
-        removeCoupling(context, obj)
+        # if delete:
+            # print(
+            #    f" before remove multi daughters obj {obj.name} coup Coup.name")
+        if delete:
+            removeCoupling(context, obj)
         Daughters = CenterObjDaughters
         return Daughters
 
@@ -2025,7 +2060,7 @@ def planaranalysizer(context, Coup):
     v1c = Coup.data.vertices[1].co@Coup.matrix_world
     OffsetLeft = - v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
 
-    ###zscale and StopperHeight
+    # zscale and StopperHeight
     lowestvert = 0
     for vert in Coup.data.vertices:  # find lowest z coordinate
         vco = vert.co@Coup.matrix_world
@@ -2046,7 +2081,7 @@ def planaranalysizer(context, Coup):
         PUrP.StopperBool = True
 
     # for stopper height such den kürzesten abstand bei gleichen x
-    #smallestdistance = 50
+    # smallestdistance = 50
     distance = []
 
     for vert in Coup.data.vertices:
@@ -2057,7 +2092,7 @@ def planaranalysizer(context, Coup):
                     # collect distances to vert
                     distance.append(
                         vco[2] - lowestexampleco[2])
-                    #print(f"distance {vert.co.z - lowestexample.co.z}")
+                    # print(f"distance {vert.co.z - lowestexample.co.z}")
     distance.sort()
     StopperHeight = distance[0]
 

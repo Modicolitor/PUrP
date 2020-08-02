@@ -72,13 +72,12 @@ bugs:
 general operator bug:
 
 
-
+[] single add coup lands away from cursor
 
 
 [] remap large planar arrays to multiple children of former apply
 [] Operator Single to several CenterObj [] ignore mainplaine option
 [] reorganize UI 
-
 
 [] test oversize planar with global scale 
 [] gizmot problem fragen
