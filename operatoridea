@@ -71,9 +71,12 @@ after applying
 bugs:
 general operator bug:
 
+[] apply all Problems 
+   [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack)
+   [] utf8 byte error hard to reproduce
 
 [] single add coup lands away from cursor
-
+[] 90° rotated planar shows Coupscale gizmot problems in analyzer (Stopperheight error)
 
 [] remap large planar arrays to multiple children of former apply
 [] Operator Single to several CenterObj [] ignore mainplaine option
