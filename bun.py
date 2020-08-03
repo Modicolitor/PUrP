@@ -2431,8 +2431,16 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         PUrP = context.scene.PUrP
 
         ###stop when its the wrong active 
-        if "PUrP_" not in coup.name or "Planar" in coup.name:
+        if "PUrP_" not in coup.name or "Planar" in coup.name or len(coup.children) == 0:
             return {'FINISHED'}
+
+        ##type of coup  
+        couptype = None 
+        for child in coup.children: 
+            if "fix" in child.name:
+                couptype = 'STICK'
+        if couptype == None:
+            couptype = 'MF'
 
         # Centerobjects sammeln
         CenterObjs = []
@@ -2446,30 +2454,39 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         ### find the CenterObj with the closest distance to the mainplane 
         distancelist = []
         for Cob in CenterObjs: 
-            distancelist = SideOfPlane(context, ob, CenterObj)
+            distancelist.append(SideOfPlane(context, coup, Cob))
         
         numShortest = None 
         for num, Cob in enumerate(CenterObjs):
             if numShortest == None: 
                 numShortest = num
-            elif abs(distancelist[num]) < distancelist[numShortest]:
+            elif abs(distancelist[num]) < abs(distancelist[numShortest]):
                 numShortest = num
         NewCenterObj = CenterObjs[numShortest]
         
-        ### add mainplane bool to the closest CenterObj, when ignore Mainplane False 
+        ### add mainplane as parent to the closest CenterObj, when ignore Mainplane False 
         if not PUrP.IgnoreMainCut:
             #### is the coup connected to another CenterObj
             if coup.parent != NewCenterObj:
                 ##remove old parent 
                 for mod in coup.parent.modifiers:
                     if coup.name in mod.name: 
-                        mod.remove(mod)
+                        coup.parent.modifiers.remove(mod)
                 ##add new parent
                 coup.parent = NewCenterObj
+                mod = NewCenterObj.modifiers.new(coup.name, 'BOOLEAN')
+                mod.object = coup
+                mod.operation = 'DIFFERENCE' 
 
         
 
-        ### add inlay mods to other CenterObjs 
+        ### add inlay mods to CenterObjs
+        for Cob in CenterObjs:
+            if couptype == 'STICK':
+                print("Stick")
+            else:
+                print("MF")
+
             ## stick case 
             ##MF case 
 
