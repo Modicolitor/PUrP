@@ -1184,7 +1184,7 @@ def centerObjDecider(context, CenterObj):
                                 # mid = Cobj.modifiers[mod]
                                 # Cobj.modifiers.remove(mid)
 
-
+#takes coup and CenterObj and returns the distance 
 def SideOfPlane(context, coup, CenterObj):
 
     matrix = coup.matrix_world
@@ -2417,4 +2417,110 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.separate(type='LOOSE')
         bpy.ops.object.editmode_toggle()
+        return {'FINISHED'}
+
+
+
+class PP_OT_ApplySingleToObjects(bpy.types.Operator):
+    '''Applys the active SingleConnector to the selected objects. Select the objects first and the connector last.'''
+    bl_idname = "object.applysingletoobjects"
+    bl_label = "PP_OT_ApplySingleToObjects"
+    bl_options = {'REGISTER', "UNDO"}
+    def execute(self, context):
+        coup = bpy.data.objects[context.object.name]
+        PUrP = context.scene.PUrP
+
+        ###stop when its the wrong active 
+        if "PUrP_" not in coup.name or "Planar" in coup.name:
+            return {'FINISHED'}
+
+        # Centerobjects sammeln
+        CenterObjs = []
+        
+        for ob in context.selected_objects:
+            if ob != coup:
+                if "SingleConnector" not in ob.name and "PlanarConnector" not in ob.name:  # fail selection
+                    CenterObjs.append(ob)
+                    
+
+        ### find the CenterObj with the closest distance to the mainplane 
+        distancelist = []
+        for Cob in CenterObjs: 
+            distancelist = SideOfPlane(context, ob, CenterObj)
+        
+        numShortest = None 
+        for num, Cob in enumerate(CenterObjs):
+            if numShortest == None: 
+                numShortest = num
+            elif abs(distancelist[num]) < distancelist[numShortest]:
+                numShortest = num
+        NewCenterObj = CenterObjs[numShortest]
+        
+        ### add mainplane bool to the closest CenterObj, when ignore Mainplane False 
+        if not PUrP.IgnoreMainCut:
+            #### is the coup connected to another CenterObj
+            if coup.parent != NewCenterObj:
+                ##remove old parent 
+                for mod in coup.parent.modifiers:
+                    if coup.name in mod.name: 
+                        mod.remove(mod)
+                ##add new parent
+                coup.parent = NewCenterObj
+
+        
+
+        ### add inlay mods to other CenterObjs 
+            ## stick case 
+            ##MF case 
+
+        ###apply mainplane bool to centerobjs, when ignore mainplane false 
+
+        ###apply inlays 
+            ## Stick case 
+            ## MF case 
+                ##direction thingy 
+
+        # suchen nach dem Centerobj connected to Coup
+        '''
+        if coup.parent != None:
+            OriCenterObj = coup.parent
+        else: 
+            OriCenterObj = CenterObjs[0]
+
+        # Generate Modifier on all CenterObj and apply
+        for CenterObj in CenterObjs:
+
+            # is there already a modifier for this coup
+            BoolCool = False
+            for mod in CenterObj.modifiers:
+                if mod.name == coup.name:
+                    BoolCool = True
+
+            if not BoolCool:
+                mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+                mod.object = coup
+                mod.operation = 'DIFFERENCE'
+
+                ###mods for the children #### carefull: stick and MF
+                for child in coup.children:
+                    if "fix" not in child.name:
+                        mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+                        mod.object = coup
+                        mod.operation = 'DIFFERENCE'
+
+            context.view_layer.objects.active = CenterObj
+            bpy.ops.object.modifier_apply(modifier=coup.name)
+
+            # CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.mesh.separate(type='LOOSE')
+            bpy.ops.object.editmode_toggle()
+
+        # delete planar coupling
+        removeCoupling(context, coup)
+        '''
+
+
         return {'FINISHED'}

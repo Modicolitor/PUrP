@@ -53,6 +53,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="PlanarKorrekturBG", default=1)
     KeepCoup = bpy.props.BoolProperty(
         name="Keep Connector", default=False)
+    IgnoreMainCut = bpy.props.BoolProperty(
+        name="Keep Connector", default=False)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

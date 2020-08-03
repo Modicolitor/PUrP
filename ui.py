@@ -99,17 +99,21 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.label(text="Special Apply Methods")
             subcol.operator("object.applyplanarmultiobj", text='Planar To Multiple Objects',
                             icon="PARTICLE_POINT")  # zeige button an
-            subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
+            #subcol.operator("object.applymultipleplanartoobject", text='Multiple Planar to Object',
+            #                icon="MOD_INSTANCE")
+            subcol.operator("object.applysingletoobjects", text='Single Connector To Multiple Objects',
                             icon="MOD_INSTANCE")
+            subcol.prop(PUrP, "IgnoreMainCut", text = "Ignore Main Cut")
 
-            subcol.operator("object.remapcoups",
-                            text='Remap To Active', icon="FILE_REFRESH")
+            
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
             subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
             subcol.operator(
                 "pup.moddown", text='Down in Couplingorder', icon="TRIA_DOWN")
+            subcol.operator("object.remapcoups",
+                        text='Remap To Active', icon="FILE_REFRESH")
             subcol.label(text="Modifier Visibility")
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
