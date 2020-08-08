@@ -1521,11 +1521,12 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP 
+        #* PUrP.GlobalScale 
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1591,11 +1592,12 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP 
+        
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1684,11 +1686,11 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.valuelow = self.lowestz + self.delta / 100
+            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / 100
             # if self.has_stopper:
             self.valuemiddle = self.middlez + self.delta / 100
 
@@ -1786,11 +1788,11 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.lowestz + self.delta / 100
+            self.value = self.lowestz + self.delta * PUrP.GlobalScale  / 100
 
             self.execute(context)
 
