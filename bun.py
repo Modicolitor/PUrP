@@ -2429,6 +2429,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
+        data = bpy.data
         coup = bpy.data.objects[context.object.name]
         PUrP = context.scene.PUrP
 
@@ -2453,22 +2454,33 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                     CenterObjs.append(ob)
 
         # find the CenterObj with the closest distance to the mainplane
-        distancelist = []
+        #distancelist = []
+        OverLapCenterObjs = []
         for Cob in CenterObjs:
-            distancelist.append(SideOfPlane(context, coup, Cob))
+            #distancelist.append(SideOfPlane(context, coup, Cob))
+            if bvhOverlap(context, coup, Cob):
+                #overlappcount += 1
+                OverLapCenterObjs.append(Cob)
 
-        numShortest = None
-        for num, Cob in enumerate(CenterObjs):
-            if numShortest == None:
-                numShortest = num
-            elif abs(distancelist[num]) < abs(distancelist[numShortest]):
-                numShortest = num
-        NewCenterObj = CenterObjs[numShortest]
+        #numShortest = None
+        #for num, Cob in enumerate(CenterObjs):
+        #    if numShortest == None:
+        #        numShortest = num
+        #    elif abs(distancelist[num]) < abs(distancelist[numShortest]):
+        #        numShortest = num
+        
+        for child in coup.children:
+            if coup.name + "_stick_fix" in child.name:
+                fix = child
+            elif coup.name + "_stick_diff" in child.name:
+                diff = child
+
+        OverLapCenterObj = OverLapCenterObjs[0] ###not lösung erstmal
 
         # add mainplane as parent to the closest CenterObj, when ignore Mainplane False
         if not PUrP.IgnoreMainCut:
             # is the coup connected to another CenterObj
-            if coup.parent != NewCenterObj:
+            if coup.parent != OverLapCenterObj:
                 # remove old parent
                 for mod in coup.parent.modifiers:
                     if coup.name in mod.name:
@@ -2480,62 +2492,52 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 mod.operation = 'DIFFERENCE'
 
         # add inlay mods to CenterObjs
-        for Cob in CenterObjs:
+        print(CenterObjs)
+        
+        for num, Cob in enumerate(CenterObjs):
+            context.view_layer.objects.active = Cob
             if couptype == 'STICK':
+                # stick case
                 print("Stick")
+                ###add if necessary and apply diff obj of stick
+                if coup.name + "_stick_diff" in Cob.modifiers:
+                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name + "_stick_diff")
+                else: 
+                    print("not found, add modifier") 
+                    mod = Cob.modifiers.new(type = 'BOOLEAN', name = coup.name + "_stick_diff" )
+                    mod.object = data.objects[coup.name + "_stick_diff"]
+                    mod.operation = "DIFFERENCE"
+                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name + "_stick_diff")
+
+                
+                
+
+                #delete diff 
+                if num == len(CenterObjs)-1: # last in line
+                    if not PUrP.KeepCoup: ##not global delete forbid
+                        data.objects.remove(data.objects[coup.name + "_stick_diff"])
+                        fix.parent = None 
+                        fix.display_type = 'SOLID'
+                        
+                ###fix to object
+                    else: 
+                        ##copy fix
+                        newfix = copyobject(context, ob, Cob.name + "_stick")
+                        newfix.parent = None 
+                        newfix.display_type = 'SOLID'
             else:
+                # MF case
                 print("MF")
-
-            # stick case
-            # MF case
-
-        # apply mainplane bool to centerobjs, when ignore mainplane false
-
-        # apply inlays
-            # Stick case
-            # MF case
+                
                 # direction thingy
-
-        # suchen nach dem Centerobj connected to Coup
-        '''
-        if coup.parent != None:
-            OriCenterObj = coup.parent
-        else: 
-            OriCenterObj = CenterObjs[0]
-
-        # Generate Modifier on all CenterObj and apply
-        for CenterObj in CenterObjs:
-
-            # is there already a modifier for this coup
-            BoolCool = False
-            for mod in CenterObj.modifiers:
-                if mod.name == coup.name:
-                    BoolCool = True
-
-            if not BoolCool:
-                mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
-                mod.object = coup
-                mod.operation = 'DIFFERENCE'
-
-                ###mods for the children #### carefull: stick and MF
-                for child in coup.children:
-                    if "fix" not in child.name:
-                        mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
-                        mod.object = coup
-                        mod.operation = 'DIFFERENCE'
-
-            context.view_layer.objects.active = CenterObj
-            bpy.ops.object.modifier_apply(modifier=coup.name)
-
-            # CenterObj.modifiers.new(coup.name, 'BOOLEAN')
-
-            bpy.ops.object.editmode_toggle()
-            bpy.ops.mesh.select_all(action='SELECT')
-            bpy.ops.mesh.separate(type='LOOSE')
-            bpy.ops.object.editmode_toggle()
-
-        # delete planar coupling
-        removeCoupling(context, coup)
-        '''
+            
+  
 
         return {'FINISHED'}
+
+
+def copyobject(context, ob, newname):
+    newob = bpy.data.objects.new(name=newname  + "_stick", object_data=ob.data)
+    newob.parent = ob.parent 
+    newob.matrix_world = ob.matrix_world
+    return newob

@@ -84,6 +84,7 @@ results
 
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 
+[] poll functions for all operators
 
 [] visibility 
 [] exchange should keep the state of visibility
