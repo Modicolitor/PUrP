@@ -82,6 +82,7 @@ results
 [] planar changes rotation, while active to setting 
 
 
+[] planar coupscale gizmot, only updates values after applying (low level problem)
 
 [] apply all --> error cObj in print not found 
 
@@ -89,12 +90,9 @@ results
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 [] multiuser data
 
-<<<<<<< HEAD
 [] flat cut no gizmos
 [] planar flat needs constant linedistance 
-=======
-[] poll functions for all operators
->>>>>>> 070d5ef88ec993a9fac8148a2877239673449778
+[] poll functions for all operators 
 
 [] visibility 
 [] exchange should keep the state of visibility

@@ -14,6 +14,7 @@ from .bun import oversizeToPrim
 from .bun import applyScalRot
 from .bun import singcoupmode
 from .bun import planaranalysizerGlobal
+from .bun import planaranalysizerLocal
 
 from bpy.types import (
     Operator,
@@ -2079,8 +2080,10 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         print(self.value)
 
         coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-        vx3 = ob.data.vertices[3].co@ob.matrix_world
-        PUrP.CoupScale = abs(vx3[0]) / coupfaktor
+        vx3 = ob.data.vertices[3].co.x*ob.scale.x
+        print(
+            f"vx3 co{ob.data.vertices[3].co} scale{ob.scale[0]} vx3 {vx3} coupscale {abs(vx3) / coupfaktor}  ")
+        PUrP.CoupScale = abs(vx3) / coupfaktor
         PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerGlobal(
             context, ob)
 
@@ -2088,6 +2091,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
 
     def modal(self, context, event):
         ob = context.object
+
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
@@ -2099,8 +2103,14 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
+            PUrP = context.scene.PUrP
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
+            coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+            vx3 = ob.data.vertices[3].co.x*ob.scale.x
+            PUrP.CoupScale = abs(vx3) / coupfaktor
+            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerLocal(
+                context, ob)
             # applyScalRot(self.obout)
             # applyScalRot(self.obin)
             # oversizeToPrim(context, singcoupmode(
