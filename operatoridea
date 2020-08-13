@@ -79,11 +79,18 @@ results
 [] build volume with arrays and options
 [] order must scale with 
 [] duplicated planar end up beeing applied in copies too 
+[] planar changes rotation, while active to setting 
+
+
 
 [] apply all --> error cObj in print not found 
 
+[] forbid coupling to build plate 
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
+[] multiuser data
 
+[] flat cut no gizmos
+[] planar flat needs constant linedistance 
 
 [] visibility 
 [] exchange should keep the state of visibility

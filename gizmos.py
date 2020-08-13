@@ -13,7 +13,7 @@ from .gizmotshape import PUrP_CylinderShapeWidget
 from .bun import oversizeToPrim
 from .bun import applyScalRot
 from .bun import singcoupmode
-from .bun import planaranalysizer
+from .bun import planaranalysizerGlobal
 
 from bpy.types import (
     Operator,
@@ -1521,8 +1521,8 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-        PUrP = context.scene.PUrP 
-        #* PUrP.GlobalScale 
+        PUrP = context.scene.PUrP
+        # * PUrP.GlobalScale
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
@@ -1592,8 +1592,8 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-        PUrP = context.scene.PUrP 
-        
+        PUrP = context.scene.PUrP
+
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
@@ -1792,7 +1792,7 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.lowestz + self.delta * PUrP.GlobalScale  / 100
+            self.value = self.lowestz + self.delta * PUrP.GlobalScale / 100
 
             self.execute(context)
 
@@ -2081,7 +2081,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
         vx3 = ob.data.vertices[3].co@ob.matrix_world
         PUrP.CoupScale = abs(vx3[0]) / coupfaktor
-        PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+        PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerGlobal(
             context, ob)
 
         return {'FINISHED'}

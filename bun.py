@@ -49,16 +49,18 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         # handling CenterObj
         if active != None:
-
             if active.type == "MESH":
                 if PUrP_name in active.name:
-                    CenterObj = context.scene.PUrP.CenterObj
+                    CenterObj = PUrP.CenterObj
                 else:
                     CenterObj = active
-                    context.scene.PUrP.CenterObj = CenterObj
+                    PUrP.CenterObj = CenterObj
         else:
-            active = context.scene.PUrP.CenterObj
-            active.select_set(True)
+            if PUrP.CenterObj != None:
+                active = context.scene.PUrP.CenterObj
+                active.select_set(True)
+            else:
+                return{"FINISHED"}
 
         # apply scale to CenterObj
         bpy.ops.object.transform_apply(
@@ -2006,7 +2008,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
 
             #
-            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerLocal(
                 context, obj)
             # Stopperbool test
 
@@ -2059,36 +2061,50 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         return Cyclvert, aRadius, bRadius, upperverts
 
 
-def planaranalysizer(context, Coup):
+def planaranalysizerLocal(context, Coup):
     PUrP = context.scene.PUrP
 
     coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
 
-    v3c = Coup.data.vertices[3].co@Coup.matrix_world
-    PUrP.CoupScale = v3c[0] / coupfaktor
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+    print(f"Cubic {Coup.data.name}")
 
-    v0c = Coup.data.vertices[0].co@Coup.matrix_world
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    print("fail..................................................")
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
     OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
 
-    v1c = Coup.data.vertices[1].co@Coup.matrix_world
-    OffsetLeft = - v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = abs(v1c[0]) - 1.5*coupfaktor * PUrP.CoupScale
 
     # zscale and StopperHeight
     lowestvert = 0
     for vert in Coup.data.vertices:  # find lowest z coordinate
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
         if vco[2] <= lowestvert:
             lowestvert = vco[2]
 
     lowestlist = []
     lowestexample = Coup.data.vertices[0]
     for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
         if vco[2] == lowestvert:
             lowestlist.append(vco[2])
             lowestexample = vert  # example for stopperheight evaluation
 
-    lowestexampleco = lowestexample.co@Coup.matrix_world
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
     PUrP.StopperBool = False
     if len(lowestlist) == 4:  # with 4 verts its a stopper
         PUrP.StopperBool = True
@@ -2098,7 +2114,77 @@ def planaranalysizer(context, Coup):
     distance = []
 
     for vert in Coup.data.vertices:
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
+        if vco[0] == lowestexampleco[0]:
+            if vco[1] == lowestexampleco[1]:
+                if vco[2] != lowestexampleco[2]:
+                    # collect distances to vert
+                    distance.append(
+                        vco[2] - lowestexampleco[2])
+                    # print(f"distance {vert.co.z - lowestexample.co.z}")
+    distance.sort()
+    StopperHeight = distance[0]
+
+    # zscale top vert at co.z = 0
+    if PUrP.StopperBool == True:
+        zScale = -lowestexampleco[2] - distance[0]
+    else:
+        zScale = distance[0]
+
+    return OffsetRight, OffsetLeft, zScale, StopperHeight
+
+
+def planaranalysizerGlobal(context, Coup):
+    PUrP = context.scene.PUrP
+
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
+    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    # zscale and StopperHeight
+    lowestvert = 0
+    for vert in Coup.data.vertices:  # find lowest z coordinate
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] <= lowestvert:
+            lowestvert = vco[2]
+
+    lowestlist = []
+    lowestexample = Coup.data.vertices[0]
+    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] == lowestvert:
+            lowestlist.append(vco[2])
+            lowestexample = vert  # example for stopperheight evaluation
+
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
+    PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        PUrP.StopperBool = True
+
+    # for stopper height such den kürzesten abstand bei gleichen x
+    # smallestdistance = 50
+    distance = []
+
+    for vert in Coup.data.vertices:
+        vco = vert.co  # @Coup.matrix_world
         if vco[0] == lowestexampleco[0]:
             if vco[1] == lowestexampleco[1]:
                 if vco[2] != lowestexampleco[2]:
@@ -2218,6 +2304,10 @@ def removePUrPOrder():
     bpy.ops.object.delete(use_global=False)
 
 
+def checkname(context, coup):
+    return True
+
+
 class PP_OT_ReMapCoups(bpy.types.Operator):
     '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
@@ -2326,6 +2416,19 @@ class PP_OT_MakeBuildVolume(bpy.types.Operator):
         BuildVol.display_type = 'WIRE'
         bpy.ops.object.transform_apply(
             location=False, rotation=False, scale=True)
+
+        mod1 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayX", type='ARRAY')
+
+        mod2 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayY", type='ARRAY')
+        mod2.relative_offset_displace[0] = 0
+        mod2.relative_offset_displace[1] = 1
+
+        mod3 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayZ", type='ARRAY')
+        mod3.relative_offset_displace[0] = 0
+        mod3.relative_offset_displace[2] = 1
 
         return {'FINISHED'}
 
