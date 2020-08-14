@@ -61,6 +61,8 @@ from .bun import PP_OT_MakeBuildVolume
 from .bun import PP_OT_ApplyPlanarMultiObj
 from .bun import PP_OT_ApplyMultiplePlanarToObject
 from .bun import PP_OT_ApplySingleToObjects
+from .bun import PP_OT_TestCorrectnameOperator
+from .bun import PP_OT_UnmapCoup
 from .bvh_overlap import PP_OT_OverlapcheckOperator
 from bpy.types import Scene, Image, Object
 import bpy
@@ -101,12 +103,14 @@ classes = (PP_PT_PuzzlePrintMenu,
            PP_OT_MoveModUp,
            PP_OT_ToggleCoupVisibilityOperator,
            PP_OT_ApplySingleToObjects,
+           PP_OT_TestCorrectnameOperator,
            PP_OT_ActiveCoupDefaultOperator,
            PP_OT_CouplingOrder,
            PP_OT_ReMapCoups,
            PP_OT_MakeBuildVolume,
            PP_OT_ApplyPlanarMultiObj,
            PP_OT_ApplyMultiplePlanarToObject,
+           PP_OT_UnmapCoup,
            PP_OT_OversizeGizmo,
            PP_OT_CoupScaleGizmo,
            PP_OT_LowerRadiusGizmo,

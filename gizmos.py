@@ -13,7 +13,8 @@ from .gizmotshape import PUrP_CylinderShapeWidget
 from .bun import oversizeToPrim
 from .bun import applyScalRot
 from .bun import singcoupmode
-from .bun import planaranalysizer
+from .bun import planaranalysizerGlobal
+from .bun import planaranalysizerLocal
 
 from bpy.types import (
     Operator,
@@ -1521,11 +1522,12 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP
+        # * PUrP.GlobalScale
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1591,11 +1593,12 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
+        PUrP = context.scene.PUrP
 
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1684,11 +1687,11 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.valuelow = self.lowestz + self.delta / 100
+            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / 100
             # if self.has_stopper:
             self.valuemiddle = self.middlez + self.delta / 100
 
@@ -1786,11 +1789,11 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.lowestz + self.delta / 100
+            self.value = self.lowestz + self.delta * PUrP.GlobalScale / 100
 
             self.execute(context)
 
@@ -2077,15 +2080,18 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         print(self.value)
 
         coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-        vx3 = ob.data.vertices[3].co@ob.matrix_world
-        PUrP.CoupScale = abs(vx3[0]) / coupfaktor
-        PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+        vx3 = ob.data.vertices[3].co.x*ob.scale.x
+        print(
+            f"vx3 co{ob.data.vertices[3].co} scale{ob.scale[0]} vx3 {vx3} coupscale {abs(vx3) / coupfaktor}  ")
+        PUrP.CoupScale = abs(vx3) / coupfaktor
+        PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerGlobal(
             context, ob)
 
         return {'FINISHED'}
 
     def modal(self, context, event):
         ob = context.object
+
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
@@ -2097,8 +2103,14 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
+            PUrP = context.scene.PUrP
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
+            coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+            vx3 = ob.data.vertices[3].co.x*ob.scale.x
+            PUrP.CoupScale = abs(vx3) / coupfaktor
+            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerLocal(
+                context, ob)
             # applyScalRot(self.obout)
             # applyScalRot(self.obin)
             # oversizeToPrim(context, singcoupmode(

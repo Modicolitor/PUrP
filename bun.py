@@ -49,16 +49,18 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         # handling CenterObj
         if active != None:
-
             if active.type == "MESH":
                 if PUrP_name in active.name:
-                    CenterObj = context.scene.PUrP.CenterObj
+                    CenterObj = PUrP.CenterObj
                 else:
                     CenterObj = active
-                    context.scene.PUrP.CenterObj = CenterObj
+                    PUrP.CenterObj = CenterObj
         else:
-            active = context.scene.PUrP.CenterObj
-            active.select_set(True)
+            if PUrP.CenterObj != None:
+                active = context.scene.PUrP.CenterObj
+                active.select_set(True)
+            else:
+                return{"FINISHED"}
 
         # apply scale to CenterObj
         bpy.ops.object.transform_apply(
@@ -1184,7 +1186,9 @@ def centerObjDecider(context, CenterObj):
                                 # mid = Cobj.modifiers[mod]
                                 # Cobj.modifiers.remove(mid)
 
-#takes coup and CenterObj and returns the distance 
+# takes coup and CenterObj and returns the distance
+
+
 def SideOfPlane(context, coup, CenterObj):
 
     matrix = coup.matrix_world
@@ -2004,7 +2008,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
 
             #
-            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizer(
+            PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerLocal(
                 context, obj)
             # Stopperbool test
 
@@ -2057,36 +2061,50 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         return Cyclvert, aRadius, bRadius, upperverts
 
 
-def planaranalysizer(context, Coup):
+def planaranalysizerLocal(context, Coup):
     PUrP = context.scene.PUrP
 
     coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
 
-    v3c = Coup.data.vertices[3].co@Coup.matrix_world
-    PUrP.CoupScale = v3c[0] / coupfaktor
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+    print(f"Cubic {Coup.data.name}")
 
-    v0c = Coup.data.vertices[0].co@Coup.matrix_world
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    print("fail..................................................")
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
     OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
 
-    v1c = Coup.data.vertices[1].co@Coup.matrix_world
-    OffsetLeft = - v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = abs(v1c[0]) - 1.5*coupfaktor * PUrP.CoupScale
 
     # zscale and StopperHeight
     lowestvert = 0
     for vert in Coup.data.vertices:  # find lowest z coordinate
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
         if vco[2] <= lowestvert:
             lowestvert = vco[2]
 
     lowestlist = []
     lowestexample = Coup.data.vertices[0]
     for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
         if vco[2] == lowestvert:
             lowestlist.append(vco[2])
             lowestexample = vert  # example for stopperheight evaluation
 
-    lowestexampleco = lowestexample.co@Coup.matrix_world
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
     PUrP.StopperBool = False
     if len(lowestlist) == 4:  # with 4 verts its a stopper
         PUrP.StopperBool = True
@@ -2096,7 +2114,77 @@ def planaranalysizer(context, Coup):
     distance = []
 
     for vert in Coup.data.vertices:
-        vco = vert.co@Coup.matrix_world
+        vco = vert.co  # @Coup.matrix_world
+        if vco[0] == lowestexampleco[0]:
+            if vco[1] == lowestexampleco[1]:
+                if vco[2] != lowestexampleco[2]:
+                    # collect distances to vert
+                    distance.append(
+                        vco[2] - lowestexampleco[2])
+                    # print(f"distance {vert.co.z - lowestexample.co.z}")
+    distance.sort()
+    StopperHeight = distance[0]
+
+    # zscale top vert at co.z = 0
+    if PUrP.StopperBool == True:
+        zScale = -lowestexampleco[2] - distance[0]
+    else:
+        zScale = distance[0]
+
+    return OffsetRight, OffsetLeft, zScale, StopperHeight
+
+
+def planaranalysizerGlobal(context, Coup):
+    PUrP = context.scene.PUrP
+
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
+    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    # zscale and StopperHeight
+    lowestvert = 0
+    for vert in Coup.data.vertices:  # find lowest z coordinate
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] <= lowestvert:
+            lowestvert = vco[2]
+
+    lowestlist = []
+    lowestexample = Coup.data.vertices[0]
+    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] == lowestvert:
+            lowestlist.append(vco[2])
+            lowestexample = vert  # example for stopperheight evaluation
+
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
+    PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        PUrP.StopperBool = True
+
+    # for stopper height such den kürzesten abstand bei gleichen x
+    # smallestdistance = 50
+    distance = []
+
+    for vert in Coup.data.vertices:
+        vco = vert.co  # @Coup.matrix_world
         if vco[0] == lowestexampleco[0]:
             if vco[1] == lowestexampleco[1]:
                 if vco[2] != lowestexampleco[2]:
@@ -2185,7 +2273,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                     enter_editmode=False, location=(0, 0, 0))
                 obj = context.object
                 obj.name = modname + "_Order"
-
+                obj.scale = mathutils.Vector((PUrP.GlobalScale,PUrP.GlobalScale,PUrP.GlobalScale))
                 obj.location.z += 0.5 * PUrP.GlobalScale
 
                 obj.data.body = str(num+1)
@@ -2216,11 +2304,75 @@ def removePUrPOrder():
     bpy.ops.object.delete(use_global=False)
 
 
+def copyobject(context, ob, newname):
+    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
+    newob.parent = ob.parent
+    newob.matrix_world = ob.matrix_world
+    return newob
+
+
+# changes name of object (planar and flat cut) and adjust name of related modifiers (the other aren't easily duplicateable)
+def correctname(context, coup):
+    data = bpy.data
+    oriname = coup.name[:]
+    if not "." in oriname:
+        pass
+    else:
+        check = False
+        while check == False:
+            if "Single" in coup.name:
+                newname = coup.name[:len(coup.name)-6] + \
+                    str(random.randint(1, 999))
+            elif "Planar" in coup.name:
+                newname = coup.name[:len(coup.name)-12] + \
+                    str(random.randint(1, 999)) + "_diff"
+            # str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+            if newname not in data.objects:
+                check = True
+
+        coup.name = newname
+        for ob in data.objects:
+            for mod in ob.modifiers:
+                if "PUrP" in mod.name:
+                    if mod.type == 'BOOLEAN':
+                        if mod.object.name == newname:
+                            mod.name = newname
+
+    # return True
+
+
+class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
+    bl_idname = "object.pp_ot_testcorrectname"
+    bl_label = "PP_OT_TestCorrectname"
+
+    def execute(self, context):
+        coup = context.object
+        correctname(context, coup)
+        return {'FINISHED'}
+
+
 class PP_OT_ReMapCoups(bpy.types.Operator):
     '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
     bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                # print(f"context.object != None {context.object != None}")
+                if context.object.PUrPCobj:
+                    return True
+                elif context.object.parent != None:
+                    if context.object.parent.PUrPCobj:
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+        else:
+            return False
 
     def execute(self, context):
 
@@ -2299,6 +2451,82 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class PP_OT_UnmapCoup(bpy.types.Operator):
+    bl_idname = "object.pp_ot_unmapcoup"
+    bl_label = "PP_OT_UnmapCoup"
+
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                # print(f"context.object != None {context.object != None}")
+                if context.object.PUrPCobj:
+                    return True
+                elif context.object.parent != None:
+                    if context.object.parent.PUrPCobj:
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        selected = context.selected_objects[:]
+        for coup in selected:
+            if is_planar(context, coup) or is_single(context, coup):
+                #coup.matrix_world = coup.parent.matrix_world
+                coup.parent = None
+                remove_coupmods(context, coup)
+                unmapped_signal(context, coup)
+
+        return {'FINISHED'}
+
+# goes through all objects and removes coup related modifiers
+
+
+def remove_coupmods(context, coup):
+    data = bpy.data
+
+    for ob in data.objects:
+        for mod in ob.modifiers:
+            if coup.name in mod.name:
+                ob.modifiers.remove(mod)
+
+
+def is_planar(context, coup):
+    return "Planar" in coup.name
+
+
+def is_single(context, coup):
+    return "Single" in coup.name
+
+
+def is_mf(context, coup):
+    back = False
+    for child in coup.children:
+        if "union" in child.name:
+            back = True
+    return back
+
+
+def is_stick(context, coup):
+    back = False
+    for child in coup.children:
+        if "fix" in child.name:
+            back = True
+    return back
+
+
+def is_flat(context, coup):
+    if "Single" in coup.name:
+        if len(coup.children) == 1 or len(coup.children) == 0:
+            return True
+    return False
+
+
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
     bl_idname = "object.makebuildvolume"
     bl_label = "PP_OT_MakeBuildVolume"
@@ -2324,6 +2552,19 @@ class PP_OT_MakeBuildVolume(bpy.types.Operator):
         BuildVol.display_type = 'WIRE'
         bpy.ops.object.transform_apply(
             location=False, rotation=False, scale=True)
+
+        mod1 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayX", type='ARRAY')
+
+        mod2 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayY", type='ARRAY')
+        mod2.relative_offset_displace[0] = 0
+        mod2.relative_offset_displace[1] = 1
+
+        mod3 = BuildVol.modifiers.new(
+            name="PUrP_BuildVol_ArrayZ", type='ARRAY')
+        mod3.relative_offset_displace[0] = 0
+        mod3.relative_offset_displace[2] = 1
 
         return {'FINISHED'}
 
@@ -2420,23 +2661,24 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
 class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     '''Applys the active SingleConnector to the selected objects. Select the objects first and the connector last.'''
     bl_idname = "object.applysingletoobjects"
     bl_label = "PP_OT_ApplySingleToObjects"
     bl_options = {'REGISTER', "UNDO"}
+
     def execute(self, context):
+        data = bpy.data
         coup = bpy.data.objects[context.object.name]
         PUrP = context.scene.PUrP
 
-        ###stop when its the wrong active 
+        # stop when its the wrong active
         if "PUrP_" not in coup.name or "Planar" in coup.name or len(coup.children) == 0:
             return {'FINISHED'}
 
-        ##type of coup  
-        couptype = None 
-        for child in coup.children: 
+        # type of coup
+        couptype = None
+        for child in coup.children:
             if "fix" in child.name:
                 couptype = 'STICK'
         if couptype == None:
@@ -2444,100 +2686,89 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
 
         # Centerobjects sammeln
         CenterObjs = []
-        
+
         for ob in context.selected_objects:
             if ob != coup:
                 if "SingleConnector" not in ob.name and "PlanarConnector" not in ob.name:  # fail selection
                     CenterObjs.append(ob)
-                    
 
-        ### find the CenterObj with the closest distance to the mainplane 
-        distancelist = []
-        for Cob in CenterObjs: 
-            distancelist.append(SideOfPlane(context, coup, Cob))
-        
-        numShortest = None 
-        for num, Cob in enumerate(CenterObjs):
-            if numShortest == None: 
-                numShortest = num
-            elif abs(distancelist[num]) < abs(distancelist[numShortest]):
-                numShortest = num
-        NewCenterObj = CenterObjs[numShortest]
-        
-        ### add mainplane as parent to the closest CenterObj, when ignore Mainplane False 
+        # find the CenterObj with the closest distance to the mainplane
+        #distancelist = []
+        OverLapCenterObjs = []
+        for Cob in CenterObjs:
+            #distancelist.append(SideOfPlane(context, coup, Cob))
+            if bvhOverlap(context, coup, Cob):
+                #overlappcount += 1
+                OverLapCenterObjs.append(Cob)
+
+        #numShortest = None
+        # for num, Cob in enumerate(CenterObjs):
+        #    if numShortest == None:
+        #        numShortest = num
+        #    elif abs(distancelist[num]) < abs(distancelist[numShortest]):
+        #        numShortest = num
+
+        for child in coup.children:
+            if coup.name + "_stick_fix" in child.name:
+                fix = child
+            elif coup.name + "_stick_diff" in child.name:
+                diff = child
+
+        OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
+
+        # add mainplane as parent to the closest CenterObj, when ignore Mainplane False
         if not PUrP.IgnoreMainCut:
-            #### is the coup connected to another CenterObj
-            if coup.parent != NewCenterObj:
-                ##remove old parent 
+            # is the coup connected to another CenterObj
+            if coup.parent != OverLapCenterObj:
+                # remove old parent
                 for mod in coup.parent.modifiers:
-                    if coup.name in mod.name: 
+                    if coup.name in mod.name:
                         coup.parent.modifiers.remove(mod)
-                ##add new parent
+                # add new parent
                 coup.parent = NewCenterObj
                 mod = NewCenterObj.modifiers.new(coup.name, 'BOOLEAN')
                 mod.object = coup
-                mod.operation = 'DIFFERENCE' 
-
-        
-
-        ### add inlay mods to CenterObjs
-        for Cob in CenterObjs:
-            if couptype == 'STICK':
-                print("Stick")
-            else:
-                print("MF")
-
-            ## stick case 
-            ##MF case 
-
-        ###apply mainplane bool to centerobjs, when ignore mainplane false 
-
-        ###apply inlays 
-            ## Stick case 
-            ## MF case 
-                ##direction thingy 
-
-        # suchen nach dem Centerobj connected to Coup
-        '''
-        if coup.parent != None:
-            OriCenterObj = coup.parent
-        else: 
-            OriCenterObj = CenterObjs[0]
-
-        # Generate Modifier on all CenterObj and apply
-        for CenterObj in CenterObjs:
-
-            # is there already a modifier for this coup
-            BoolCool = False
-            for mod in CenterObj.modifiers:
-                if mod.name == coup.name:
-                    BoolCool = True
-
-            if not BoolCool:
-                mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
-                mod.object = coup
                 mod.operation = 'DIFFERENCE'
 
-                ###mods for the children #### carefull: stick and MF
-                for child in coup.children:
-                    if "fix" not in child.name:
-                        mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
-                        mod.object = coup
-                        mod.operation = 'DIFFERENCE'
+        # add inlay mods to CenterObjs
+        print(CenterObjs)
 
-            context.view_layer.objects.active = CenterObj
-            bpy.ops.object.modifier_apply(modifier=coup.name)
+        for num, Cob in enumerate(CenterObjs):
+            context.view_layer.objects.active = Cob
+            if couptype == 'STICK':
+                # stick case
+                print("Stick")
+                # add if necessary and apply diff obj of stick
+                if coup.name + "_stick_diff" in Cob.modifiers:
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=coup.name + "_stick_diff")
+                else:
+                    print("not found, add modifier")
+                    mod = Cob.modifiers.new(
+                        type='BOOLEAN', name=coup.name + "_stick_diff")
+                    mod.object = data.objects[coup.name + "_stick_diff"]
+                    mod.operation = "DIFFERENCE"
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=coup.name + "_stick_diff")
 
-            # CenterObj.modifiers.new(coup.name, 'BOOLEAN')
+                # delete diff
+                if num == len(CenterObjs)-1:  # last in line
+                    if not PUrP.KeepCoup:  # not global delete forbid
+                        data.objects.remove(
+                            data.objects[coup.name + "_stick_diff"])
+                        fix.parent = None
+                        fix.display_type = 'SOLID'
 
-            bpy.ops.object.editmode_toggle()
-            bpy.ops.mesh.select_all(action='SELECT')
-            bpy.ops.mesh.separate(type='LOOSE')
-            bpy.ops.object.editmode_toggle()
+                # fix to object
+                    else:
+                        # copy fix
+                        newfix = copyobject(context, ob, Cob.name + "_stick")
+                        newfix.parent = None
+                        newfix.display_type = 'SOLID'
+            else:
+                # MF case
+                print("MF")
 
-        # delete planar coupling
-        removeCoupling(context, coup)
-        '''
-
+                # direction thingy
 
         return {'FINISHED'}

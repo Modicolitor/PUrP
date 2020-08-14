@@ -71,6 +71,34 @@ after applying
 bugs:
 general operator bug:
 
+
+results 
+[] gizmos movement must scale with global
+[-] can you add a coupling to a planar --> looks like not
+[] globalscale in planar oversize/thickness
+[] build volume with arrays and options
+[] order must scale with 
+[] duplicated planar end up beeing applied in copies too 
+[] planar changes rotation, while active to setting 
+
+
+[] planar coupscale gizmot, only updates values after applying (low level problem)
+
+[] apply all --> error cObj in print not found 
+
+[] forbid coupling to build plate 
+[] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
+[] multiuser data
+
+[] flat cut no gizmos
+[] planar flat needs constant linedistance 
+[] poll functions for all operators 
+
+[] visibility 
+[] exchange should keep the state of visibility
+[] active setting stopper height bool and Height*?*   (add rotated but not rotation applied)
+
+
 [] apply all Problems 
    [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
    [] utf8 byte error hard to reproduce
@@ -78,12 +106,17 @@ general operator bug:
 [] single add coup lands away from cursor
 [] 90° rotated planar shows Coupscale gizmot problems in analyzer (Stopperheight error)
 
+[] unmappe connector operator
 
 [] Operator Single to several CenterObj [] ignore mainplaine option
 [] reorganize UI 
 
 [] test oversize planar with global scale 
 [] gizmot problem fragen
+
+[] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
+
+
 
 mögliche Probleme
 [] Order System update system that stays out of the way 
