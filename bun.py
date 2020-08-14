@@ -2304,8 +2304,44 @@ def removePUrPOrder():
     bpy.ops.object.delete(use_global=False)
 
 
-def checkname(context, coup):
-    return True
+# changes name of object (planar and flat cut) and adjust name of related modifiers (the other aren't easily duplicateable)
+def correctname(context, coup):
+    data = bpy.data
+    oriname = coup.name[:]
+    if not "." in oriname:
+        pass
+    else:
+        check = False
+        while check == False:
+            if "Single" in coup.name:
+                newname = coup.name[:len(coup.name)-6] + \
+                    str(random.randint(1, 999))
+            elif "Planar" in coup.name:
+                newname = coup.name[:len(coup.name)-12] + \
+                    str(random.randint(1, 999)) + "_diff"
+            # str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+            if newname not in data.objects:
+                check = True
+
+        coup.name = newname
+        for ob in data.objects:
+            for mod in ob.modifiers:
+                if "PUrP" in mod.name:
+                    if mod.type == 'BOOLEAN':
+                        if mod.object.name == newname:
+                            mod.name = newname
+
+    # return True
+
+
+class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
+    bl_idname = "object.pp_ot_testcorrectname"
+    bl_label = "PP_OT_TestCorrectname"
+
+    def execute(self, context):
+        coup = context.object
+        correctname(context, coup)
+        return {'FINISHED'}
 
 
 class PP_OT_ReMapCoups(bpy.types.Operator):
@@ -2566,19 +2602,19 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 OverLapCenterObjs.append(Cob)
 
         #numShortest = None
-        #for num, Cob in enumerate(CenterObjs):
+        # for num, Cob in enumerate(CenterObjs):
         #    if numShortest == None:
         #        numShortest = num
         #    elif abs(distancelist[num]) < abs(distancelist[numShortest]):
         #        numShortest = num
-        
+
         for child in coup.children:
             if coup.name + "_stick_fix" in child.name:
                 fix = child
             elif coup.name + "_stick_diff" in child.name:
                 diff = child
 
-        OverLapCenterObj = OverLapCenterObjs[0] ###not lösung erstmal
+        OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
 
         # add mainplane as parent to the closest CenterObj, when ignore Mainplane False
         if not PUrP.IgnoreMainCut:
@@ -2596,51 +2632,50 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
 
         # add inlay mods to CenterObjs
         print(CenterObjs)
-        
+
         for num, Cob in enumerate(CenterObjs):
             context.view_layer.objects.active = Cob
             if couptype == 'STICK':
                 # stick case
                 print("Stick")
-                ###add if necessary and apply diff obj of stick
+                # add if necessary and apply diff obj of stick
                 if coup.name + "_stick_diff" in Cob.modifiers:
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name + "_stick_diff")
-                else: 
-                    print("not found, add modifier") 
-                    mod = Cob.modifiers.new(type = 'BOOLEAN', name = coup.name + "_stick_diff" )
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=coup.name + "_stick_diff")
+                else:
+                    print("not found, add modifier")
+                    mod = Cob.modifiers.new(
+                        type='BOOLEAN', name=coup.name + "_stick_diff")
                     mod.object = data.objects[coup.name + "_stick_diff"]
                     mod.operation = "DIFFERENCE"
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name + "_stick_diff")
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=coup.name + "_stick_diff")
 
-                
-                
-
-                #delete diff 
-                if num == len(CenterObjs)-1: # last in line
-                    if not PUrP.KeepCoup: ##not global delete forbid
-                        data.objects.remove(data.objects[coup.name + "_stick_diff"])
-                        fix.parent = None 
+                # delete diff
+                if num == len(CenterObjs)-1:  # last in line
+                    if not PUrP.KeepCoup:  # not global delete forbid
+                        data.objects.remove(
+                            data.objects[coup.name + "_stick_diff"])
+                        fix.parent = None
                         fix.display_type = 'SOLID'
-                        
-                ###fix to object
-                    else: 
-                        ##copy fix
+
+                # fix to object
+                    else:
+                        # copy fix
                         newfix = copyobject(context, ob, Cob.name + "_stick")
-                        newfix.parent = None 
+                        newfix.parent = None
                         newfix.display_type = 'SOLID'
             else:
                 # MF case
                 print("MF")
-                
+
                 # direction thingy
-            
-  
 
         return {'FINISHED'}
 
 
 def copyobject(context, ob, newname):
-    newob = bpy.data.objects.new(name=newname  + "_stick", object_data=ob.data)
-    newob.parent = ob.parent 
+    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
+    newob.parent = ob.parent
     newob.matrix_world = ob.matrix_world
     return newob

@@ -105,6 +105,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
 
+            subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
+                            icon="MOD_INSTANCE")
+
             subcol.label(text="Coupling Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
