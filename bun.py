@@ -2273,7 +2273,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                     enter_editmode=False, location=(0, 0, 0))
                 obj = context.object
                 obj.name = modname + "_Order"
-
+                obj.scale = mathutils.Vector((PUrP.GlobalScale,PUrP.GlobalScale,PUrP.GlobalScale))
                 obj.location.z += 0.5 * PUrP.GlobalScale
 
                 obj.data.body = str(num+1)
