@@ -2304,6 +2304,13 @@ def removePUrPOrder():
     bpy.ops.object.delete(use_global=False)
 
 
+def copyobject(context, ob, newname):
+    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
+    newob.parent = ob.parent
+    newob.matrix_world = ob.matrix_world
+    return newob
+
+
 # changes name of object (planar and flat cut) and adjust name of related modifiers (the other aren't easily duplicateable)
 def correctname(context, coup):
     data = bpy.data
@@ -2349,6 +2356,23 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
     bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                # print(f"context.object != None {context.object != None}")
+                if context.object.PUrPCobj:
+                    return True
+                elif context.object.parent != None:
+                    if context.object.parent.PUrPCobj:
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+        else:
+            return False
 
     def execute(self, context):
 
@@ -2425,6 +2449,68 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
 
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
+
+
+class PP_OT_UnmapCoup(bpy.types.Operator):
+    bl_idname = "object.pp_ot_unmapcoup"
+    bl_label = "PP_OT_UnmapCoup"
+
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                # print(f"context.object != None {context.object != None}")
+                if context.object.PUrPCobj:
+                    return True
+                elif context.object.parent != None:
+                    if context.object.parent.PUrPCobj:
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+        else:
+            return False
+
+    def execute(self, context):
+        PUrP = context.scene.PUrP
+        selected = context.selected_objects[:]
+        for coup in selected:
+            if coup.name:
+                unmapped_signal(context, coup)
+
+        return {'FINISHED'}
+
+
+def is_planar(context, coup):
+    return "Planar" in coup.name
+
+
+def is_single(context, coup):
+    return "Single" in coup.name
+
+
+def is_mf(context, coup):
+    back = False
+    for child in coup.children:
+        if "union" in child.name:
+            back = True
+    return back
+
+
+def is_stick(context, coup):
+    back = False
+    for child in coup.children:
+        if "fix" in child.name:
+            back = True
+    return back
+
+
+def is_flat(context, coup):
+    if "Single" in coup.name:
+        if len(coup.children) == 1 or len(coup.children) == 0:
+            return True
+    return False
 
 
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
@@ -2672,10 +2758,3 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 # direction thingy
 
         return {'FINISHED'}
-
-
-def copyobject(context, ob, newname):
-    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
-    newob.parent = ob.parent
-    newob.matrix_world = ob.matrix_world
-    return newob

@@ -115,7 +115,9 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator(
                 "pup.moddown", text='Down in Couplingorder', icon="TRIA_DOWN")
             subcol.operator("object.remapcoups",
-                            text='Remap To Active', icon="FILE_REFRESH")
+                            text='Remap Connector To Active', icon="FILE_REFRESH")
+            subcol.operator("object.pp_ot_unmapcoup",
+                            text='Unmap Connector', icon="FILE_REFRESH")
             subcol.label(text="Modifier Visibility")
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
