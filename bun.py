@@ -2476,10 +2476,24 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
         PUrP = context.scene.PUrP
         selected = context.selected_objects[:]
         for coup in selected:
-            if coup.name:
+            if is_planar(context, coup) or is_single(context, coup):
+                #coup.matrix_world = coup.parent.matrix_world
+                coup.parent = None
+                remove_coupmods(context, coup)
                 unmapped_signal(context, coup)
 
         return {'FINISHED'}
+
+# goes through all objects and removes coup related modifiers
+
+
+def remove_coupmods(context, coup):
+    data = bpy.data
+
+    for ob in data.objects:
+        for mod in ob.modifiers:
+            if coup.name in mod.name:
+                ob.modifiers.remove(mod)
 
 
 def is_planar(context, coup):
