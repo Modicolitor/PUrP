@@ -55,6 +55,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Keep Connector", default=False)
     IgnoreMainCut = bpy.props.BoolProperty(
         name="Keep Connector", default=False)
+    ViewPortVisAdd = bpy.props.BoolProperty(
+        name="Add with Viewport Visibility", default=True)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

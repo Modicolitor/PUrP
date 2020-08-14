@@ -87,7 +87,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                     subcol.enabled = True
                 if PUrP.StopperBool:
                     subcol.prop(PUrP, "StopperHeight", text='Stopper Height')
-
+            subcol.prop(PUrP, "ViewPortVisAdd", text='Add with Viewport Visibility')
             subcol = col.column()
             subcol.operator("rem.coup", text="Delete Coupling",
                             icon="CANCEL")  # zeige button an
@@ -131,6 +131,15 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.prop(PUrP, "BuildplateZ", text='Buildplate Z')
             subcol.operator("object.makebuildvolume",
                             text='Generate Buildvolume', icon="MESH_CUBE")
+
+            if "BuildVolume" in context.object.name:
+                Vol = context.object
+                mods = Vol.modifiers
+                subcol.label(text = "BuildVolume Arrays")
+                subcol.prop(mods["PUrP_BuildVol_ArrayX"], "count", text='Build Volume X Repeat')
+                subcol.prop(mods["PUrP_BuildVol_ArrayY"], "count", text='Build Volume Y Repeat')
+                subcol.prop(mods["PUrP_BuildVol_ArrayZ"], "count", text='Build Volume Z Repeat')
+
 
         else:
             col.operator("pup.init", icon="SHADERFX")

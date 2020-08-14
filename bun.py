@@ -775,11 +775,14 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 ob.select_set(False)
 
             CenterObj = obj.parent
-            if PUrP_name in obj.name:  # eines meiner coupling
-
+            if is_coup(context, obj):  # eines meiner coupling
+                viewportvis = True
                 for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
+                    if obj.name == mod.name:
+                        viewportvis = mod.show_viewport
                     if obj.name in mod.name:
                         obj.parent.modifiers.remove(mod)
+                    
 
                 for child in obj.children:  # lösche alle kinder
                     child.hide_select = False
@@ -839,6 +842,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
                     mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
+                    mod.show_viewport = viewportvis
                     mod.object = obj
                     mod.operation = 'DIFFERENCE'
                     # obj.scale = mathutils.Vector((1, 1, 1))
@@ -2495,6 +2499,11 @@ def remove_coupmods(context, coup):
             if coup.name in mod.name:
                 ob.modifiers.remove(mod)
 
+def is_coup(context, coup):
+    if "PUrP" in coup.name:
+        if is_single(context, coup) or is_planar:
+            return True
+    return False
 
 def is_planar(context, coup):
     return "Planar" in coup.name
@@ -2555,17 +2564,19 @@ class PP_OT_MakeBuildVolume(bpy.types.Operator):
 
         mod1 = BuildVol.modifiers.new(
             name="PUrP_BuildVol_ArrayX", type='ARRAY')
+        mod1.count = 1
 
         mod2 = BuildVol.modifiers.new(
             name="PUrP_BuildVol_ArrayY", type='ARRAY')
         mod2.relative_offset_displace[0] = 0
         mod2.relative_offset_displace[1] = 1
+        mod2.count = 1
 
         mod3 = BuildVol.modifiers.new(
             name="PUrP_BuildVol_ArrayZ", type='ARRAY')
         mod3.relative_offset_displace[0] = 0
         mod3.relative_offset_displace[2] = 1
-
+        mod3.count = 1
         return {'FINISHED'}
 
 
