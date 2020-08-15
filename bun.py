@@ -664,9 +664,11 @@ def genPlanar():
     mod.count = LineLength
 
     mod = obj.modifiers.new(name="PUrP_Array_2", type="ARRAY")
+    mod.use_relative_offset = False
+    mod.use_constant_offset = True
+    mod.constant_offset_displace[0] = 0
+    mod.constant_offset_displace[1] = LineDistance
 
-    mod.relative_offset_displace[0] = 0
-    mod.relative_offset_displace[1] = LineDistance
     mod.count = LineCount
     mod.use_merge_vertices = True
 
@@ -782,7 +784,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         viewportvis = mod.show_viewport
                     if obj.name in mod.name:
                         obj.parent.modifiers.remove(mod)
-                    
 
                 for child in obj.children:  # lösche alle kinder
                     child.hide_select = False
@@ -2007,7 +2008,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 location=False, rotation=False, scale=True)
 
             PUrP.Oversize = obj.modifiers["PUrP_Solidify"].thickness
-            PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+            PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].constant_offset_displace[1]
             PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
 
@@ -2277,7 +2278,8 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                     enter_editmode=False, location=(0, 0, 0))
                 obj = context.object
                 obj.name = modname + "_Order"
-                obj.scale = mathutils.Vector((PUrP.GlobalScale,PUrP.GlobalScale,PUrP.GlobalScale))
+                obj.scale = mathutils.Vector(
+                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
                 obj.location.z += 0.5 * PUrP.GlobalScale
 
                 obj.data.body = str(num+1)
@@ -2499,11 +2501,13 @@ def remove_coupmods(context, coup):
             if coup.name in mod.name:
                 ob.modifiers.remove(mod)
 
+
 def is_coup(context, coup):
     if "PUrP" in coup.name:
         if is_single(context, coup) or is_planar:
             return True
     return False
+
 
 def is_planar(context, coup):
     return "Planar" in coup.name
