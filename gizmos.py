@@ -1527,7 +1527,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 100
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1598,7 +1598,7 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta * PUrP.GlobalScale / 1000
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / 100
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
