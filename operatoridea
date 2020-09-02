@@ -79,11 +79,17 @@ results
 [] test oversize planar with global scale 
 [+] build volume with arrays and options
 [+] order must scale with 
-[] duplicated planar end up beeing applied in copies too 
+[] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [+] planar changes rotation, while active to setting 
 
-
+[] unmap moves connector to origin
+[] remap unavalable by stick (?) --> poll 
+[] delete fails for unmapped
 [] planar coupscale gizmot, only updates values after applying (low level problem)
+
+
+[]\purp\ui.py", line 135, in draw
+    if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'
 
 [] apply all --> error cObj in print not found 
 

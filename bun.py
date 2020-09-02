@@ -2312,8 +2312,10 @@ def removePUrPOrder():
 
 def copyobject(context, ob, newname):
     newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
+    newob.matrix_world = ob.parent.matrix_world
     newob.parent = ob.parent
-    newob.matrix_world = ob.matrix_world
+    col = in_collection(context, ob)
+    col.objects.link(newob)
     return newob
 
 
@@ -2675,6 +2677,23 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         bpy.ops.object.editmode_toggle()
         return {'FINISHED'}
 
+# doppelt
+
+
+def copy_obj(context, child, newname):
+    matrix = child.matrix_world
+    childtmpdata = child.data.copy()
+    child_new = bpy.data.objects.new(
+        name="newname", object_data=childtmpdata)
+
+    col = in_collection(context, child)
+    col.objects.link(child_new)
+    child_new.parent = child.parent
+    child_new.matrix_world = matrix
+    child_new.display_type = 'WIRE'
+
+    return child_new
+
 
 class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     '''Applys the active SingleConnector to the selected objects. Select the objects first and the connector last.'''
@@ -2688,23 +2707,22 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         PUrP = context.scene.PUrP
 
         # stop when its the wrong active
-        if "PUrP_" not in coup.name or "Planar" in coup.name or len(coup.children) == 0:
+        if not is_coup(context, coup) or is_planar(context, coup) or is_flat(context, coup):
+            self.report({'WARNING'}, "Wrong active Object")
             return {'FINISHED'}
 
         # type of coup
         couptype = None
-        for child in coup.children:
-            if "fix" in child.name:
-                couptype = 'STICK'
-        if couptype == None:
+        if is_stick(context, coup):
+            couptype = 'STICK'
+        if is_mf(context, coup):
             couptype = 'MF'
 
         # Centerobjects sammeln
         CenterObjs = []
-
         for ob in context.selected_objects:
             if ob != coup:
-                if "SingleConnector" not in ob.name and "PlanarConnector" not in ob.name:  # fail selection
+                if not is_coup(context, ob):
                     CenterObjs.append(ob)
 
         # find the CenterObj with the closest distance to the mainplane
@@ -2716,18 +2734,14 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 #overlappcount += 1
                 OverLapCenterObjs.append(Cob)
 
-        #numShortest = None
-        # for num, Cob in enumerate(CenterObjs):
-        #    if numShortest == None:
-        #        numShortest = num
-        #    elif abs(distancelist[num]) < abs(distancelist[numShortest]):
-        #        numShortest = num
-
+        # child zuordnung
         for child in coup.children:
             if coup.name + "_stick_fix" in child.name:
                 fix = child
-            elif coup.name + "_stick_diff" in child.name:
+            elif coup.name + "_stick_diff" in child.name or coup.name + "_diff" in child.name:
                 diff = child
+            elif coup.name + "_union" in child.name:
+                union = child
 
         OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
 
@@ -2766,24 +2780,131 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                     bpy.ops.object.modifier_apply(
                         apply_as='DATA', modifier=coup.name + "_stick_diff")
 
-                # delete diff
-                if num == len(CenterObjs)-1:  # last in line
-                    if not PUrP.KeepCoup:  # not global delete forbid
-                        data.objects.remove(
-                            data.objects[coup.name + "_stick_diff"])
-                        fix.parent = None
-                        fix.display_type = 'SOLID'
-
-                # fix to object
-                    else:
-                        # copy fix
-                        newfix = copyobject(context, ob, Cob.name + "_stick")
+                # letzte Runde, delete or dublicate
+                # last in line
+                if num == len(CenterObjs)-1:
+                    if PUrP.KeepCoup:
+                        newfix = copyobject(context, fix, Cob.name + "_stick")
+                        print(f"made newfix {newfix.name}")
                         newfix.parent = None
                         newfix.display_type = 'SOLID'
+                        newfix.show_in_front = True
+                    else:
+                        data.objects.remove(
+                            data.objects[coup.name + "_stick_diff"])
+                        mw = fix.matrix_world.copy()
+                        fix.parent = None
+                        fix.matrix_world = mw
+                        fix.display_type = 'SOLID'
+                        fix.show_in_front = True
+
             else:
                 # MF case
                 print("MF")
+                if origin_in_bb(context, union, Cob):
+                    # ignore mainplane
+                    if PUrP.IgnoreMainCut:
+                        ensure_mod(context, union, Cob, "union")
+                        bpy.ops.object.modifier_apply(
+                            apply_as='DATA', modifier=coup.name + "_union")
+                    else:
+                        # union + das Cobjs
+                        # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
+                        applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
+                else:  # wenn nicht zentraler CObj mach nur ein loch
+                    # nur diff teil wichtig
+                    # check ob Cobj den mod hat
+                    # wenn nicht mach ihn
+                    ensure_mod(context, diff, Cob, "diff")
+                    # apply modifier
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=coup.name + "_diff")
 
-                # direction thingy
+                    # when letzter Cobj
+                    if num == len(CenterObjs)-1:
+                        # wenn keep
+                        if PUrP.KeepCoup:
+                            # unmap coup
+                            mw = coup.matrix_world.copy()
+                            coup.parent = None
+                            coup.matrix_world = mw
+                            unmapped_signal(context, coup)
+                        else:
+                            removeCoupling(context, coup)
 
         return {'FINISHED'}
+
+
+def ensure_mod(context, ele, CObj, nameadd):
+    data = bpy.data
+    check = False
+    if nameadd == "":   # coup and not an inlay
+        coup = ele
+        modname = coup.name
+    else:
+        coup = ele.parent
+        modname = coup.name + "_" + nameadd
+
+    if coup.name in CObj.modifiers:
+        return True
+    elif coup.name + "_" + nameadd in CObj.modifiers:
+        return True
+
+    print("not found, add modifier")
+
+    mod = CObj.modifiers.new(
+        type='BOOLEAN', name=modname)
+    mod.object = data.objects[modname]
+    mod.operation = "DIFFERENCE"
+
+
+def lowest_value(vectorlist, dim):
+    initvector = vectorlist[1]
+    lowest = initvector[dim]
+    for v in vectorlist:
+        if lowest > v[dim]:
+            lowest = v[dim]
+    return lowest
+
+
+def highest_value(vectorlist, dim):
+    initvector = vectorlist[1]
+    highest = initvector[dim]
+    for v in vectorlist:
+        if highest < v[dim]:
+            highest = v[dim]
+    return highest
+
+
+def origin_in_bb(context, union, CObj):
+    bbox_corners = [CObj.matrix_world @
+                    mathutils.Vector(corner) for corner in CObj.bound_box]
+
+    xhighest = highest_value(bbox_corners, 0)
+    xlowest = lowest_value(bbox_corners, 0)
+    yhighest = highest_value(bbox_corners, 1)
+    ylowest = lowest_value(bbox_corners, 1)
+    zhighest = highest_value(bbox_corners, 2)
+    zlowest = lowest_value(bbox_corners, 2)
+
+    print(f"xhighest {xhighest} yhighest {yhighest} zhighest {zhighest} xlowest {xlowest} ylowest {ylowest} zlowest {zlowest}")
+
+    answer = False
+    unionloc = union.location@union.matrix_world
+    print(f"unionloc {unionloc}")
+    if xhighest < unionloc[0]:
+        print("01")
+        if xlowest > unionloc[0]:
+            print("02")
+            if yhighest < unionloc[1]:
+                print("11")
+                if ylowest > unionloc[1]:
+                    print("12")
+                    if zhighest < unionloc[2]:
+                        print("21")
+                        if zlowest > unionloc[2]:
+                            print("22")
+                            answer = True
+
+    print(f"origin in bb answer {answer}")
+    return answer
