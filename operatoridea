@@ -91,7 +91,11 @@ results
 []\purp\ui.py", line 135, in draw
     if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'
 
+[] single to multiple objects mf when wrong parent
+
 [] apply all --> error cObj in print not found 
+
+
 
 [---] forbid coupling to build plate  -->  seems to be alright
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply

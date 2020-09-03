@@ -2485,7 +2485,7 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
         selected = context.selected_objects[:]
         for coup in selected:
             if is_planar(context, coup) or is_single(context, coup):
-                #coup.matrix_world = coup.parent.matrix_world
+                # coup.matrix_world = coup.parent.matrix_world
                 coup.parent = None
                 remove_coupmods(context, coup)
                 unmapped_signal(context, coup)
@@ -2726,12 +2726,12 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                     CenterObjs.append(ob)
 
         # find the CenterObj with the closest distance to the mainplane
-        #distancelist = []
+        # distancelist = []
         OverLapCenterObjs = []
         for Cob in CenterObjs:
-            #distancelist.append(SideOfPlane(context, coup, Cob))
+            # distancelist.append(SideOfPlane(context, coup, Cob))
             if bvhOverlap(context, coup, Cob):
-                #overlappcount += 1
+                # overlappcount += 1
                 OverLapCenterObjs.append(Cob)
 
         # child zuordnung
@@ -2743,8 +2743,8 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
             elif coup.name + "_union" in child.name:
                 union = child
 
-        OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
-
+        # OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
+        '''
         # add mainplane as parent to the closest CenterObj, when ignore Mainplane False
         if not PUrP.IgnoreMainCut:
             # is the coup connected to another CenterObj
@@ -2758,7 +2758,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 mod = NewCenterObj.modifiers.new(coup.name, 'BOOLEAN')
                 mod.object = coup
                 mod.operation = 'DIFFERENCE'
-
+        '''
         # add inlay mods to CenterObjs
         print(CenterObjs)
 
@@ -2766,17 +2766,37 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
             context.view_layer.objects.active = Cob
             if couptype == 'STICK':
                 # stick case
-                print("Stick")
-                # add if necessary and apply diff obj of stick
-                if coup.name + "_stick_diff" in Cob.modifiers:
-                    bpy.ops.object.modifier_apply(
-                        apply_as='DATA', modifier=coup.name + "_stick_diff")
+                # print("Stick")
+                # mainplane
+                if bvhOverlap(context, coup, Cob):
+                    # ignore mainplane
+                    remove_mod(context, coup, coup.parent, "")
+                    remove_mod(context, diff, coup.parent, "stick_diff")
+                    mw = coup.matrix_world.copy()
+                    coup.parent = Cob
+                    coup.matrix_world = mw
+                    if not PUrP.IgnoreMainCut:
+                        # union + das Cobjs
+                        # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
+
+                        ensure_mod(context, coup, Cob, "")
+
+                        # ensure_mod(context, diff, Cob, "stick_diff")
+                        daughters = cut_n_separate(context, coup, Cob)
+                        print(f"Daughters {daughters} ")
+                        for daughter in daughters:
+                            print(f"taking care of daughter {daughter.name}")
+                            context.view_layer.objects.active = daughter
+                            ensure_mod(context, diff, daughter, "stick_diff")
+                            bpy.ops.object.modifier_apply(
+                                apply_as='DATA', modifier=coup.name + "_stick_diff")
+                        print(f"Daughters set {Cob.name}")
+                        # applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
+
                 else:
-                    print("not found, add modifier")
-                    mod = Cob.modifiers.new(
-                        type='BOOLEAN', name=coup.name + "_stick_diff")
-                    mod.object = data.objects[coup.name + "_stick_diff"]
-                    mod.operation = "DIFFERENCE"
+                    # without overlap just add the inlay mod and apply
+                    context.view_layer.objects.active = Cob
+                    ensure_mod(context, diff, Cob, "stick_diff")
                     bpy.ops.object.modifier_apply(
                         apply_as='DATA', modifier=coup.name + "_stick_diff")
 
@@ -2789,6 +2809,9 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         newfix.parent = None
                         newfix.display_type = 'SOLID'
                         newfix.show_in_front = True
+
+                        change_parent(context, coup, None)
+                        unmapped_signal(context, coup)
                     else:
                         data.objects.remove(
                             data.objects[coup.name + "_stick_diff"])
@@ -2798,11 +2821,17 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         fix.display_type = 'SOLID'
                         fix.show_in_front = True
 
-            else:
+                        # remove mainplane when not keep
+                        print("remove coup {coup.name}")
+                        data.objects.remove(coup)
+
+            elif couptype == 'MF':
                 # MF case
                 print("MF")
                 if origin_in_bb(context, union, Cob):
-                    # ignore mainplane
+
+                    change_parent(context, coup, Cob)
+
                     if PUrP.IgnoreMainCut:
                         ensure_mod(context, union, Cob, "union")
                         bpy.ops.object.modifier_apply(
@@ -2825,14 +2854,50 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         # wenn keep
                         if PUrP.KeepCoup:
                             # unmap coup
-                            mw = coup.matrix_world.copy()
-                            coup.parent = None
-                            coup.matrix_world = mw
+                            change_parent(context, coup, None)
                             unmapped_signal(context, coup)
                         else:
                             removeCoupling(context, coup)
 
         return {'FINISHED'}
+
+
+def change_parent(context, obj, parent):
+    mw = obj.matrix_world.copy()
+    obj.parent = parent
+    obj.matrix_world = mw
+
+
+def cut_n_separate(context, coup, Cobj):
+    context.view_layer.objects.active = Cobj
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name)
+
+    # seperate by loose parts
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.separate(type='LOOSE')
+    bpy.ops.object.editmode_toggle()
+
+    # remember objects
+    CenterObjDaughters = context.selected_objects[:]
+    if context.object not in CenterObjDaughters:
+        CenterObjDaughters.append(context.object)
+
+    return CenterObjDaughters
+
+
+def remove_mod(context, ele, CObj, nameadd):
+    data = bpy.data
+    check = False
+    if nameadd == "":   # coup and not an inlay
+        coup = ele
+        modname = coup.name
+    else:
+        coup = ele.parent
+        modname = coup.name + "_" + nameadd
+
+    if modname in CObj.modifiers:
+        CObj.modifiers.remove(CObj.modifiers[modname])
+        return True
 
 
 def ensure_mod(context, ele, CObj, nameadd):
@@ -2845,12 +2910,11 @@ def ensure_mod(context, ele, CObj, nameadd):
         coup = ele.parent
         modname = coup.name + "_" + nameadd
 
-    if coup.name in CObj.modifiers:
-        return True
-    elif coup.name + "_" + nameadd in CObj.modifiers:
+    if modname in CObj.modifiers:
+        print(f"{modname} found in {CObj.name}")
         return True
 
-    print("not found, add modifier")
+    print(f"{modname} not found, add modifier")
 
     mod = CObj.modifiers.new(
         type='BOOLEAN', name=modname)
@@ -2892,17 +2956,17 @@ def origin_in_bb(context, union, CObj):
     answer = False
     unionloc = union.location@union.matrix_world
     print(f"unionloc {unionloc}")
-    if xhighest < unionloc[0]:
+    if xhighest > unionloc[0]:
         print("01")
-        if xlowest > unionloc[0]:
+        if xlowest < unionloc[0]:
             print("02")
-            if yhighest < unionloc[1]:
+            if yhighest > unionloc[1]:
                 print("11")
-                if ylowest > unionloc[1]:
+                if ylowest < unionloc[1]:
                     print("12")
-                    if zhighest < unionloc[2]:
+                    if zhighest > unionloc[2]:
                         print("21")
-                        if zlowest > unionloc[2]:
+                        if zlowest < unionloc[2]:
                             print("22")
                             answer = True
 
