@@ -87,6 +87,7 @@ results
 [] delete fails for unmapped
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 
+[] exchange not working with unmapped (modifier in parent not there)
 
 []\purp\ui.py", line 135, in draw
     if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'

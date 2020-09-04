@@ -1240,21 +1240,22 @@ def unmapped_signal(context, coup):
 
     bpy.ops.object.text_add(
         enter_editmode=False, location=(0, 0, 0))
-    SingalText = context.object
-    SingalText.name = coup.name + "_Order"
+    SignalText = context.object
+    SignalText.name = coup.name + "_Order"
 
-    SingalText.location.z += 0.5 * PUrP.GlobalScale
-    SingalText.scale = mathutils.Vector(
+    SignalText.location.z += 0.5 * PUrP.GlobalScale
+
+    SignalText.data.body = "UNMAPED"
+    SignalText.data.extrude = 0.05
+    SignalText.show_in_front = True
+    SignalText.display_type = 'WIRE'
+    SignalText.hide_select = True
+    SignalText.parent = coup
+    SignalText.matrix_world = coup.matrix_world
+    SignalText.rotation_euler.x = 1.5708
+    SignalText.location.x -= 0.3
+    SignalText.scale = mathutils.Vector(
         (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
-    SingalText.data.body = "UNMAPED"
-    SingalText.data.extrude = 0.05
-    SingalText.show_in_front = True
-    SingalText.display_type = 'WIRE'
-    SingalText.hide_select = True
-    SingalText.parent = coup
-    SingalText.matrix_world = coup.matrix_world
-    SingalText.rotation_euler.x = 1.5708
-    SingalText.location.x -= 0.3
     print(f"coup {coup.name} was false with both daughters")
 
 
@@ -2792,7 +2793,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                                 apply_as='DATA', modifier=coup.name + "_stick_diff")
                         print(f"Daughters set {Cob.name}")
                         # applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
-
+                    else:
+                        context.view_layer.objects.active = Cob
+                        ensure_mod(context, diff, Cob, "stick_diff")
+                        bpy.ops.object.modifier_apply(
+                            apply_as='DATA', modifier=coup.name + "_stick_diff")
                 else:
                     # without overlap just add the inlay mod and apply
                     context.view_layer.objects.active = Cob
@@ -2812,6 +2817,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
 
                         change_parent(context, coup, None)
                         unmapped_signal(context, coup)
+                        context.view_layer.objects.active = coup
                     else:
                         data.objects.remove(
                             data.objects[coup.name + "_stick_diff"])
@@ -2828,7 +2834,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
             elif couptype == 'MF':
                 # MF case
                 print("MF")
-                if origin_in_bb(context, union, Cob):
+                if origin_in_bb(context, coup, Cob):
 
                     change_parent(context, coup, Cob)
 
@@ -2836,10 +2842,13 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         ensure_mod(context, union, Cob, "union")
                         bpy.ops.object.modifier_apply(
                             apply_as='DATA', modifier=coup.name + "_union")
+                        remove_mod(context, coup, Cob, "")
+                        #remove_mod(context, diff, Cob, "")
                     else:
                         # union + das Cobjs
                         # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
-                        applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
+                        foundCob = Cob
+                        #applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
                 else:  # wenn nicht zentraler CObj mach nur ein loch
                     # nur diff teil wichtig
                     # check ob Cobj den mod hat
@@ -2854,10 +2863,21 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         # wenn keep
                         if PUrP.KeepCoup:
                             # unmap coup
-                            change_parent(context, coup, None)
-                            unmapped_signal(context, coup)
+                            if PUrP.IgnoreMainCut:
+                                change_parent(context, coup, None)
+                                unmapped_signal(context, coup)
+                            else:
+                                applySingleCoup(
+                                    context, coup, foundCob, PUrP.KeepCoup)
+
                         else:
-                            removeCoupling(context, coup)
+                            # when everything is done apply or remove couple to found Cob
+                            if PUrP.IgnoreMainCut:
+                                removeCoupling(context, coup)
+                            else:
+                                applySingleCoup(
+                                    context, coup, foundCob, True)
+                                #removeCoupling(context, coup)
 
         return {'FINISHED'}
 
@@ -2970,5 +2990,5 @@ def origin_in_bb(context, union, CObj):
                             print("22")
                             answer = True
 
-    print(f"origin in bb answer {answer}")
+    print(f"origin in bb answer {answer} for {union.name} and {CObj.name}")
     return answer
