@@ -69,6 +69,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         CenterObj.PUrPCobj = True
         Centerloc = CenterObj.location
 
+        is_unmap = PUrP.AddUnmapped
+
         # make slice plane when not planar
         if PUrP.SingleCouplingModes != "4":
             bpy.ops.mesh.primitive_plane_add(
@@ -88,58 +90,48 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             context.object.display_type = 'WIRE'
             # context.object.show_in_front = True
 
-            context.object.parent = data.objects[CenterObj_name]
-
-            # set boolean for the slice plane
-            mod = data.objects[CenterObj_name].modifiers.new(
-                name=context.object.name, type="BOOLEAN")
-            mod.object = data.objects[newname_mainplane]
-            mod.operation = 'DIFFERENCE'
+            if not is_unmap:
+                context.object.parent = data.objects[CenterObj_name]
+                # set boolean for the slice plane
+                mod = data.objects[CenterObj_name].modifiers.new(
+                    name=context.object.name, type="BOOLEAN")
+                mod.show_viewport = False
+                if PUrP.ViewPortVisAdd:
+                    mod.show_viewport = True
+                mod.object = data.objects[newname_mainplane]
+                mod.operation = 'DIFFERENCE'
 
         else:
             newname_mainplane = "Null"  # for planar
 
-        # loc = mathutils.Vector((0,0,0))
-        # print(f'CenterObj {CenterObj.name} vor Divisioncall. Active {active.name} ')
-        coupModeDivision(context, CenterObj, newname_mainplane)
-
-        # cursorloc.x -= CenterObj.location.x
-        # cursorloc.y -= CenterObj.location.y
-        # cursorloc.z -= CenterObj.location.z
-        # context.scene.objects.link(unioncopy)
+        coupModeDivision(context, CenterObj, newname_mainplane, is_unmap)
 
         if PUrP.SingleCouplingModes != "4":
-            data.objects[newname_mainplane].location += cursorloc
-            # data.objects[newname_mainplane].scale *= PUrP.CoupScale * \
-            # PUrP.GlobalScale
-            # data.objects[newname_mainplane].select_set(True)
-            # context.view_layer.objects.active = data.objects[newname_mainplane]
-            # bpy.ops.object.transform_apply(
-            #    location=False, rotation=False, scale=True)
+            data.objects[newname_mainplane].location = cursorloc
 
         elif PUrP.SingleCouplingModes == "4":
-            context.object.location += cursorloc
+            context.object.location = cursorloc
             # context.object.select_set(True)
 
         context.scene.cursor.location = cursorlocori
-        # for ob in context.selected_objects:
-        #    ob.select_set(False)
-        # context.object.select_set(True)
 
         # order refreshing
-        data = bpy.data
-        Orderbool = False
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order" in ob.name:
-                Orderbool = True
-                bpy.ops.pup.couplingorder()
-                bpy.ops.pup.couplingorder()
-                break
+        if not is_unmap:
+            data = bpy.data
+            Orderbool = False
+            for ob in data.objects:
+                if "PUrP" in ob.name and "_Order" in ob.name:
+                    Orderbool = True
+                    bpy.ops.pup.couplingorder()
+                    bpy.ops.pup.couplingorder()
+                    break
+        else:
+            unmapped_signal(context, data.objects[newname_mainplane])
 
         return{"FINISHED"}
 
 
-def coupModeDivision(context, CenterObj, newname_mainplane):
+def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped):
     data = bpy.data
 
     PUrP = bpy.context.scene.PUrP
@@ -154,18 +146,20 @@ def coupModeDivision(context, CenterObj, newname_mainplane):
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
         # add negativ object
         # loc.z += 0.45
-        ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff')
+        ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff', is_unmapped)
 
         # add positiv object
-        ob1 = genPrimitive(CenterObj, newname_mainplane, '_union')
+        ob1 = genPrimitive(CenterObj, newname_mainplane, '_union', is_unmapped)
         oversizeToPrim(context, singcoupmode(context, "2", None), ob0, ob1)
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":  # stick
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
-        ob0 = genPrimitive(CenterObj, newname_mainplane, '_stick_diff')
+        ob0 = genPrimitive(CenterObj, newname_mainplane,
+                           '_stick_diff', is_unmapped)
 
-        ob1 = genPrimitive(CenterObj, newname_mainplane, '_stick_fix')
+        ob1 = genPrimitive(CenterObj, newname_mainplane,
+                           '_stick_fix', is_unmapped)
 
         oversizeToPrim(context, singcoupmode(context, "1", None), ob0, ob1)
 
@@ -290,7 +284,7 @@ def applyScalRot(obj):
     mat @= trans
 
 
-def genPrimitive(CenterObj, newname_mainplane, nameadd):
+def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
     size = 1  # PUrP.CoupSize
@@ -389,6 +383,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
 
     # print(f"zscale should affect obj {context.object.name}")
     #
+
     mod = context.object.modifiers.new(
         name=context.object.name + "Bevel", type="BEVEL")  # bevelOption to the Subcoupling
     mod.width = PUrP.BevelOffset
@@ -397,17 +392,18 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd):
     context.object.display_type = 'WIRE'
     context.object.show_in_front = True
     context.object.hide_select = True
-
-    if ("_diff" in bpy.context.object.name) or ("_union" in bpy.context.object.name):
-        mod = CenterObj.modifiers.new(name=context.object.name, type="BOOLEAN")
-        mod.object = context.object
-        mod.show_viewport = False
-        if nameadd == "_diff":
-            mod.operation = 'DIFFERENCE'
-        elif nameadd == '_union':
-            mod.operation = 'UNION'
-    else:
-        pass
+    if not is_unmapped:
+        if ("_diff" in bpy.context.object.name) or ("_union" in bpy.context.object.name):
+            mod = CenterObj.modifiers.new(
+                name=context.object.name, type="BOOLEAN")
+            mod.object = context.object
+            mod.show_viewport = False
+            if nameadd == "_diff":
+                mod.operation = 'DIFFERENCE'
+            elif nameadd == '_union':
+                mod.operation = 'UNION'
+        else:
+            pass
 
     return context.object
 
@@ -773,17 +769,23 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
         for obj in selected:  # für die selektierten
             # deselct all
+
             for ob in context.selected_objects:
                 ob.select_set(False)
 
             CenterObj = obj.parent
             if is_coup(context, obj):  # eines meiner coupling
+                is_unmap = False
+                if is_unmapped(context, obj) or PUrP.AddUnmapped:
+                    is_unmap = True
                 viewportvis = True
-                for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
-                    if obj.name == mod.name:
-                        viewportvis = mod.show_viewport
-                    if obj.name in mod.name:
-                        obj.parent.modifiers.remove(mod)
+
+                if not is_unmap:
+                    for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
+                        if obj.name == mod.name:
+                            viewportvis = mod.show_viewport
+                        if obj.name in mod.name:
+                            obj.parent.modifiers.remove(mod)
 
                 for child in obj.children:  # lösche alle kinder
                     child.hide_select = False
@@ -803,23 +805,17 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     for ob in context.selected_objects:  # deselte all
                         ob.select_set(False)
                     obj.select_set(True)
-                    # delete the old planar coupling
-                    # print(f"I delete now mainplane in exchange {obj} ")
-                    # delete mainplane before making new planar
                     bpy.ops.object.delete(use_global=False)
 
                     # report stupidity
-                    if PUrP.SingleCouplingModes == "1" and C.scene.PUrP.SingleCouplingTypes == "3":
+                    if PUrP.SingleCouplingModes == "1" and context.scene.PUrP.SingleCouplingTypes == "3":
                         self.report(
                             {'WARNING'}, "Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
 
                     # generate new planar
-                    coupModeDivision(context, CenterObj, oldname)
+                    coupModeDivision(context, CenterObj, oldname, is_unmap)
                     context.object.matrix_world = trans
-                    # obj = context.object
-                    # obj.select_set(True)
-                    # context.object.location = loc
-                    #  ##planarversion
+
                 else:  # when it was SingleCoupling, the mainplane is kept
                     if "Plane" not in obj.data.name:
                         # print(f"2obj.data.name {obj.data.name}")
@@ -840,14 +836,14 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         obj = context.object
 
                     # obj.modifiers["PUrP_Solidify"].thickness = CutThickness
-
-                    mod = CenterObj.modifiers.new(
-                        name=obj.name, type="BOOLEAN")
-                    mod.show_viewport = viewportvis
-                    mod.object = obj
-                    mod.operation = 'DIFFERENCE'
+                    if not is_unmap:
+                        mod = CenterObj.modifiers.new(
+                            name=obj.name, type="BOOLEAN")
+                        mod.show_viewport = viewportvis
+                        mod.object = obj
+                        mod.operation = 'DIFFERENCE'
                     # obj.scale = mathutils.Vector((1, 1, 1))
-                    coupModeDivision(context, CenterObj, obj.name)
+                    coupModeDivision(context, CenterObj, obj.name, is_unmap)
                     # print(f"obj at rescale {obj}")
                     scalefactor = PUrP.GlobalScale * PUrP.CoupScale
                     obj.data.vertices[0].co = mathutils.Vector(
@@ -863,14 +859,16 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.view_layer.objects.active = obj
                     bpy.ops.object.transform_apply(
                         location=False, rotation=False, scale=True)
-
-        Orderbool = False
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order":
-                Orderbool = True
-                bpy.ops.pup.couplingorder()
-                bpy.ops.pup.couplingorder()
-                break
+                    if is_unmap:
+                        unmapped_signal(context, obj)
+        if not is_unmap:
+            Orderbool = False
+            for ob in data.objects:
+                if "PUrP" in ob.name and "_Order":
+                    Orderbool = True
+                    bpy.ops.pup.couplingorder()
+                    bpy.ops.pup.couplingorder()
+                    break
 
         return {'FINISHED'}
 
@@ -1256,6 +1254,7 @@ def unmapped_signal(context, coup):
     SignalText.location.x -= 0.3
     SignalText.scale = mathutils.Vector(
         (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+    context.view_layer.objects.active = coup
     print(f"coup {coup.name} was false with both daughters")
 
 
@@ -2279,8 +2278,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                     enter_editmode=False, location=(0, 0, 0))
                 obj = context.object
                 obj.name = modname + "_Order"
-                obj.scale = mathutils.Vector(
-                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+
                 obj.location.z += 0.5 * PUrP.GlobalScale
 
                 obj.data.body = str(num+1)
@@ -2292,6 +2290,12 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                 obj.matrix_world = matrixWorld
                 obj.rotation_euler.x = 1.5708
                 obj.location.x -= 0.3
+                obj.scale = mathutils.Vector(
+                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+                bpy.ops.object.transform_apply(
+                    location=False, rotation=False, scale=True)
+
+                context.view_layer.objects.active = CenterObj
         else:
             removePUrPOrder()
         context.view_layer.objects.active = data.objects[initialActivename]
@@ -2540,6 +2544,14 @@ def is_flat(context, coup):
     if "Single" in coup.name:
         if len(coup.children) == 1 or len(coup.children) == 0:
             return True
+    return False
+
+
+def is_unmapped(context, coup):
+    if coup.parent == None:
+        return True
+    elif coup.name not in coup.parent.modifiers:
+        return True
     return False
 
 

@@ -82,6 +82,8 @@ results
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [+] planar changes rotation, while active to setting 
 
+
+[] Versioncheck + exact/fast settings   
 [] unmap moves connector to origin
 [] remap unavalable by stick (?) --> poll 
 [] delete fails for unmapped
@@ -89,8 +91,6 @@ results
 
 [] exchange not working with unmapped (modifier in parent not there)
 
-[]\purp\ui.py", line 135, in draw
-    if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'
 
 [] single to multiple objects mf when wrong parent
 
@@ -116,13 +116,13 @@ results
    [] utf8 byte error hard to reproduce
 
 [] single add coup lands away from cursor
+[] 
 
+[] exchange doesn't respect viewport mod visibility
 
-[+] unmappe connector operator
-
-[] Operator Single to several CenterObj [+] ignore mainplaine option
+[+] Operator Single to several CenterObj [+] ignore mainplaine option
 [] reorganize UI 
-
+[]delete unmapped
 
 [] gizmot problem fragen
 
@@ -160,6 +160,9 @@ Publishing:
 
 
 resolved bug:
+[+]\purp\ui.py", line 135, in draw
+    if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'
+[+] unmappe connector operator
 [+] remap large planar arrays to multiple children of former apply 
 [+] bvh overlap missed all modifier settings
 [+] apply has problemes with strangers Modifiers 
