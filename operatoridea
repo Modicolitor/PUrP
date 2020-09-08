@@ -74,7 +74,7 @@ general operator bug:
 
 results 
 [] gizmos movement must scale with global
-[] globalscale in planar oversize/thicknessclaypoo
+[+ --> test] globalscale in planar oversize/thicknessclaypoo
 [] test oversize planar with global scale 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] Versioncheck + exact/fast settings   

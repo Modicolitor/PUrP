@@ -85,7 +85,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             # bpy.ops.object.modifier_add(type='SOLIDIFY')
             mod = context.object.modifiers.new(
                 name="PUrP_Solidify", type="SOLIDIFY")
-            mod.thickness = CutThickness
+            mod.thickness = CutThickness * GlobalScale 
             mod.offset = 1.0
             context.object.display_type = 'WIRE'
             # context.object.show_in_front = True
@@ -671,7 +671,7 @@ def genPlanar():
     # Solidify
     mod = obj.modifiers.new(name="PUrP_Solidify", type="SOLIDIFY")
 
-    mod.thickness = Oversize
+    mod.thickness = Oversize * PUrP.GlobalScale
     mod.offset = -1.0
     mod.solidify_mode = "NON_MANIFOLD"
     mod.nonmanifold_thickness_mode = 'CONSTRAINTS'
@@ -721,7 +721,7 @@ def newmainPlane(context, CenterObj):
     # bpy.ops.object.modifier_add(type='SOLIDIFY')
     mod = context.object.modifiers.new(
         name="PUrP_Solidify", type="SOLIDIFY")
-    mod.thickness = CutThickness
+    mod.thickness = CutThickness *  PUrP.GlobalScale
     mod.offset = 1.0
     context.object.display_type = 'WIRE'
     # context.object.show_in_front = True
