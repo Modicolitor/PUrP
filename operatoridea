@@ -74,53 +74,36 @@ general operator bug:
 
 results 
 [] gizmos movement must scale with global
-[-] can you add a coupling to a planar --> looks like not
-[] globalscale in planar oversize/thickness
+[] globalscale in planar oversize/thicknessclaypoo
 [] test oversize planar with global scale 
-[+] build volume with arrays and options
-[+] order must scale with 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
-[+] planar changes rotation, while active to setting 
-
-
 [] Versioncheck + exact/fast settings   
-[] unmap moves connector to origin
-[] remap unavalable by stick (?) --> poll 
+
+
 [] delete fails for unmapped
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 
-[] exchange not working with unmapped (modifier in parent not there)
+
+[] sometime unmap jumps connector? ground weird parenting ding
 
 
-[] single to multiple objects mf when wrong parent
-
-[] apply all --> error cObj in print not found 
-
-
-
-[---] forbid coupling to build plate  -->  seems to be alright
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 [] multiuser data
 
 [] flat cut no gizmos
-[] planar (flat) needs constant linedistance 
 [] poll functions for all operators 
-
-[] visibility 
-[+] exchange should keep the state of visibility
-[+?] active setting stopper height bool and Height*?*   (add rotated but not rotation applied)
-[+?] 90° rotated planar shows Coupscale gizmot problems in analyzer (Stopperheight error)
 
 [] apply all Problems 
    [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
    [] utf8 byte error hard to reproduce
-
+    [] apply all --> error cObj in print not found  
+    
 [] single add coup lands away from cursor
 [] 
 
-[] exchange doesn't respect viewport mod visibility
 
-[+] Operator Single to several CenterObj [+] ignore mainplaine option
+
+
 [] reorganize UI 
 []delete unmapped
 
@@ -160,6 +143,20 @@ Publishing:
 
 
 resolved bug:
+[---] forbid coupling to build plate  -->  seems to be alright
+[+] remap unavalable by stick (?) --> poll 
+[+] single to multiple objects mf when wrong parent
+[+] planar changes rotation, while active to setting 
+[+] unmap moves connector to origin
+[+] build volume with arrays and options
+[+] order must scale with 
+[+] exchange should keep the state of visibility
+[+?] active setting stopper height bool and Height*?*   (add rotated but not rotation applied)
+[+?] 90° rotated planar shows Coupscale gizmot problems in analyzer (Stopperheight error)
+
+[+] exchange doesn't respect viewport mod visibility
+[+] planar (flat) needs constant linedistance 
+[+] Operator Single to several CenterObj [+] ignore mainplaine option
 [+]\purp\ui.py", line 135, in draw
     if "BuildVolume" in context.object.name: AttributeError: 'NoneType' object has no attribute 'name'
 [+] unmappe connector operator
