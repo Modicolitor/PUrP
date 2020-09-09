@@ -78,6 +78,7 @@ results
 [] Versioncheck + exact/fast settings   
 
 [] delete fails for unmapped
+[] unmap poll: unmapped coups should be possible but ignored, coup + object should apply double 
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 
 
@@ -98,7 +99,7 @@ results
 [] single add coup lands away from cursor
 
 [] reorganize UI 
-[] delete unmapped
+
 
 [-] gizmot problem fragen
 

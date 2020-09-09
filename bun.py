@@ -2460,21 +2460,16 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
 class PP_OT_UnmapCoup(bpy.types.Operator):
     bl_idname = "object.pp_ot_unmapcoup"
     bl_label = "PP_OT_UnmapCoup"
+    bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
                 # print(f"context.object != None {context.object != None}")
-                if context.object.PUrPCobj:
+                if is_coup(context, context.object):
                     return True
-                elif context.object.parent != None:
-                    if context.object.parent.PUrPCobj:
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
+
         else:
             return False
 
@@ -2482,11 +2477,12 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
         PUrP = context.scene.PUrP
         selected = context.selected_objects[:]
         for coup in selected:
-            if is_planar(context, coup) or is_single(context, coup):
-                # coup.matrix_world = coup.parent.matrix_world
-                coup.parent = None
-                remove_coupmods(context, coup)
-                unmapped_signal(context, coup)
+            if not is_unmapped(context, coup):
+                if is_planar(context, coup) or is_single(context, coup):
+                    # coup.matrix_world = coup.parent.matrix_world
+                    coup.parent = None
+                    remove_coupmods(context, coup)
+                    unmapped_signal(context, coup)
 
         return {'FINISHED'}
 
@@ -2497,9 +2493,12 @@ def remove_coupmods(context, coup):
     data = bpy.data
 
     for ob in data.objects:
-        for mod in ob.modifiers:
-            if coup.name in mod.name:
-                ob.modifiers.remove(mod)
+        if not is_inlay(context, ob):
+            print(f"not is_inlay object {coup.name}")
+            for mod in ob.modifiers:
+                if coup.name in mod.name:
+
+                    ob.modifiers.remove(mod)
 
 
 def is_coup(context, coup):
@@ -2544,6 +2543,12 @@ def is_unmapped(context, coup):
     if coup.parent == None:
         return True
     elif coup.name not in coup.parent.modifiers:
+        return True
+    return False
+
+
+def is_inlay(context, coup):
+    if "diff" in coup.name or "union" in coup.name or "fix" in coup.name:
         return True
     return False
 
