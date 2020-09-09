@@ -83,7 +83,7 @@ results
 [] delete fails for unmapped
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 
-
+[] apply coup op error when not cut at all (with single stick)
 [] sometime unmap jumps connector? ground weird parenting ding
 
 

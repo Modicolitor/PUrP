@@ -988,7 +988,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
-                mod.show_viewport = True
+                #mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
 
@@ -997,7 +997,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
-                mod.show_viewport = True
+                #mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_union' == mod.name:
@@ -1088,11 +1088,10 @@ def removeCoupling(context, Coupl):
             bpy.ops.object.delete(use_global=False)
         elif 'fix' in child.name:
             child.hide_select = False
-            # active = child
-
             # apply bevel and stuff
             for mod in child.modifiers:
                 print(f"fix stick active {active} mod {mod.name}")
+                context.view_layer.objects.active = child
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             child.name = Coupl.parent.name
@@ -1302,13 +1301,6 @@ def applySingleCoup(context, Coup, CenterObj, delete):
         # apply rotation centerplane obj damit die vector rechnung funktioniert
         bpy.ops.object.transform_apply(
             location=False, rotation=True, scale=True)
-
-        # CouplingNormal = obj.data.vertices[0].normal.normalized()
-        # TESTARRIA
-        # for v in DaughterOne.data.vertices:
-        #    direction = CouplingNormal.dot(
-        #       v.co) - CouplingNormal.dot(obj.data.vertices[0].co)
-        # print(f"directon test  {v.index} direction {direction}")
 
         direction = SideOfPlane(context, obj, DaughterOne)
 
@@ -1894,7 +1886,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
 
-            PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness
+            PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness / \
+                PUrP.GlobalScale
             PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
             yv0 = self.obout.data.vertices[0].co.y
 
@@ -2006,7 +1999,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
 
-            PUrP.Oversize = obj.modifiers["PUrP_Solidify"].thickness
+            PUrP.Oversize = obj.modifiers["PUrP_Solidify"].thickness / \
+                PUrP.GlobalScale
             PUrP.LineDistance = obj.modifiers["PUrP_Array_2"].constant_offset_displace[1]
             PUrP.LineCount = obj.modifiers["PUrP_Array_2"].count
             PUrP.LineLength = obj.modifiers["PUrP_Array_1"].count
