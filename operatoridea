@@ -74,21 +74,13 @@ general operator bug:
 
 results 
 
+[] single add coup lands away from cursor
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] Versioncheck + exact/fast settings   
-
-[] delete fails for unmapped
-[] unmap poll: unmapped coups should be possible but ignored, coup + object should apply double 
 [] planar coupscale gizmot, only updates values after applying (low level problem)
-
-
 [] sometime unmap jumps connector? ground weird parenting ding
-
-
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 [] multiuser data
-
-[] flat cut no gizmos
 [] poll functions for all operators 
 
 [] apply all Problems 
@@ -96,12 +88,11 @@ results
    [] utf8 byte error hard to reproduce
     [] apply all --> error cObj in print not found  
     
-[] single add coup lands away from cursor
 
 [] reorganize UI 
 
 
-[-] gizmot problem fragen
+[] gizmot problem rausbekommen
 
 New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
@@ -112,14 +103,9 @@ mögliche Probleme
 [] Order System update system that stays out of the way 
 
 Tests
-[] apply all had a bad day try again 
 [] operator descriptions
 [] test linux, Mag
-[] Active settings with for global scale influence
-[] using globalsize
 [] move up and down with fremde modifiers 
-[]  Special Apply Operator:does modifier remain? 
-
 
 Publishing: 
 [] Small Website inkl. Documentation
@@ -137,6 +123,8 @@ Publishing:
 
 
 resolved bug:
+[+] delete fails for unmapped
+[+] unmap poll: unmapped coups should be possible but ignored, coup + object should apply double 
 [+] test oversize planar with global scale 
 [+] gizmos movement must scale with global
 [+ --> test] globalscale in planar oversize/thicknessclaypoo

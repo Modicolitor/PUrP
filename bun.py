@@ -860,14 +860,14 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         location=False, rotation=False, scale=True)
                     if is_unmap:
                         unmapped_signal(context, obj)
-        if not is_unmap:
-            Orderbool = False
-            for ob in data.objects:
-                if "PUrP" in ob.name and "_Order":
-                    Orderbool = True
-                    bpy.ops.pup.couplingorder()
-                    bpy.ops.pup.couplingorder()
-                    break
+            if not is_unmap:
+                Orderbool = False
+                for ob in data.objects:
+                    if "PUrP" in ob.name and "_Order":
+                        Orderbool = True
+                        bpy.ops.pup.couplingorder()
+                        bpy.ops.pup.couplingorder()
+                        break
 
         return {'FINISHED'}
 
@@ -1513,12 +1513,13 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                     child.select_set(True)
                     bpy.ops.object.delete(use_global=False)
 
-                # entferne modifier und zwar immer auch wenn es schon zerlegt ist
-                for mod in obj.parent.modifiers:
-                    # !!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
-                    if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_stick_fix' == mod.name) or (str(obj.name) + '_stick_diff' == mod.name) or (str(obj.name) == mod.name):
-                        print(f'I delete modifier {mod.name}')
-                        obj.parent.modifiers.remove(mod)
+                if not is_unmapped(context, obj):
+                    # entferne modifier und zwar immer auch wenn es schon zerlegt ist
+                    for mod in obj.parent.modifiers:
+                        # !!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
+                        if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_stick_fix' == mod.name) or (str(obj.name) + '_stick_diff' == mod.name) or (str(obj.name) == mod.name):
+                            print(f'I delete modifier {mod.name}')
+                            obj.parent.modifiers.remove(mod)
 
                 obj.select_set(True)
                 print(f'selected objects{context.selected_objects}')
