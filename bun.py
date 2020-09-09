@@ -1357,13 +1357,13 @@ def applySingleCoup(context, Coup, CenterObj, delete):
                     print(f"ReMV {mod.name} from DaughterOne")
                     DaughterOne.modifiers.remove(mod)
                     # DORemovedMod = True
-
-        for mod in DaughterTwo.modifiers:
-            if mod not in DTwoAllMods:
-                if "PUrP_" in mod.name:
-                    print(f"ReMV {mod.name} from DaughterTwo")
-                    DaughterTwo.modifiers.remove(mod)
-                    # DTRemovedMod = True
+        if DaughterTwo != None:
+            for mod in DaughterTwo.modifiers:
+                if mod not in DTwoAllMods:
+                    if "PUrP_" in mod.name:
+                        print(f"ReMV {mod.name} from DaughterTwo")
+                        DaughterTwo.modifiers.remove(mod)
+                        # DTRemovedMod = True
 
         # delete Coupling
 

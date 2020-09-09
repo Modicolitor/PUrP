@@ -73,17 +73,14 @@ general operator bug:
 
 
 results 
-[] gizmos movement must scale with global
-[+ --> test] globalscale in planar oversize/thicknessclaypoo
-[] test oversize planar with global scale 
+
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] Versioncheck + exact/fast settings   
-
 
 [] delete fails for unmapped
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 
-[] apply coup op error when not cut at all (with single stick)
+
 [] sometime unmap jumps connector? ground weird parenting ding
 
 
@@ -99,19 +96,15 @@ results
     [] apply all --> error cObj in print not found  
     
 [] single add coup lands away from cursor
-[] 
-
-
-
 
 [] reorganize UI 
-[]delete unmapped
+[] delete unmapped
 
-[] gizmot problem fragen
+[-] gizmot problem fragen
 
 New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
-
+[] shift increase precision of Gizmos
 
 
 mögliche Probleme
@@ -143,6 +136,10 @@ Publishing:
 
 
 resolved bug:
+[+] test oversize planar with global scale 
+[+] gizmos movement must scale with global
+[+ --> test] globalscale in planar oversize/thicknessclaypoo
+[+] apply coup op error when not cut at all (with single stick)
 [---] forbid coupling to build plate  -->  seems to be alright
 [+] remap unavalable by stick (?) --> poll 
 [+] single to multiple objects mf when wrong parent

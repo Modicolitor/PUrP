@@ -1963,7 +1963,7 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
     def execute(self, context):
         ob = context.object
 
-        ob.modifiers["PUrP_Array_2"].relative_offset_displace[1] = self.value
+        ob.modifiers["PUrP_Array_2"].constant_offset_displace[1] = self.value
 
         context.scene.PUrP.LineDistance = self.value
         return {'FINISHED'}
@@ -1973,7 +1973,7 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta / 1000
+            self.value = self.init_count + self.delta * self.GlobalScale / 100
 
             self.execute(context)
 
@@ -1988,13 +1988,13 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         ob = context.object
-
+        self.GlobalScale = context.scene.PUrP.GlobalScale
         self.init_value = event.mouse_y
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+        self.value = ob.modifiers["PUrP_Array_2"].constant_offset_displace[1]
 
-        self.init_count = ob.modifiers["PUrP_Array_2"].relative_offset_displace[1]
+        self.init_count = ob.modifiers["PUrP_Array_2"].constant_offset_displace[1]
 
         self.execute(context)
 
