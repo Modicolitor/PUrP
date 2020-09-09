@@ -85,7 +85,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             # bpy.ops.object.modifier_add(type='SOLIDIFY')
             mod = context.object.modifiers.new(
                 name="PUrP_Solidify", type="SOLIDIFY")
-            mod.thickness = CutThickness * GlobalScale 
+            mod.thickness = CutThickness * GlobalScale
             mod.offset = 1.0
             context.object.display_type = 'WIRE'
             # context.object.show_in_front = True
@@ -721,7 +721,7 @@ def newmainPlane(context, CenterObj):
     # bpy.ops.object.modifier_add(type='SOLIDIFY')
     mod = context.object.modifiers.new(
         name="PUrP_Solidify", type="SOLIDIFY")
-    mod.thickness = CutThickness *  PUrP.GlobalScale
+    mod.thickness = CutThickness * PUrP.GlobalScale
     mod.offset = 1.0
     context.object.display_type = 'WIRE'
     # context.object.show_in_front = True
@@ -779,7 +779,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 if is_unmapped(context, obj) or PUrP.AddUnmapped:
                     is_unmap = True
                 viewportvis = True
-
                 if not is_unmap:
                     for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
                         if obj.name == mod.name:
@@ -835,7 +834,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         data.objects[newname].matrix_world = trans
                         obj = context.object
 
-                    # obj.modifiers["PUrP_Solidify"].thickness = CutThickness
+                    obj.modifiers["PUrP_Solidify"].thickness = CutThickness * GlobalScale
                     if not is_unmap:
                         mod = CenterObj.modifiers.new(
                             name=obj.name, type="BOOLEAN")

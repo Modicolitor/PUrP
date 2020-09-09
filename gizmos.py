@@ -702,8 +702,9 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
             ob.modifiers["PUrP_Solidify"].thickness = 0
             #context.scene.PUrP.Oversize = 0
         else:
-            ob.modifiers["PUrP_Solidify"].thickness = self.value
-            #context.scene.PUrP.Oversize = self.value
+            ob.modifiers["PUrP_Solidify"].thickness = self.value * \
+                self.GlobalScale
+            context.scene.PUrP.CutThickness = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -719,7 +720,8 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            ob.modifiers["PUrP_Solidify"].thickness = self.init_count
+            ob.modifiers["PUrP_Solidify"].thickness = self.init_count * \
+                self.GlobalScale
 
             return {'CANCELLED'}
 
@@ -727,9 +729,12 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         ob = context.object
+        PUrP = context.scene.PUrP
+        self.GlobalScale = PUrP.GlobalScale
         self.init_value = event.mouse_y
-        self.value = ob.modifiers["PUrP_Solidify"].thickness
-        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
+        self.value = ob.modifiers["PUrP_Solidify"].thickness / self.GlobalScale
+        self.init_count = ob.modifiers["PUrP_Solidify"].thickness / \
+            self.GlobalScale
 
         self.execute(context)
 
@@ -2017,12 +2022,13 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
             ob.modifiers["PUrP_Solidify"].thickness = 0
             context.scene.PUrP.Oversize = 0
         else:
-            ob.modifiers["PUrP_Solidify"].thickness = self.value
+            ob.modifiers["PUrP_Solidify"].thickness = self.value * \
+                self.GlobalScale
             context.scene.PUrP.Oversize = self.value
         return {'FINISHED'}
 
     def modal(self, context, event):
-
+        ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
 
             self.delta = event.mouse_y - self.init_value
@@ -2034,7 +2040,9 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
-            ob.modifiers["PUrP_Solidify"].thickness = self.init_count
+            ob.modifiers["PUrP_Solidify"].thickness = self.init_count * \
+                self.GlobalScale
+            self.GlobalScale
 
             return {'CANCELLED'}
 
@@ -2042,16 +2050,18 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
 
     def invoke(self, context, event):
         ob = context.object
-
+        PUrP = context.scene.PUrP
+        self.GlobalScale = PUrP.GlobalScale
         self.init_value = event.mouse_y
 
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
-        self.value = ob.modifiers["PUrP_Solidify"].thickness
+        self.value = ob.modifiers["PUrP_Solidify"].thickness / self.GlobalScale
 
         #helpi = [str(ob.modifiers["PUrP_Solidify"].thickness)]
 
         # float(helpi[0])
-        self.init_count = ob.modifiers["PUrP_Solidify"].thickness
+        self.init_count = ob.modifiers["PUrP_Solidify"].thickness / \
+            self.GlobalScale
 
         self.execute(context)
 
