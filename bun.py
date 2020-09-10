@@ -1501,25 +1501,32 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
         objects = bpy.data.objects
         selected = context.selected_objects[:]
 
+        coups = []
         for obj in selected:
-            if ("SingleConnector" in obj.name) or ("PlanarConnector" in obj.name):
-                # clean selection array
-                for ob in context.selected_objects:
-                    ob.select_set(False)
+            #print("obj in delete schleife {obj}")
+            if is_coup(context, obj):
+                coups.append(obj)
 
-                    # name_active = obj.name
-                for child in obj.children:
-                    child.hide_select = False
-                    child.select_set(True)
-                    bpy.ops.object.delete(use_global=False)
+        print(f"coups are {coups}")
+        for obj in coups:
+            # clean selection array
+            print("OBj check when it crash {obj.name}")
+            for ob in context.selected_objects:
+                ob.select_set(False)
 
-                if not is_unmapped(context, obj):
-                    # entferne modifier und zwar immer auch wenn es schon zerlegt ist
-                    for mod in obj.parent.modifiers:
-                        # !!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
-                        if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_stick_fix' == mod.name) or (str(obj.name) + '_stick_diff' == mod.name) or (str(obj.name) == mod.name):
-                            print(f'I delete modifier {mod.name}')
-                            obj.parent.modifiers.remove(mod)
+                # name_active = obj.name
+            for child in obj.children:
+                child.hide_select = False
+                child.select_set(True)
+                bpy.ops.object.delete(use_global=False)
+
+            if not is_unmapped(context, obj):
+                # entferne modifier und zwar immer auch wenn es schon zerlegt ist
+                for mod in obj.parent.modifiers:
+                    # !!!!!!!!!!Das wird ein BUG     weil auch die ohne nummer gelöscht werden siehe lange zeile unten
+                    if (str(obj.name) + '_diff' == mod.name) or (str(obj.name) + '_union' == mod.name) or (str(obj.name) + '_stick_fix' == mod.name) or (str(obj.name) + '_stick_diff' == mod.name) or (str(obj.name) == mod.name):
+                        print(f'I delete modifier {mod.name}')
+                        obj.parent.modifiers.remove(mod)
 
                 obj.select_set(True)
                 print(f'selected objects{context.selected_objects}')
@@ -2504,7 +2511,8 @@ def remove_coupmods(context, coup):
 
 def is_coup(context, coup):
     if "PUrP" in coup.name:
-        if is_single(context, coup) or is_planar:
+        if is_single(context, coup) or is_planar(context, coup):
+            print(f"Coup positiv in Single {coup.name}")
             return True
     return False
 
@@ -2514,7 +2522,11 @@ def is_planar(context, coup):
 
 
 def is_single(context, coup):
-    return "Single" in coup.name
+    if "Single" in coup.name:
+        if not is_inlay(context, coup):
+            #print(f"Coup positiv in Single {coup.name}")
+            return True
+    return False
 
 
 def is_mf(context, coup):
