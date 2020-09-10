@@ -1690,7 +1690,7 @@ class PP_OT_MoveModDown(bpy.types.Operator):
 
         if (context.view_layer.objects.active != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
+                if is_single(context, context.object) or is_planar(context, context.object):
                     return True
         else:
             return False
@@ -1724,7 +1724,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
         if (context.view_layer.objects.active != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
+                if is_single(context, context.object) or is_planar(context, context.object):
                     return True
         else:
             return False
@@ -1877,7 +1877,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
     def poll(cls, context):
         if (context.view_layer.objects.active != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
+                if is_single(context, context.object) or is_planar(context, context.object):
                     return True
         else:
             return False
@@ -2380,25 +2380,19 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
                 # print(f"context.object != None {context.object != None}")
-                if context.object.PUrPCobj:
-                    return True
-                elif context.object.parent != None:
-                    if context.object.parent.PUrPCobj:
+                if not is_coup(context, context.object):
+                    if len(context.selected_objects) > 1:
                         return True
-                    else:
-                        return False
-                else:
-                    return False
-        else:
-            return False
+
+        return False
 
     def execute(self, context):
 
         selected = context.selected_objects[:]
         active = context.object
         CenterObj = active
-        if "SingleConnector" in active.name or "Planar" in active.name:
-            print("Active Object ")
+        if is_coup(context, active):
+            #print("Active Object ")
             self.report({'WARNING'}, "Active object is a connector!")
             return {'FINISHED'}
         elif not CenterObj.PUrPCobj:
@@ -2516,7 +2510,7 @@ def remove_coupmods(context, coup):
 def is_coup(context, coup):
     if "PUrP" in coup.name:
         if is_single(context, coup) or is_planar(context, coup):
-            print(f"Coup positiv in Single {coup.name}")
+
             return True
     return False
 
@@ -2620,6 +2614,17 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
     bl_label = "PP_OT_ApplyPlanarMultiObj"
     bl_options = {'REGISTER', "UNDO"}
 
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if len(context.selected_objects) > 1:
+                    if is_planar(context, context.object):
+                        return True
+
+        else:
+            return False
+
     def execute(self, context):
 
         coup = bpy.data.objects[context.object.name]
@@ -2627,9 +2632,8 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
         # Centerobjects sammeln
         CenterObjs = []
         for ob in context.selected_objects:
-            if ob != coup:
-                if "SingleConnector" not in ob.name and "PlanarConnector" not in ob.name:  # fail selection
-                    CenterObjs.append(ob)
+            if not is_coup(context, ob):  # fail selection
+                CenterObjs.append(ob)
 
         # suchen nach dem Centerobj mit dem Planar?
         OriCenterObj = coup.parent
@@ -2671,18 +2675,33 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
     bl_label = "PP_OT_ApplyMultiplePlanarToObject"
     bl_options = {'REGISTER', "UNDO"}
 
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                if not is_planar(context, context.object) and not is_single(context, context.object):
+                    if len(context.selected_objects) > 1:
+                        for ob in context.selected_objects:
+                            if is_planar(context, ob):
+                                return True
+
+        return False
+
     def execute(self, context):
-        coups = context.selected_objects[:]
+        selected = context.selected_objects[:]
         CenterObj = bpy.data.objects[context.object.name]
 
+        coups = []
         # deselect all for the separate by selection
-        for ob in context.selected_objects:
+        for ob in selected:
             ob.select_set(False)
+            if is_planar(context, ob):
+                coups.append(ob)
 
         # check for modifier
         for coup in coups:
-            if "PlanarConnector" not in coup.name:
-                continue
+            # if "PlanarConnector" not in coup.name:
+            #    continue
             is_coup = False
             for mod in CenterObj.modifiers:
                 if mod.name == coup.name:
@@ -2729,6 +2748,19 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     bl_label = "PP_OT_ApplySingleToObjects"
     bl_options = {'REGISTER', "UNDO"}
 
+    @classmethod
+    def poll(cls, context):
+        if (context.object != None):
+            if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+                # print(f"context.object != None {context.object != None}")
+                if is_coup(context, context.object):
+                    if len(context.selected_objects) > 1:
+                        for ob in context.selected_objects:
+                            if is_single(context, ob):
+                                return True
+
+        return False
+
     def execute(self, context):
         data = bpy.data
         coup = bpy.data.objects[context.object.name]
@@ -2752,6 +2784,9 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
             if ob != coup:
                 if not is_coup(context, ob):
                     CenterObjs.append(ob)
+        # break when only coup was selected
+        if len(CenterObjs) == 0:
+            return{'FINISHED'}
 
         # find the CenterObj with the closest distance to the mainplane
         # distancelist = []

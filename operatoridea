@@ -27,13 +27,13 @@ after applying
 bugs:
 general operator bug:
 
-[] single add coup lands away from cursor
+
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] Versioncheck + exact/fast settings   
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 [] sometime unmap jumps connector? ground weird parenting ding
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
-[] multiuser data
+[?] multiuser data??????
 [] poll functions for all operators 
 
 [] apply all Problems 
@@ -41,6 +41,7 @@ general operator bug:
    [] utf8 byte error hard to reproduce
     [] apply all --> error cObj in print not found  
     
+[] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
 
 [] reorganize UI 
 
@@ -51,9 +52,6 @@ New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
 [] shift increase precision of Gizmos
 
-
-mögliche Probleme
-[] Order System update system that stays out of the way 
 
 Tests
 [] operator descriptions
@@ -76,6 +74,7 @@ Publishing:
 
 
 resolved bug:
+[+] single add coup lands away from cursor
 [+] delete multiple (at least if wrong things are selected) fail
 [+] delete fails for unmapped
 [+] unmap poll: unmapped coups should be possible but ignored, coup + object should apply double 
