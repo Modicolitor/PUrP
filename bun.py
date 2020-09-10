@@ -106,11 +106,15 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         coupModeDivision(context, CenterObj, newname_mainplane, is_unmap)
 
+        CObCo = CenterObj.location
+        CurCo = cursorloc
+        cursorlocrelativ = CurCo - CObCo
+
         if PUrP.SingleCouplingModes != "4":
-            data.objects[newname_mainplane].location = cursorloc
+            data.objects[newname_mainplane].location = cursorlocrelativ
 
         elif PUrP.SingleCouplingModes == "4":
-            context.object.location = cursorloc
+            context.object.location = cursorlocrelativ
             # context.object.select_set(True)
 
         context.scene.cursor.location = cursorlocori
