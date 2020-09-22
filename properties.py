@@ -59,6 +59,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Add with Viewport Visibility", default=True)
     AddUnmapped = bpy.props.BoolProperty(
         name="Add with Connector without center object", default=False)
+    ExactOptBool = bpy.props.BoolProperty(
+        name="Is Exactoption in Bool available", default=True)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
@@ -108,5 +110,13 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ('2', 'Male-Female', ''),
                ('3', 'FlatCut', ''),
                ('4', 'Planar', ''),
+               ]
+    )
+
+    BoolModSettings = bpy.props.EnumProperty(
+        name='BoolModSettings',
+        description='Mode selection in Bool Modifier',
+        items=[('1', 'Exact', ''),
+               ('2', 'Fast', ''),
                ]
     )

@@ -100,6 +100,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
                     mod.show_viewport = True
                 mod.object = data.objects[newname_mainplane]
                 mod.operation = 'DIFFERENCE'
+                set_BoolSolver(context, mod)
 
         else:
             newname_mainplane = "Null"  # for planar
@@ -402,6 +403,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
                 name=context.object.name, type="BOOLEAN")
             mod.object = context.object
             mod.show_viewport = False
+            set_BoolSolver(context, mod)
             if nameadd == "_diff":
                 mod.operation = 'DIFFERENCE'
             elif nameadd == '_union':
@@ -687,6 +689,7 @@ def genPlanar():
     mod = obj.parent.modifiers.new(name=obj.name, type="BOOLEAN")
     mod.operation = 'DIFFERENCE'
     mod.object = obj
+    set_BoolSolver(context, mod)
     print(f"Active after planar generation {context.object}, obj is {obj}")
 
     return obj
@@ -845,6 +848,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         mod.show_viewport = viewportvis
                         mod.object = obj
                         mod.operation = 'DIFFERENCE'
+                        set_BoolSolver(context, mod)
                     # obj.scale = mathutils.Vector((1, 1, 1))
                     coupModeDivision(context, CenterObj, obj.name, is_unmap)
                     # print(f"obj at rescale {obj}")
@@ -1815,6 +1819,11 @@ class PP_OT_Ini(bpy.types.Operator):
         # bpy.types.Scene.PUrP.PUrP_name = bpy.props.StringProperty()
         PUrP = bpy.context.scene.PUrP
         PUrP.PUrP_name = "PUrP_"
+
+        version = float(bpy.app.version_string[:4])
+        print(f"Blender version is {version} vergleich {version <= 2.90}")
+        if version <= 2.90:
+            PUrP.ExactOptBool = False
         # PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
         # CylVert
 
@@ -1886,8 +1895,16 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         PUrP = context.scene.PUrP
         obj = context.object
 
-        if "SingleConnector" in obj.name:
+        if is_single(context, obj):
             children = obj.children
+            if PUrP.ExactOptBool:
+                if is_unmapped(context, obj):
+                    PUrP.BoolModSettings = '1'
+                else:
+                    if obj.parent.modifiers[obj.name].solver == 'EXACT':
+                        PUrP.BoolModSettings = '1'
+                    elif obj.parent.modifiers[obj.name].solver == 'FAST':
+                        PUrP.BoolModSettings = '2'
             # order correction
             for child in children:
                 if "diff" in child.name:
@@ -1972,7 +1989,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 PUrP.Oversize = (abs(outpoint) - abs(inpoint)
                                  ) / PUrP.GlobalScale
 
-        elif "PlanarConnector" in obj.name:
+        elif is_planar(context, obj):
             PUrP.SingleCouplingModes = "4"
             if "Cubic" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "1"
@@ -2006,6 +2023,15 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 PUrP.PlanarCouplingTypes = "15"
             elif "T-Straight" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "16"
+
+            if PUrP.ExactOptBool:
+                if is_unmapped:
+                    PUrP.BoolModSettings = '1'
+                else:
+                    if obj.parent.modifier[obj.name + "_diff"].solver == 'EXACT':
+                        PUrP.BoolModSettings = '1'
+                    elif obj.parent.modifier[obj.name + "_diff"].solver == 'FAST':
+                        PUrP.BoolModSettings = '2'
 
             # Apply scale e.g. zscale determination
             bpy.ops.object.transform_apply(
@@ -2369,6 +2395,15 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+def set_BoolSolver(context, mod):
+    PUrP = context.scene.PUrP
+    if PUrP.ExactOptBool:
+        if PUrP.BoolModSettings == '1':
+            mod.solver = 'EXACT'
+        elif PUrP.BoolModSettings == '2':
+            mod.solver = 'FAST'
+
+
 class PP_OT_ReMapCoups(bpy.types.Operator):
     '''Remap selected couplings to active centerobject'''
     bl_idname = "object.remapcoups"
@@ -2422,9 +2457,11 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
                 if "SingleConnector" in coup.name:
                     mod = CenterObj.modifiers.new(
                         name=coup.name, type="BOOLEAN")
+
                     mod.object = coup
                     mod.operation = 'DIFFERENCE'
                     mod.show_viewport = True
+                    set_BoolSolver(context, mod)
 
                     # inlay modifiers
                     for child in coup.children:
@@ -2433,6 +2470,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
                                 name=child.name, type="BOOLEAN")
                             mod.object = child
                             mod.show_viewport = False
+                            set_BoolSolver(context, mod)
                             if "_diff" in child.name:
                                 mod.operation = 'DIFFERENCE'
                             elif '_union' in child.name:
@@ -2443,6 +2481,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
                     mod.object = coup
                     mod.operation = 'DIFFERENCE'
                     mod.show_viewport = True
+                    set_BoolSolver(context, mod)
 
                 matrix_w = coup.matrix_world
 
@@ -2651,6 +2690,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
                 mod = CenterObj.modifiers.new(coup.name, 'BOOLEAN')
                 mod.object = coup
                 mod.operation = 'DIFFERENCE'
+                set_BoolSolver(context, mod)
 
             context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
@@ -2807,21 +2847,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 union = child
 
         # OverLapCenterObj = OverLapCenterObjs[0]  # not lösung erstmal
-        '''
-        # add mainplane as parent to the closest CenterObj, when ignore Mainplane False
-        if not PUrP.IgnoreMainCut:
-            # is the coup connected to another CenterObj
-            if coup.parent != OverLapCenterObj:
-                # remove old parent
-                for mod in coup.parent.modifiers:
-                    if coup.name in mod.name:
-                        coup.parent.modifiers.remove(mod)
-                # add new parent
-                coup.parent = NewCenterObj
-                mod = NewCenterObj.modifiers.new(coup.name, 'BOOLEAN')
-                mod.object = coup
-                mod.operation = 'DIFFERENCE'
-        '''
+
         # add inlay mods to CenterObjs
         print(CenterObjs)
 
@@ -3002,6 +3028,7 @@ def ensure_mod(context, ele, CObj, nameadd):
         type='BOOLEAN', name=modname)
     mod.object = data.objects[modname]
     mod.operation = "DIFFERENCE"
+    set_BoolSolver(context, mod)
 
 
 def lowest_value(vectorlist, dim):

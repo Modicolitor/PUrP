@@ -33,7 +33,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 pass
 
             subcol = col.column()
-            #subcol.label(text="Coupling Mode")
+            # subcol.label(text="Coupling Mode")
             # subcol.label(text="AddingCouplings")
 
             subcol.operator("add.coup", text="Add Coupling",
@@ -49,13 +49,15 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                 subcol.prop(PUrP, "SingleCouplingTypes", text='Coupling Type')
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text='Coupling Type')
+            if context.scene.PUrP.ExactOptBool:
+                subcol.prop(PUrP, "BoolModSettings", text='Solver')
             subcol.prop(PUrP, "GlobalScale", text='Global Scale')
             subcol.prop(PUrP, "CoupScale", text='Connector Scale')
 
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":  # cylinder cone
                 subcol.prop(context.scene.PUrP, "CylVert", text='Vertices')
                 subcol.prop(context.scene.PUrP, "aRadius", text='Radius')
-                #subcol.prop(PUrP, "aRadius", text='Radius 1')
+                # subcol.prop(PUrP, "aRadius", text='Radius 1')
                 if PUrP.SingleCouplingTypes == "3":
                     subcol.prop(PUrP, "bRadius", text='Radius Top')
 
@@ -87,6 +89,7 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                     subcol.enabled = True
                 if PUrP.StopperBool:
                     subcol.prop(PUrP, "StopperHeight", text='Stopper Height')
+
             subcol.prop(PUrP, "ViewPortVisAdd",
                         text='Add with Viewport Visibility')
             subcol.prop(PUrP, "AddUnmapped",
@@ -159,7 +162,7 @@ class PP_PT_PuzzlePrintActive(bpy.types.Panel):
     
     
     
-    #schreibe auf den Bildschirm
+    # schreibe auf den Bildschirm
     def draw(self, context):
         
 

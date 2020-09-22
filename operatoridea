@@ -26,10 +26,10 @@ after applying
 
 bugs:
 general operator bug:
-
+[] L/ROFfset planar widget moves more than to zero
 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
-[] Versioncheck + exact/fast settings   
+
 [] planar coupscale gizmot, only updates values after applying (low level problem)
 [] sometime unmap jumps connector? ground weird parenting ding
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
@@ -46,7 +46,7 @@ general operator bug:
 [] reorganize UI 
 
 
-[] gizmot problem rausbekommen
+
 
 New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
@@ -74,6 +74,8 @@ Publishing:
 
 
 resolved bug:
+[+] Versioncheck + exact/fast settings   
+[+] gizmot problem rausbekommen --> Blender Bug in 2.91 a lot better
 [+] single add coup lands away from cursor
 [+] delete multiple (at least if wrong things are selected) fail
 [+] delete fails for unmapped
