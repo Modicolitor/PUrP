@@ -1518,12 +1518,18 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        for v in self.rightestV:
-            v.co.x = self.value
-
         PUrP = context.scene.PUrP
-        context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x - \
-            1.5*self.coupfaktor * PUrP.CoupScale
+        korrvalue = self.value - 1.5*self.coupfaktor * PUrP.CoupScale
+        PUrP.OffsetRight = korrvalue
+        print(self.value)
+        if korrvalue >= 0:
+            for v in self.rightestV:
+                v.co.x = self.value
+            else:
+                pass
+
+        # context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x - \
+        #    1.5*self.coupfaktor * PUrP.CoupScale
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -1588,13 +1594,18 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-
-        for v in self.leftestV:
-            v.co.x = self.value
-
         PUrP = context.scene.PUrP
-        PUrP.OffsetLeft = - \
-            ob.data.vertices[1].co.x - 1.5*self.coupfaktor * PUrP.CoupScale
+        korrvalue = -self.value - 1.5*self.coupfaktor * PUrP.CoupScale
+        PUrP.OffsetLeft = korrvalue
+        print(self.value)
+        if korrvalue >= 0:
+            for v in self.leftestV:
+                v.co.x = self.value
+            else:
+                pass
+
+        # PUrP.OffsetLeft = - \
+        #    ob.data.vertices[1].co.x - 1.5*self.coupfaktor * PUrP.CoupScale
         return {'FINISHED'}
 
     def modal(self, context, event):
