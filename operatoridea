@@ -26,7 +26,7 @@ after applying
 
 bugs:
 general operator bug:
-[] L/ROFfset planar widget moves more than to zero
+
 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 
@@ -43,7 +43,7 @@ general operator bug:
     
 [] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
 
-[+] reorganize UI 
+
 [ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
 [ ]  exchange single doesn'T respect add with/out visibility 
 
@@ -75,6 +75,8 @@ Publishing:
 
 
 resolved bug:
+[+] L/ROFfset planar widget moves more than to zero
+[+] reorganize UI 
 [+] Versioncheck + exact/fast settings   
 [+] gizmot problem rausbekommen --> Blender Bug in 2.91 a lot better
 [+] single add coup lands away from cursor

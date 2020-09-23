@@ -782,9 +782,12 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
             CenterObj = obj.parent
             if is_coup(context, obj):  # eines meiner coupling
+                correctname(context, coup)
+
                 is_unmap = False
                 if is_unmapped(context, obj) or PUrP.AddUnmapped:
                     is_unmap = True
+
                 viewportvis = True
                 if not is_unmap:
                     for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
@@ -2441,9 +2444,9 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
 
         for coup in selected:
             if coup != CenterObj:
+                correctname(context, coup)
                 # collect all coup mods of the selected to delete from potential parent
                 if coup.parent != None:
-
                     if "PUrP" in coup.name:
                         Couplist = []
                         # only the one in the list in this case
@@ -2522,6 +2525,7 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
         PUrP = context.scene.PUrP
         selected = context.selected_objects[:]
         for coup in selected:
+            correctname(context, coup)
             if not is_unmapped(context, coup):
                 if is_planar(context, coup) or is_single(context, coup):
                     # coup.matrix_world = coup.parent.matrix_world
