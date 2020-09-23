@@ -143,6 +143,7 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped):
     # Oversize = PUrP.Oversize
     # zScale = PUrP.zScale
     GlobalScale = PUrP.GlobalScale
+    print(f"CenterObj in coupmode division {CenterObj}")
     if PUrP.SingleCouplingModes == "3":                     # flatCut
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
         newMain = data.objects[newname_mainplane]
@@ -171,7 +172,7 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped):
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "4":
-        newMain = genPlanar()
+        newMain = genPlanar(context, CenterObj)
     # Adjustment for globalscale
     # newMain.scale = mathutils.Vector((GlobalScale, GlobalScale, GlobalScale))
 
@@ -299,6 +300,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     bRadius = PUrP.bRadius
     data = bpy.data
 
+    #print(f"CenterObj in gen primitive {CenterObj}")
     loc = mathutils.Vector((0, 0, 0))
     if PrimTypes == "1":
         bpy.ops.mesh.primitive_cube_add(size=size, location=loc)
@@ -414,15 +416,15 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     return context.object
 
 
-def genPlanar():
-    context = bpy.context
+def genPlanar(context, CenterObj):
+    #context = bpy.context
     PUrP = bpy.context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
     LineLength = PUrP.LineLength
     LineCount = PUrP.LineCount
     LineDistance = PUrP.LineDistance
     Oversize = PUrP.Oversize
-    CenterObj = PUrP.CenterObj
+    #CenterObj = PUrP.CenterObj
     GlobalScale = PUrP.GlobalScale
     CoupSize = PUrP.CoupSize
     CutThickness = PUrP.CutThickness
@@ -753,9 +755,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
         context = bpy.context
         data = bpy.data
-
-        # muss CenterOBj erst bestimmt werden ???
-        # CenterObj = context.scene.PUrP.CenterObj
         PUrP = context.scene.PUrP
         CutThickness = PUrP.CutThickness
         GlobalScale = PUrP.GlobalScale
@@ -767,12 +766,18 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
         for obj in selected:  # für die selektierten
             # deselct all
 
-            for ob in context.selected_objects:
-                ob.select_set(False)
-
-            CenterObj = obj.parent
             if is_coup(context, obj):  # eines meiner coupling
+
+                for ob in context.selected_objects:
+                    ob.select_set(False)
+
                 correctname(context, obj)
+                if not is_unmapped(context, obj):
+                    CenterObj = obj.parent
+                    print("Parent to CenterObj Exchange")
+                else:
+                    CenterObj = PUrP.CenterObj
+                    print("OldData to CenterObj Exchange")
 
                 is_unmap = False
                 if is_unmapped(context, obj) or PUrP.AddUnmapped:
@@ -816,6 +821,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.object.matrix_world = trans
 
                 else:  # when it was SingleCoupling, the mainplane is kept
+
                     if "Plane" not in obj.data.name:
                         # print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
@@ -989,7 +995,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}. Active obj: {active.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
-                #mod.show_viewport = True
+                # mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
 
@@ -998,7 +1004,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
-                #mod.show_viewport = True
+                # mod.show_viewport = True
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_union' == mod.name:
@@ -1504,7 +1510,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
         coups = []
         for obj in selected:
-            #print("obj in delete schleife {obj}")
+            # print("obj in delete schleife {obj}")
             if is_coup(context, obj):
                 coups.append(obj)
 
@@ -2206,7 +2212,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         active = context.object
         CenterObj = active
         if is_coup(context, active):
-            #print("Active Object ")
+            # print("Active Object ")
             self.report({'WARNING'}, "Active object is a connector!")
             return {'FINISHED'}
         elif not CenterObj.PUrPCobj:
@@ -2625,12 +2631,12 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         bpy.ops.object.modifier_apply(
                             apply_as='DATA', modifier=coup.name + "_union")
                         remove_mod(context, coup, Cob, "")
-                        #remove_mod(context, diff, Cob, "")
+                        # remove_mod(context, diff, Cob, "")
                     else:
                         # union + das Cobjs
                         # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
                         foundCob = Cob
-                        #applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
+                        # applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
                 else:  # wenn nicht zentraler CObj mach nur ein loch
                     # nur diff teil wichtig
                     # check ob Cobj den mod hat
@@ -2659,7 +2665,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             else:
                                 applySingleCoup(
                                     context, coup, foundCob, True)
-                                #removeCoupling(context, coup)
+                                # removeCoupling(context, coup)
 
         return {'FINISHED'}
 
@@ -2918,11 +2924,11 @@ def correctname(context, coup):
 
                 CoupCo = coup.location
                 Globalloc = CoupCo + CObCo
-                #matrix_world = coup.matrix_world
+                # matrix_world = coup.matrix_world
                 coup.parent = None
                 remove_coupmods(context, coup)
                 unmapped_signal(context, coup)
-                #coup.matrix_world = matrix_world
+                # coup.matrix_world = matrix_world
                 coup.location = Globalloc
 
     # return True
@@ -2966,7 +2972,7 @@ def is_planar(context, coup):
 def is_single(context, coup):
     if "Single" in coup.name:
         if not is_inlay(context, coup):
-            #print(f"Coup positiv in Single {coup.name}")
+            # print(f"Coup positiv in Single {coup.name}")
             return True
     return False
 

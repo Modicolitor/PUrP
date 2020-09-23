@@ -27,14 +27,8 @@ after applying
 bugs:
 general operator bug:
 
-
-[ ] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
-[] unmapping via "correctname" makes Problems not working (for doubled duplicated planar)
-
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 
-[] planar coupscale gizmot, only updates values after applying (low level problem)
-[] sometime unmap jumps connector? ground weird parenting ding
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 [?] multiuser data??????
 [] poll functions for all operators 
@@ -50,7 +44,9 @@ general operator bug:
 [ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
 [ ]  exchange single doesn'T respect add with/out visibility 
 
-
+Known Issues
+[] planar coupscale gizmot, only updates values after applying (low level problem)
+[] sometime unmap jumps connector? ground weird parenting ding
 
 New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
@@ -78,6 +74,7 @@ Publishing:
 
 
 resolved bug:
+[+] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
 [+] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 
 [+] L/ROFfset planar widget moves more than to zero
 [+] reorganize UI 
