@@ -27,7 +27,7 @@ after applying
 bugs:
 general operator bug:
 
-[] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 
+
 [ ] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
 [] unmapping via "correctname" makes Problems not working (for doubled duplicated planar)
 
@@ -78,6 +78,7 @@ Publishing:
 
 
 resolved bug:
+[+] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 
 [+] L/ROFfset planar widget moves more than to zero
 [+] reorganize UI 
 [+] Versioncheck + exact/fast settings   

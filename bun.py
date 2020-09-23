@@ -2175,6 +2175,7 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
 class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
     bl_idname = "object.pp_ot_testcorrectname"
     bl_label = "PP_OT_TestCorrectname"
+    bl_options = {'REGISTER', "UNDO"}
 
     def execute(self, context):
         coup = context.object
@@ -2900,7 +2901,7 @@ def correctname(context, coup):
                 check = True
 
         coup.name = newname
-
+        # when Cobj and Connector duplicated together, the bool mod is using the copied connector, change its name too
         for ob in data.objects:
             for mod in ob.modifiers:
                 if "PUrP" in mod.name:
@@ -2910,10 +2911,19 @@ def correctname(context, coup):
 
         if is_unmapped(context, coup):
             if is_planar(context, coup) or is_single(context, coup):
-                coup.matrix_world = coup.parent.matrix_world
+                if coup.parent != None:
+                    CObCo = coup.parent.location
+                else:
+                    CObCo = mathutils.Vector((0, 0, 0))
+
+                CoupCo = coup.location
+                Globalloc = CoupCo + CObCo
+                #matrix_world = coup.matrix_world
                 coup.parent = None
                 remove_coupmods(context, coup)
                 unmapped_signal(context, coup)
+                #coup.matrix_world = matrix_world
+                coup.location = Globalloc
 
     # return True
 
