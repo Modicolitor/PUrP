@@ -27,11 +27,11 @@ after applying
 bugs:
 general operator bug:
 
-[] duplicated planar end up beeing applied in copies too <-- rename function and remap
+[ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
+[ ] exchange single doesn'T respect add with/out visibility 
 
+[] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
-[?] multiuser data??????
-[] poll functions for all operators 
 
 [] apply all Problems 
    [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
@@ -41,8 +41,7 @@ general operator bug:
 [] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
 
 
-[ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
-[ ]  exchange single doesn'T respect add with/out visibility 
+
 
 Known Issues
 [] planar coupscale gizmot, only updates values after applying (low level problem)
@@ -74,6 +73,7 @@ Publishing:
 
 
 resolved bug:
+[+] poll functions for all operators 
 [+] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
 [+] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 
 [+] L/ROFfset planar widget moves more than to zero
