@@ -3,18 +3,14 @@ import bpy
 '''UI -Elements'''
 
 
-class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
+class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_label = "New Coupling"
+    bl_label = "Add, Exchange, Apply"
     bl_category = "PuzzleUrPrint"
 
-    # schreibe auf den Bildschirm
-
     def draw(self, context):
-
         data = bpy.data
-
         layout = self.layout
 
         layout.use_property_split = True
@@ -38,6 +34,8 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
 
             subcol.operator("add.coup", text="Add Coupling",
                             icon="PLUS")  # zeige button an
+            subcol.operator("rem.coup", text="Delete Coupling",
+                            icon="CANCEL")  # zeige button an
             subcol.label(text="Adjust")
             subcol.operator("object.exchangecoup",
                             text="Exchange", icon="FILE_REFRESH")
@@ -94,14 +92,39 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                         text='Add with Viewport Visibility')
             subcol.prop(PUrP, "AddUnmapped",
                         text='Add Unmapped')
-            subcol = col.column()
-            subcol.operator("rem.coup", text="Delete Coupling",
-                            icon="CANCEL")  # zeige button an
+            subcol = col.box()
             subcol.operator("apl.coup", text="Apply Coupling",
                             icon="MOD_DYNAMICPAINT")  # zeige button an
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
             subcol.prop(PUrP, "KeepCoup", text="Keep Connector")
+
+        else:
+            col.operator("pup.init", icon="SHADERFX")
+
+
+class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Special Apply"
+    bl_category = "PuzzleUrPrint"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        data = bpy.data
+        layout = self.layout
+
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+
+        if "PuzzleUrPrint" in data.collections:
+            PUrP = context.scene.PUrP
+            subcol = col.column()
             subcol.label(text="Special Apply Methods")
             subcol.operator("object.applyplanarmultiobj", text='Planar To Multiple Objects',
                             icon="PARTICLE_POINT")  # zeige button an
@@ -111,10 +134,38 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
 
-            subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
-                            icon="MOD_INSTANCE")
+            # subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
+            #                icon="MOD_INSTANCE")
 
-            subcol.label(text="Coupling Order")
+
+class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Mapping, Order, Visibility"
+    bl_category = "PuzzleUrPrint"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        data = bpy.data
+        layout = self.layout
+
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+
+        if "PuzzleUrPrint" in data.collections:
+            PUrP = context.scene.PUrP
+            subcol = col.column()
+            subcol.label(text="Mapping")
+            subcol.operator("object.remapcoups",
+                            text='Remap Connector To Active', icon="FILE_REFRESH")
+            subcol.operator("object.pp_ot_unmapcoup",
+                            text='Unmap Connector', icon="FILE_REFRESH")
+            subcol.label(text="Mapping")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
             subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
@@ -128,10 +179,32 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
             subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
-            subcol.operator("object.pp_ot_overlapcheck",
-                            text='Check Overlap', icon="HIDE_OFF")
+            # subcol.operator("object.pp_ot_overlapcheck",
+            #                text='Check Overlap', icon="HIDE_OFF")
 
-            subcol.label(text="Modifier Visibility")
+
+class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Build Volume"
+    bl_category = "PuzzleUrPrint"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        data = bpy.data
+        layout = self.layout
+
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+
+        if "PuzzleUrPrint" in data.collections:
+            PUrP = context.scene.PUrP
+            subcol = col.column()
             subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
             subcol.prop(PUrP, "BuildplateY", text='Buildplate Y')
             subcol.prop(PUrP, "BuildplateZ", text='Buildplate Z')
@@ -148,9 +221,6 @@ class PP_PT_PuzzlePrintMenu(bpy.types.Panel):
                                 "count", text='Build Volume Y Repeat')
                     subcol.prop(mods["PUrP_BuildVol_ArrayZ"],
                                 "count", text='Build Volume Z Repeat')
-
-        else:
-            col.operator("pup.init", icon="SHADERFX")
 
 
 '''

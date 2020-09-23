@@ -42,7 +42,11 @@ from .gizmotshape import PUrP_CubeShapeWidget
 from .gizmotshape import PUrP_ConeShapeWidget
 from .gizmotshape import PUrP_CylinderShapeWidget
 
-from .ui import PP_PT_PuzzlePrintMenu
+from .ui import PP_PT_PuzzlePrintAddMenu
+from .ui import PP_PT_PuzzlePrintSApplyMenu
+from .ui import PP_PT_PuzzlePrintOrderMenu
+from .ui import PP_PT_PuzzlePrintBuildVolumeMenu
+
 from .properties import PUrPropertyGroup
 from .bun import PP_OT_ApplyAllCouplings
 
@@ -93,7 +97,10 @@ bl_info = {  # für export als addon
 # Centerobj Pointer
 
 
-classes = (PP_PT_PuzzlePrintMenu,
+classes = (PP_PT_PuzzlePrintAddMenu,
+           PP_PT_PuzzlePrintSApplyMenu,
+           PP_PT_PuzzlePrintOrderMenu,
+           PP_PT_PuzzlePrintBuildVolumeMenu,
            PP_OT_AddSingleCoupling,
            PP_OT_ExChangeCoup,
            PP_OT_ApplyCoupling,

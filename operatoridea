@@ -43,8 +43,9 @@ general operator bug:
     
 [] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
 
-[] reorganize UI 
-
+[+] reorganize UI 
+[ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
+[ ]  exchange single doesn'T respect add with/out visibility 
 
 
 
