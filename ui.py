@@ -159,26 +159,31 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
 
         if "PuzzleUrPrint" in data.collections:
             PUrP = context.scene.PUrP
-            subcol = col.column()
+            subcol = col.box()
             subcol.label(text="Mapping")
             subcol.operator("object.remapcoups",
                             text='Remap Connector To Active', icon="FILE_REFRESH")
             subcol.operator("object.pp_ot_unmapcoup",
                             text='Unmap Connector', icon="FILE_REFRESH")
+            subcol = col.box()
             subcol.label(text="Mapping")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
             subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
             subcol.operator(
                 "pup.moddown", text='Down in Couplingorder', icon="TRIA_DOWN")
-            subcol.operator("object.remapcoups",
-                            text='Remap Connector To Active', icon="FILE_REFRESH")
-            subcol.operator("object.pp_ot_unmapcoup",
-                            text='Unmap Connector', icon="FILE_REFRESH")
-            subcol.label(text="Modifier Visibility")
+
+            subcol = col.box()
+            subcol.label(text="Connector Visibility Toggles")
+            subcol.operator("purp.connectorhide",
+                            text='Visibility Selected', icon="HIDE_OFF")
+            subcol.operator("purp.allconnectorhide",
+                            text='Visibility All', icon="HIDE_OFF")
+            subcol.label(text="Modifier Visibility Toggle")
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="HIDE_OFF")
             subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
+
             # subcol.operator("object.pp_ot_overlapcheck",
             #                text='Check Overlap', icon="HIDE_OFF")
 

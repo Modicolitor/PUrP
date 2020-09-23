@@ -499,23 +499,13 @@ def genPlanar():
     obj.scale.x *= adjustScale * GlobalScale * CoupScale
     obj.scale.y *= adjustScale * GlobalScale * CoupScale
 
-    # apply scale to get scale to one #####################################might need coupsize, too?
+    # apply scale to get scale to one
 
     obj.select_set(True)
     context.view_layer.objects.active = obj
     print(f"obj before apply scale {obj.name}")
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
-    '''# but then also have a global scale
-    obj.scale *= GlobalScale
-
-    # apply scale to get scale to one #####################################might need coupsize, too?
-    obj.select_set(True)
-    # bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-
-    obj.scale *=  CoupSize
-    print(f"obj {obj.name} coupSize {CoupSize} obj.scale {obj.scale} ")
-    '''
     import bmesh
     # planar side offset
     me = bpy.context.object.data
@@ -782,7 +772,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
             CenterObj = obj.parent
             if is_coup(context, obj):  # eines meiner coupling
-                correctname(context, coup)
+                correctname(context, obj)
 
                 is_unmap = False
                 if is_unmapped(context, obj) or PUrP.AddUnmapped:
@@ -2100,161 +2090,6 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
         return Cyclvert, aRadius, bRadius, upperverts
 
 
-def planaranalysizerLocal(context, Coup):
-    PUrP = context.scene.PUrP
-
-    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-
-    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
-    print(f"Cubic {Coup.data.name}")
-
-    # compensate for the 3 different position of vert3 in planar objects
-    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
-        print("Cube ............................")
-        PUrP.CoupScale = v3c[0] / coupfaktor
-    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
-        print("Dove")
-        PUrP.CoupScale = v3c[0]*2 / coupfaktor
-    elif "T" in Coup.data.name:
-        print("T")
-        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
-    else:
-        print("fail")
-
-    print("fail..................................................")
-    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
-    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
-
-    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
-    OffsetLeft = abs(v1c[0]) - 1.5*coupfaktor * PUrP.CoupScale
-
-    # zscale and StopperHeight
-    lowestvert = 0
-    for vert in Coup.data.vertices:  # find lowest z coordinate
-        vco = vert.co  # @Coup.matrix_world
-        if vco[2] <= lowestvert:
-            lowestvert = vco[2]
-
-    lowestlist = []
-    lowestexample = Coup.data.vertices[0]
-    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
-        vco = vert.co  # @Coup.matrix_world
-        if vco[2] == lowestvert:
-            lowestlist.append(vco[2])
-            lowestexample = vert  # example for stopperheight evaluation
-
-    lowestexampleco = lowestexample.co  # @Coup.matrix_world
-    PUrP.StopperBool = False
-    if len(lowestlist) == 4:  # with 4 verts its a stopper
-        PUrP.StopperBool = True
-
-    # for stopper height such den kürzesten abstand bei gleichen x
-    # smallestdistance = 50
-    distance = []
-
-    for vert in Coup.data.vertices:
-        vco = vert.co  # @Coup.matrix_world
-        if vco[0] == lowestexampleco[0]:
-            if vco[1] == lowestexampleco[1]:
-                if vco[2] != lowestexampleco[2]:
-                    # collect distances to vert
-                    distance.append(
-                        vco[2] - lowestexampleco[2])
-                    # print(f"distance {vert.co.z - lowestexample.co.z}")
-    distance.sort()
-    StopperHeight = distance[0]
-
-    # zscale top vert at co.z = 0
-    if PUrP.StopperBool == True:
-        zScale = -lowestexampleco[2] - distance[0]
-    else:
-        zScale = distance[0]
-
-    return OffsetRight, OffsetLeft, zScale, StopperHeight
-
-
-def planaranalysizerGlobal(context, Coup):
-    PUrP = context.scene.PUrP
-
-    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
-
-    # compensate for the 3 different position of vert3 in planar objects
-    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
-        print("Cube ............................")
-        PUrP.CoupScale = v3c[0] / coupfaktor
-    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
-        print("Dove")
-        PUrP.CoupScale = v3c[0]*2 / coupfaktor
-    elif "T" in Coup.data.name:
-        print("T")
-        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
-    else:
-        print("fail")
-
-    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
-    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
-
-    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
-    OffsetLeft = v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
-
-    # zscale and StopperHeight
-    lowestvert = 0
-    for vert in Coup.data.vertices:  # find lowest z coordinate
-        vco = vert.co  # @Coup.matrix_world
-        if vco[2] <= lowestvert:
-            lowestvert = vco[2]
-
-    lowestlist = []
-    lowestexample = Coup.data.vertices[0]
-    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
-        vco = vert.co  # @Coup.matrix_world
-        if vco[2] == lowestvert:
-            lowestlist.append(vco[2])
-            lowestexample = vert  # example for stopperheight evaluation
-
-    lowestexampleco = lowestexample.co  # @Coup.matrix_world
-    PUrP.StopperBool = False
-    if len(lowestlist) == 4:  # with 4 verts its a stopper
-        PUrP.StopperBool = True
-
-    # for stopper height such den kürzesten abstand bei gleichen x
-    # smallestdistance = 50
-    distance = []
-
-    for vert in Coup.data.vertices:
-        vco = vert.co  # @Coup.matrix_world
-        if vco[0] == lowestexampleco[0]:
-            if vco[1] == lowestexampleco[1]:
-                if vco[2] != lowestexampleco[2]:
-                    # collect distances to vert
-                    distance.append(
-                        vco[2] - lowestexampleco[2])
-                    # print(f"distance {vert.co.z - lowestexample.co.z}")
-    distance.sort()
-    StopperHeight = distance[0]
-
-    # zscale top vert at co.z = 0
-    if PUrP.StopperBool == True:
-        zScale = -lowestexampleco[2] - distance[0]
-    else:
-        zScale = distance[0]
-
-    return OffsetRight, OffsetLeft, zScale, StopperHeight
-
-
-def zSym(obj):
-    '''Test whether the obj is symmetrical relative to the object origin'''
-
-    z = obj.data.vertices[0].co.z
-
-    for v in obj.data.vertices:
-        if v.co.z == -z:
-            return True
-
-    return False
-
-
 class PP_OT_CouplingOrder(bpy.types.Operator):
     bl_idname = "pup.couplingorder"
     bl_label = "PP_OT_CouplingOrder"
@@ -2337,57 +2172,6 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
         return {'FINISHED'}
 
 
-def removePUrPOrder():
-    data = bpy.data
-    # garbage run
-    for ob in data.objects:
-        ob.select_set(False)
-        ob.hide_select = False
-        if "PUrP" in ob.name:
-            if "_Order" in ob.name:
-                ob.select_set(True)
-    bpy.ops.object.delete(use_global=False)
-
-
-def copyobject(context, ob, newname):
-    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
-    newob.matrix_world = ob.parent.matrix_world
-    newob.parent = ob.parent
-    col = in_collection(context, ob)
-    col.objects.link(newob)
-    return newob
-
-
-# changes name of object (planar and flat cut) and adjust name of related modifiers (the other aren't easily duplicateable)
-def correctname(context, coup):
-    data = bpy.data
-    oriname = coup.name[:]
-    if not "." in oriname:
-        pass
-    else:
-        check = False
-        while check == False:
-            if "Single" in coup.name:
-                newname = coup.name[:len(coup.name)-6] + \
-                    str(random.randint(1, 999))
-            elif "Planar" in coup.name:
-                newname = coup.name[:len(coup.name)-12] + \
-                    str(random.randint(1, 999)) + "_diff"
-            # str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
-            if newname not in data.objects:
-                check = True
-
-        coup.name = newname
-        for ob in data.objects:
-            for mod in ob.modifiers:
-                if "PUrP" in mod.name:
-                    if mod.type == 'BOOLEAN':
-                        if mod.object.name == newname:
-                            mod.name = newname
-
-    # return True
-
-
 class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
     bl_idname = "object.pp_ot_testcorrectname"
     bl_label = "PP_OT_TestCorrectname"
@@ -2396,15 +2180,6 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
         coup = context.object
         correctname(context, coup)
         return {'FINISHED'}
-
-
-def set_BoolSolver(context, mod):
-    PUrP = context.scene.PUrP
-    if PUrP.ExactOptBool:
-        if PUrP.BoolModSettings == '1':
-            mod.solver = 'EXACT'
-        elif PUrP.BoolModSettings == '2':
-            mod.solver = 'FAST'
 
 
 class PP_OT_ReMapCoups(bpy.types.Operator):
@@ -2536,75 +2311,6 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
         return {'FINISHED'}
 
 # goes through all objects and removes coup related modifiers
-
-
-def remove_coupmods(context, coup):
-    data = bpy.data
-
-    for ob in data.objects:
-        if not is_inlay(context, ob):
-            print(f"not is_inlay object {coup.name}")
-            for mod in ob.modifiers:
-                if coup.name in mod.name:
-
-                    ob.modifiers.remove(mod)
-
-
-def is_coup(context, coup):
-    if "PUrP" in coup.name:
-        if is_single(context, coup) or is_planar(context, coup):
-
-            return True
-    return False
-
-
-def is_planar(context, coup):
-    return "Planar" in coup.name
-
-
-def is_single(context, coup):
-    if "Single" in coup.name:
-        if not is_inlay(context, coup):
-            #print(f"Coup positiv in Single {coup.name}")
-            return True
-    return False
-
-
-def is_mf(context, coup):
-    back = False
-    for child in coup.children:
-        if "union" in child.name:
-            back = True
-    return back
-
-
-def is_stick(context, coup):
-    back = False
-    for child in coup.children:
-        if "fix" in child.name:
-            back = True
-    return back
-
-
-def is_flat(context, coup):
-    if "Single" in coup.name:
-        if len(coup.children) == 1 or len(coup.children) == 0:
-            return True
-    return False
-
-
-def is_unmapped(context, coup):
-    if coup.parent == None:
-        return True
-    elif coup.name not in coup.parent.modifiers:
-        return True
-    return False
-
-
-def is_inlay(context, coup):
-    if "diff" in coup.name or "union" in coup.name or "fix" in coup.name:
-        return True
-    return False
 
 
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
@@ -2768,28 +2474,11 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         bpy.ops.object.editmode_toggle()
         return {'FINISHED'}
 
-# doppelt
-
-
-def copy_obj(context, child, newname):
-    matrix = child.matrix_world
-    childtmpdata = child.data.copy()
-    child_new = bpy.data.objects.new(
-        name="newname", object_data=childtmpdata)
-
-    col = in_collection(context, child)
-    col.objects.link(child_new)
-    child_new.parent = child.parent
-    child_new.matrix_world = matrix
-    child_new.display_type = 'WIRE'
-
-    return child_new
-
 
 class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     '''Applys the active SingleConnector to the selected objects. Select the objects first and the connector last.'''
     bl_idname = "object.applysingletoobjects"
-    bl_label = "PP_OT_ApplySingleToObjects"
+    bl_label = "Apply Selected Single Connectors to active object"
     bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
@@ -2974,6 +2663,356 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class PP_OT_ConnectorHide(bpy.types.Operator):
+    bl_idname = "purp.connectorhide"
+    bl_label = "Toggle Connector Visibility of Selected"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            if (context.object != None):
+                if len(context.selected_objects) > 0:
+                    return True
+        return False
+
+    def execute(self, context):
+        couplist = selectedtocouplist(context, context.selected_objects)
+        hide = couplist[0].hide_viewport
+        for coup in couplist:
+            coupvisset(context, coup, not hide)
+        return {'FINISHED'}
+
+
+class PP_OT_AllConnectorHide(bpy.types.Operator):
+    bl_idname = "purp.allconnectorhide"
+    bl_label = "Toggle Connector Visibility of All"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            return True
+        return False
+
+    def execute(self, context):
+        couplist = selectedtocouplist(context, bpy.data.objects)
+        hide = couplist[0].hide_viewport
+        for coup in couplist:
+            coupvisset(context, coup, not hide)
+        return {'FINISHED'}
+
+
+def planaranalysizerLocal(context, Coup):
+    PUrP = context.scene.PUrP
+
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+    print(f"Cubic {Coup.data.name}")
+
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    print("fail..................................................")
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
+    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = abs(v1c[0]) - 1.5*coupfaktor * PUrP.CoupScale
+
+    # zscale and StopperHeight
+    lowestvert = 0
+    for vert in Coup.data.vertices:  # find lowest z coordinate
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] <= lowestvert:
+            lowestvert = vco[2]
+
+    lowestlist = []
+    lowestexample = Coup.data.vertices[0]
+    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] == lowestvert:
+            lowestlist.append(vco[2])
+            lowestexample = vert  # example for stopperheight evaluation
+
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
+    PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        PUrP.StopperBool = True
+
+    # for stopper height such den kürzesten abstand bei gleichen x
+    # smallestdistance = 50
+    distance = []
+
+    for vert in Coup.data.vertices:
+        vco = vert.co  # @Coup.matrix_world
+        if vco[0] == lowestexampleco[0]:
+            if vco[1] == lowestexampleco[1]:
+                if vco[2] != lowestexampleco[2]:
+                    # collect distances to vert
+                    distance.append(
+                        vco[2] - lowestexampleco[2])
+                    # print(f"distance {vert.co.z - lowestexample.co.z}")
+    distance.sort()
+    StopperHeight = distance[0]
+
+    # zscale top vert at co.z = 0
+    if PUrP.StopperBool == True:
+        zScale = -lowestexampleco[2] - distance[0]
+    else:
+        zScale = distance[0]
+
+    return OffsetRight, OffsetLeft, zScale, StopperHeight
+
+
+def planaranalysizerGlobal(context, Coup):
+    PUrP = context.scene.PUrP
+
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+
+    # compensate for the 3 different position of vert3 in planar objects
+    if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
+        print("Cube ............................")
+        PUrP.CoupScale = v3c[0] / coupfaktor
+    elif "Dovetail" in Coup.data.name or "Arrow" in Coup.data.name or "Hexagon" in Coup.data.name or "Pentagon" in Coup.data.name:
+        print("Dove")
+        PUrP.CoupScale = v3c[0]*2 / coupfaktor
+    elif "T" in Coup.data.name:
+        print("T")
+        PUrP.CoupScale = v3c[0]/0.4 / coupfaktor
+    else:
+        print("fail")
+
+    v0c = Coup.data.vertices[0].co  # @Coup.matrix_world
+    OffsetRight = v0c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    v1c = Coup.data.vertices[1].co  # @Coup.matrix_world
+    OffsetLeft = v1c[0] - 1.5*coupfaktor * PUrP.CoupScale
+
+    # zscale and StopperHeight
+    lowestvert = 0
+    for vert in Coup.data.vertices:  # find lowest z coordinate
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] <= lowestvert:
+            lowestvert = vco[2]
+
+    lowestlist = []
+    lowestexample = Coup.data.vertices[0]
+    for vert in Coup.data.vertices:  # collect all verts with lowest co.z values
+        vco = vert.co  # @Coup.matrix_world
+        if vco[2] == lowestvert:
+            lowestlist.append(vco[2])
+            lowestexample = vert  # example for stopperheight evaluation
+
+    lowestexampleco = lowestexample.co  # @Coup.matrix_world
+    PUrP.StopperBool = False
+    if len(lowestlist) == 4:  # with 4 verts its a stopper
+        PUrP.StopperBool = True
+
+    # for stopper height such den kürzesten abstand bei gleichen x
+    # smallestdistance = 50
+    distance = []
+
+    for vert in Coup.data.vertices:
+        vco = vert.co  # @Coup.matrix_world
+        if vco[0] == lowestexampleco[0]:
+            if vco[1] == lowestexampleco[1]:
+                if vco[2] != lowestexampleco[2]:
+                    # collect distances to vert
+                    distance.append(
+                        vco[2] - lowestexampleco[2])
+                    # print(f"distance {vert.co.z - lowestexample.co.z}")
+    distance.sort()
+    StopperHeight = distance[0]
+
+    # zscale top vert at co.z = 0
+    if PUrP.StopperBool == True:
+        zScale = -lowestexampleco[2] - distance[0]
+    else:
+        zScale = distance[0]
+
+    return OffsetRight, OffsetLeft, zScale, StopperHeight
+
+
+def zSym(obj):
+    '''Test whether the obj is symmetrical relative to the object origin'''
+
+    z = obj.data.vertices[0].co.z
+
+    for v in obj.data.vertices:
+        if v.co.z == -z:
+            return True
+
+    return False
+
+
+def removePUrPOrder():
+    data = bpy.data
+    # garbage run
+    for ob in data.objects:
+        ob.select_set(False)
+        ob.hide_select = False
+        if "PUrP" in ob.name:
+            if "_Order" in ob.name:
+                ob.select_set(True)
+    bpy.ops.object.delete(use_global=False)
+
+
+def copyobject(context, ob, newname):
+    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
+    newob.matrix_world = ob.parent.matrix_world
+    newob.parent = ob.parent
+    col = in_collection(context, ob)
+    col.objects.link(newob)
+    return newob
+
+
+# changes name of object (planar and flat cut) and adjust name of related modifiers (the other aren't easily duplicateable)
+def correctname(context, coup):
+    data = bpy.data
+    oriname = coup.name[:]
+    if not "." in oriname:
+        pass
+    else:
+        check = False
+        while check == False:
+            if "Single" in coup.name:
+                newname = coup.name[:len(coup.name)-6] + \
+                    str(random.randint(1, 999))
+            elif "Planar" in coup.name:
+                newname = coup.name[:len(coup.name)-12] + \
+                    str(random.randint(1, 999)) + "_diff"
+            # str(PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+            if newname not in data.objects:
+                check = True
+
+        coup.name = newname
+
+        for ob in data.objects:
+            for mod in ob.modifiers:
+                if "PUrP" in mod.name:
+                    if mod.type == 'BOOLEAN':
+                        if mod.object.name == newname:
+                            mod.name = newname
+
+        if is_unmapped(context, coup):
+            if is_planar(context, coup) or is_single(context, coup):
+                coup.matrix_world = coup.parent.matrix_world
+                coup.parent = None
+                remove_coupmods(context, coup)
+                unmapped_signal(context, coup)
+
+    # return True
+
+
+def set_BoolSolver(context, mod):
+    PUrP = context.scene.PUrP
+    if PUrP.ExactOptBool:
+        if PUrP.BoolModSettings == '1':
+            mod.solver = 'EXACT'
+        elif PUrP.BoolModSettings == '2':
+            mod.solver = 'FAST'
+
+# doppelt
+
+
+def remove_coupmods(context, coup):
+    data = bpy.data
+
+    for ob in data.objects:
+        if not is_inlay(context, ob):
+            print(f"not is_inlay object {coup.name}")
+            for mod in ob.modifiers:
+                if coup.name in mod.name:
+
+                    ob.modifiers.remove(mod)
+
+
+def is_coup(context, coup):
+    if "PUrP" in coup.name:
+        if is_single(context, coup) or is_planar(context, coup):
+
+            return True
+    return False
+
+
+def is_planar(context, coup):
+    return "Planar" in coup.name
+
+
+def is_single(context, coup):
+    if "Single" in coup.name:
+        if not is_inlay(context, coup):
+            #print(f"Coup positiv in Single {coup.name}")
+            return True
+    return False
+
+
+def is_mf(context, coup):
+    back = False
+    for child in coup.children:
+        if "union" in child.name:
+            back = True
+    return back
+
+
+def is_stick(context, coup):
+    back = False
+    for child in coup.children:
+        if "fix" in child.name:
+            back = True
+    return back
+
+
+def is_flat(context, coup):
+    if "Single" in coup.name:
+        if len(coup.children) == 1 or len(coup.children) == 0:
+            return True
+    return False
+
+
+def is_unmapped(context, coup):
+    if coup.parent == None:
+        return True
+    elif coup.name not in coup.parent.modifiers:
+        return True
+    return False
+
+
+def is_inlay(context, coup):
+    if "diff" in coup.name or "union" in coup.name or "fix" in coup.name:
+        return True
+    return False
+
+
+def copy_obj(context, child, newname):
+    matrix = child.matrix_world
+    childtmpdata = child.data.copy()
+    child_new = bpy.data.objects.new(
+        name="newname", object_data=childtmpdata)
+
+    col = in_collection(context, child)
+    col.objects.link(child_new)
+    child_new.parent = child.parent
+    child_new.matrix_world = matrix
+    child_new.display_type = 'WIRE'
+
+    return child_new
+
+
 def change_parent(context, obj, parent):
     mw = obj.matrix_world.copy()
     obj.parent = parent
@@ -3085,3 +3124,21 @@ def origin_in_bb(context, union, CObj):
 
     print(f"origin in bb answer {answer} for {union.name} and {CObj.name}")
     return answer
+
+
+def coupvisset(context, coup, hide):
+    # if is_planar(context, coup):
+    coup.hide_viewport = hide
+    if is_single(context, coup):
+        for child in coup.children:
+            child.hide_viewport = hide
+
+# takes obj list and returns list of coups
+
+
+def selectedtocouplist(context, selected):
+    couplist = []
+    for obj in selected:
+        if is_coup(context, obj):
+            couplist.append(obj)
+    return couplist

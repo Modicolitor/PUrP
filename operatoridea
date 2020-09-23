@@ -27,6 +27,9 @@ after applying
 bugs:
 general operator bug:
 
+[] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 
+[ ] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
+[] unmapping via "correctname" makes Problems not working (for doubled duplicated planar)
 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 

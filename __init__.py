@@ -67,6 +67,8 @@ from .bun import PP_OT_ApplyMultiplePlanarToObject
 from .bun import PP_OT_ApplySingleToObjects
 from .bun import PP_OT_TestCorrectnameOperator
 from .bun import PP_OT_UnmapCoup
+from .bun import PP_OT_ConnectorHide
+from .bun import PP_OT_AllConnectorHide
 from .bvh_overlap import PP_OT_OverlapcheckOperator
 from bpy.types import Scene, Image, Object
 import bpy
@@ -151,6 +153,8 @@ classes = (PP_PT_PuzzlePrintAddMenu,
            PP_OT_PlanarLineCountGizmo,
            PP_OT_ApplyAllCouplings,
            PP_OT_OverlapcheckOperator,
+           PP_OT_ConnectorHide,
+           PP_OT_AllConnectorHide,
            PUrPropertyGroup
            )
 #classes = ()
