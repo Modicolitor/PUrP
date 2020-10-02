@@ -176,12 +176,12 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
             subcol = col.box()
             subcol.label(text="Connector Visibility Toggles")
             subcol.operator("purp.connectorhide",
-                            text='Visibility Selected', icon="HIDE_OFF")
+                            text='Visibility Selected', icon="VIS_SEL_11")
             subcol.operator("purp.allconnectorhide",
                             text='Visibility All', icon="HIDE_OFF")
             subcol.label(text="Modifier Visibility Toggle")
             subcol.operator("object.togglecoupvisibility",
-                            text='Toggle Modifier Visibility', icon="HIDE_OFF")
+                            text='Toggle Modifier Visibility', icon="RESTRICT_VIEW_ON")
             subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
 
             # subcol.operator("object.pp_ot_overlapcheck",
