@@ -905,7 +905,7 @@ def otherparents(context, coup):
     for ob in data.objects:
         if ob != coup.parent:
             for mod in ob.modifiers:
-                if coup.name in mod.name:
+                if coup.name in mod.name and "diff" not in mod.name and "union" not in mod.name:
                     parents.append(ob)
     return parents
 
@@ -944,13 +944,16 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
         # how many parents (different connectors can have different CenterObj)
         Centerobjs = []
+
+        selected = selectedtocouplist(context, selected)
+        print(f"Selected {selected}")
         for obj in selected:
             if obj.parent not in Centerobjs:
                 Centerobjs.append(obj.parent)
-
             # case planar cuts several objects but only has one parent
-            if "Planar" in obj.name:
+            if is_planar:
                 Centerobjs.extend(otherparents(context, obj))
+
         # start conditions: connectors selected
         # sort selected by modifier order
         print(f" Centerobj in apply {Centerobjs}")
@@ -969,23 +972,23 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 if coup in selected:
                     coupssorted.append(coup)
 
-            for obj in coupssorted:
+            for coup in coupssorted:
                 print(f"Coup will be send to apply {obj.name}")
-                if PUrP_name in obj.name:
-                    if "Planar" in obj.name:
-                        if obj.parent != CenterObj:
-                            obj.parent = CenterObj
-                        CenterObj = obj.parent
-                        if len(centerObjList(context, obj)) > 1:
+                if is_coup(context, coup):
+                    if is_planar(context, coup):
+                        if coup.parent != CenterObj:
+                            coup.parent = CenterObj
+                        CenterObj = coup.parent
+                        if len(centerObjList(context, coup)) > 1:
                             print("ast eins")
-                            applySingleCoup(context, obj, CenterObj, False)
+                            applySingleCoup(context, coup, CenterObj, False)
                         else:
                             print("ast zwei")
-                            applySingleCoup(context, obj, CenterObj, True)
+                            applySingleCoup(context, coup, CenterObj, True)
                     else:
                         # non planar branch, only one CenterObj allowed
-                        CenterObj = obj.parent
-                        applySingleCoup(context, obj, CenterObj, True)
+                        CenterObj = coup.parent
+                        applySingleCoup(context, coup, CenterObj, True)
 
         data = bpy.data
         Orderbool = False
@@ -1357,16 +1360,21 @@ def applySingleCoup(context, Coup, CenterObj, delete):
         oriCoupNames.remove(oriCoupname)
         for coupname in oriCoupNames:
             coup = objects[coupname]
+            mw = coup.matrix_world
             print(f"restliche Coup verteilen liste {coupname}")
             if bvhOverlap(context, coup, DaughterOne):
+                #mw = coup.matrix_world
                 coup.parent = DaughterOne
+                coup.matrix_world = mw
                 DOneCoupList.append(coup)
 
             elif bvhOverlap(context, coup, DaughterTwo):
                 coup.parent = DaughterTwo
+                coup.matrix_world = mw
                 DTwoCoupList.append(coup)
             else:
                 coup.parent = None
+                coup.matrix_world = mw
                 unmapped_signal(context, coup)
 
         # all modifiers of all couplings which are identified as overlapping

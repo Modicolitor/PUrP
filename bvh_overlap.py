@@ -19,7 +19,7 @@ def bvhOverlap(context, coup, CenterObj):
     coup_tmp.select_set(True)
     context.view_layer.objects.active = coup_tmp
     coup_tmp.matrix_world = matrix
-    bpy.ops.object.transform_apply(location=True, rotation=False, scale=True)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
     # make Solidify to the mainplane, but also more stuff for planar
 

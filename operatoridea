@@ -27,7 +27,7 @@ after applying
 bugs:
 general operator bug:
 
-[] icons visibility
+
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 
@@ -71,6 +71,7 @@ Publishing:
 
 
 resolved bug:
+[+] icons visibility
 [+] unmap op moves coup
 [x] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
 [+] poll functions for all operators 
