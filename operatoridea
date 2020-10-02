@@ -27,9 +27,7 @@ after applying
 bugs:
 general operator bug:
 
-[ ] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
-[ ] exchange single doesn'T respect add with/out visibility 
-
+[] icons visibility
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 
@@ -73,6 +71,8 @@ Publishing:
 
 
 resolved bug:
+[+] unmap op moves coup
+[x] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
 [+] poll functions for all operators 
 [+] exchange remaps new planar to a another object when duplicated (duplicate and exchange coupling)
 [+] Feature Toggle Viewport Visibility: Toggle Single, Toggle All 

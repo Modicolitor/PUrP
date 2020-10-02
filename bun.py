@@ -105,7 +105,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             newname_mainplane = "Null"  # for planar
 
-        coupModeDivision(context, CenterObj, newname_mainplane, is_unmap)
+        coupModeDivision(context, CenterObj, newname_mainplane,
+                         is_unmap, PUrP.ViewPortVisAdd)
 
         CObCo = CenterObj.location
         CurCo = cursorloc
@@ -136,7 +137,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         return{"FINISHED"}
 
 
-def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped):
+def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped, visibility):
     data = bpy.data
 
     PUrP = bpy.context.scene.PUrP
@@ -172,7 +173,7 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped):
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "4":
-        newMain = genPlanar(context, CenterObj)
+        newMain = genPlanar(context, CenterObj, visibility)
     # Adjustment for globalscale
     # newMain.scale = mathutils.Vector((GlobalScale, GlobalScale, GlobalScale))
 
@@ -416,7 +417,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     return context.object
 
 
-def genPlanar(context, CenterObj):
+def genPlanar(context, CenterObj, visibility):
     #context = bpy.context
     PUrP = bpy.context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
@@ -679,6 +680,7 @@ def genPlanar(context, CenterObj):
 
     # boolean _diff at parent object
     mod = obj.parent.modifiers.new(name=obj.name, type="BOOLEAN")
+    mod.show_viewport = visibility
     mod.operation = 'DIFFERENCE'
     mod.object = obj
     set_BoolSolver(context, mod)
@@ -787,6 +789,8 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                 if not is_unmap:
                     for mod in obj.parent.modifiers:  # lösche alle modifier im centerobj
                         if obj.name == mod.name:
+                            print(
+                                f"viewportvis for {mod.name} is {mod.show_viewport}")
                             viewportvis = mod.show_viewport
                         if obj.name in mod.name:
                             obj.parent.modifiers.remove(mod)
@@ -817,7 +821,8 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                             {'WARNING'}, "Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
 
                     # generate new planar
-                    coupModeDivision(context, CenterObj, oldname, is_unmap)
+                    coupModeDivision(context, CenterObj,
+                                     oldname, is_unmap, viewportvis)
                     context.object.matrix_world = trans
 
                 else:  # when it was SingleCoupling, the mainplane is kept
@@ -844,12 +849,15 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     if not is_unmap:
                         mod = CenterObj.modifiers.new(
                             name=obj.name, type="BOOLEAN")
+                        print(f"viewportvis applied {viewportvis}")
                         mod.show_viewport = viewportvis
                         mod.object = obj
                         mod.operation = 'DIFFERENCE'
                         set_BoolSolver(context, mod)
-                    # obj.scale = mathutils.Vector((1, 1, 1))
-                    coupModeDivision(context, CenterObj, obj.name, is_unmap)
+                        obj.scale = mathutils.Vector((1, 1, 1))
+
+                    coupModeDivision(context, CenterObj,
+                                     obj.name, is_unmap, viewportvis)
                     # print(f"obj at rescale {obj}")
                     scalefactor = PUrP.GlobalScale * PUrP.CoupScale
                     obj.data.vertices[0].co = mathutils.Vector(
@@ -867,6 +875,16 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         location=False, rotation=False, scale=True)
                     if is_unmap:
                         unmapped_signal(context, obj)
+                '''
+                if not is_unmap:
+                    mod = CenterObj.modifiers.new(
+                        name=obj.name, type="BOOLEAN")
+                    print(f"viewportvis applied {viewportvis}")
+                    mod.show_viewport = viewportvis
+                    mod.object = obj
+                    mod.operation = 'DIFFERENCE'
+                    set_BoolSolver(context, mod)
+                '''
             if not is_unmap:
                 Orderbool = False
                 for ob in data.objects:
@@ -1849,12 +1867,14 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
         inlaytogglebool = PUrP.InlayToggleBool
         CenterObj = None
 
-        for ele in context.selected_objects:
+        selected = selectedtocouplist(context, context.selected_objects)
+        for coup in selected:
 
-            if "PUrP" in ele.name:  # for selected coupling of PUrP
-                CenterObj = ele.parent
-            else:
+            # "PUrP" in ele.name:  # for selected coupling of PUrP
+            if is_unmapped(context, coup):
                 continue
+            else:
+                CenterObj = coup.parent
 
             if inlaytogglebool:
                 names, mods = listPUrPMods(CenterObj)
@@ -1862,14 +1882,14 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
                 names, mods = couplingList(CenterObj)
 
             for mod in mods:
-                if ele.name in mod.name:
-                    if "diff" not in mod.name and "union" not in mod.name:
+                if coup.name in mod.name:
+                    if "diff" not in mod.name and "union" not in mod.name or is_planar(context, coup):
                         if mod.show_viewport == True:
                             mod.show_viewport = False
                         elif mod.show_viewport == False:
                             mod.show_viewport = True
                     else:
-                        mod.show_viewport = CenterObj.modifiers[ele.name].show_viewport
+                        mod.show_viewport = CenterObj.modifiers[coup.name].show_viewport
 
         return {'FINISHED'}
 
@@ -2305,15 +2325,17 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        selected = context.selected_objects[:]
+        selected = selectedtocouplist(context, context.selected_objects)
+
         for coup in selected:
             correctname(context, coup)
             if not is_unmapped(context, coup):
-                if is_planar(context, coup) or is_single(context, coup):
-                    # coup.matrix_world = coup.parent.matrix_world
-                    coup.parent = None
-                    remove_coupmods(context, coup)
-                    unmapped_signal(context, coup)
+                # if is_planar(context, coup) or is_single(context, coup):
+                mw = coup.matrix_world
+                coup.parent = None
+                coup.matrix_world = mw
+                remove_coupmods(context, coup)
+                unmapped_signal(context, coup)
 
         return {'FINISHED'}
 
