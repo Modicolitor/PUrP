@@ -28,13 +28,19 @@ bugs:
 general operator bug:
 
 
-[] duplicated planar end up beeing applied in copies too <-- rename function and remap
-[] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
 
-[] apply all Problems 
-   [] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
-   [] utf8 byte error hard to reproduce
-    [] apply all --> error cObj in print not found  
+[ ] single to Multiple: MF Error when mainplane not ignored 
+                        MF direction of apply wrong when mainplane not ignored
+
+[] duplicated planar end up beeing applied in copies too <-- rename function and remap
+[?] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
+ 
+
+
+[?] apply all Problems 
+  
+   [?] utf8 byte error hard to reproduce
+    [?] apply all --> error cObj in print not found  
     
 [] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
 
@@ -71,6 +77,7 @@ Publishing:
 
 
 resolved bug:
+ [x] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
 [+] icons visibility
 [+] unmap op moves coup
 [x] Toggle visibility broken (planar), add/exchange ignores add with/out visibility 
