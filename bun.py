@@ -2213,7 +2213,17 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
 
     def execute(self, context):
         coup = context.object
-        correctname(context, coup)
+        selected = context.selected_objects
+
+        for ob in selected:
+            if ob != coup:
+                Cob = ob
+        origin_in_bb(context, coup, Cob)
+
+        context.view_layer.objects.active = coup
+        Cob.select_set(True)
+
+        #correctname(context, coup)
         return {'FINISHED'}
 
 
@@ -2650,52 +2660,68 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         data.objects.remove(coup)
 
             elif couptype == 'MF':
+                #foundCob = None
                 # MF case
                 print("MF")
                 if origin_in_bb(context, coup, Cob):
-
+                    print(f"Detected {Cob} as Base CenterObj, adding Inlay ")
                     change_parent(context, coup, Cob)
+                    foundCob = Cob
 
-                    if PUrP.IgnoreMainCut:
-                        ensure_mod(context, union, Cob, "union")
-                        bpy.ops.object.modifier_apply(
-                            apply_as='DATA', modifier=coup.name + "_union")
-                        remove_mod(context, coup, Cob, "")
+                    if not PUrP.IgnoreMainCut:
+                        ensure_mod(context, coup, Cob, "")
+                        applySingleCoup(
+                            context, coup, Cob, True)
+                        #ensure_mod(context, coup, Cob, "")
+                        # bpy.ops.object.modifier_apply(
+                        #    apply_as='DATA', modifier=coup.name")
+                        #remove_mod(context, coup, Cob, "")
                         # remove_mod(context, diff, Cob, "")
                     else:
+                        ensure_mod(context, union, Cob, "union")
+                        context.view_layer.objects.active = Cob
+                        bpy.ops.object.modifier_apply(
+                            apply_as='DATA', modifier=coup.name + "_union")
                         # union + das Cobjs
                         # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
-                        foundCob = Cob
-                        # applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
-                else:  # wenn nicht zentraler CObj mach nur ein loch
-                    # nur diff teil wichtig
-                    # check ob Cobj den mod hat
-                    # wenn nicht mach ihn
+                        #foundCob = Cob
+                        #applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
+                else:  # wenn nicht zentraler CObj mach ein loch und zieh die mainplane ab
+                    # erst diff
                     ensure_mod(context, diff, Cob, "diff")
+                    Cob.select_set(True)
                     # apply modifier
+                    context.view_layer.objects.active = Cob
                     bpy.ops.object.modifier_apply(
                         apply_as='DATA', modifier=coup.name + "_diff")
 
-                    # when letzter Cobj
-                    if num == len(CenterObjs)-1:
-                        # wenn keep
-                        if PUrP.KeepCoup:
-                            # unmap coup
-                            if PUrP.IgnoreMainCut:
-                                change_parent(context, coup, None)
-                                unmapped_signal(context, coup)
-                            else:
-                                applySingleCoup(
-                                    context, coup, foundCob, PUrP.KeepCoup)
+                    # the mainplane for MF when not the base Cob
+                    if not PUrP.IgnoreMainCut:
+                        ensure_mod(context, coup, Cob, "")
+                        bpy.ops.object.modifier_apply(
+                            apply_as='DATA', modifier=coup.name)
 
+                # when letzter Cobj
+                if num == len(CenterObjs)-1:
+                    # wenn keep
+                    if PUrP.KeepCoup:
+                        # unmap coup
+                        if PUrP.IgnoreMainCut:
+                            change_parent(context, coup, None)
+                            unmapped_signal(context, coup)
                         else:
-                            # when everything is done apply or remove couple to found Cob
-                            if PUrP.IgnoreMainCut:
-                                removeCoupling(context, coup)
-                            else:
-                                applySingleCoup(
-                                    context, coup, foundCob, True)
-                                # removeCoupling(context, coup)
+                            # applySingleCoup(
+                            #    context, coup, Cob, PUrP.KeepCoup)  # former foundCob
+                            print("Else?????? not ignored last object")
+                    else:
+                        # when everything is done apply or remove couple to found Cob
+                        # if PUrP.IgnoreMainCut:
+                        removeCoupling(context, coup)
+                        # else:
+                        # applySingleCoup(
+                        #    context, coup, Cob, True)  # former foundCob
+                        #print("222Else?????? not ignored last object")
+                        # removeCoupling(context, coup)
 
         return {'FINISHED'}
 
@@ -2909,11 +2935,21 @@ def removePUrPOrder():
 
 
 def copyobject(context, ob, newname):
-    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob.data)
-    newob.matrix_world = ob.parent.matrix_world
+    ob_dat = ob.data.copy()
+    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob_dat)
+    matrix = ob.matrix_world
     newob.parent = ob.parent
     col = in_collection(context, ob)
     col.objects.link(newob)
+
+    for ob in context.selected_objects:
+        ob.select_set(False)
+
+    newob.select_set(True)
+    context.view_layer.objects.active = newob
+    newob.matrix_world = matrix
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
     return newob
 
 
@@ -3139,8 +3175,10 @@ def highest_value(vectorlist, dim):
 
 
 def origin_in_bb(context, union, CObj):
-    bbox_corners = [CObj.matrix_world @
-                    mathutils.Vector(corner) for corner in CObj.bound_box]
+    tmp = copyobject(context, CObj, "tmp")
+
+    bbox_corners = [tmp.matrix_world @
+                    mathutils.Vector(corner) for corner in tmp.bound_box]
 
     xhighest = highest_value(bbox_corners, 0)
     xlowest = lowest_value(bbox_corners, 0)
@@ -3152,22 +3190,25 @@ def origin_in_bb(context, union, CObj):
     print(f"xhighest {xhighest} yhighest {yhighest} zhighest {zhighest} xlowest {xlowest} ylowest {ylowest} zlowest {zlowest}")
 
     answer = False
-    unionloc = union.location@union.matrix_world
+    # union.location@union.matrix_world
+    unionloc = mathutils.Vector(
+        (union.matrix_world[0][3], union.matrix_world[1][3], union.matrix_world[2][3]))
     print(f"unionloc {unionloc}")
     if xhighest > unionloc[0]:
-        print("01")
+        # print("01")
         if xlowest < unionloc[0]:
-            print("02")
+            # print("02")
             if yhighest > unionloc[1]:
-                print("11")
+                # print("11")
                 if ylowest < unionloc[1]:
-                    print("12")
+                    # print("12")
                     if zhighest > unionloc[2]:
-                        print("21")
+                        # print("21")
                         if zlowest < unionloc[2]:
-                            print("22")
+                            # print("22")
                             answer = True
 
+    bpy.data.objects.remove(tmp)
     print(f"origin in bb answer {answer} for {union.name} and {CObj.name}")
     return answer
 

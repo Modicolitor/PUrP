@@ -134,8 +134,8 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
 
-            # subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
-            #                icon="MOD_INSTANCE")
+            subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
+                            icon="MOD_INSTANCE")
 
 
 class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
@@ -234,24 +234,25 @@ class PP_PT_PuzzlePrintActive(bpy.types.Panel):
     bl_region_type="UI"
     bl_label="Active Coupling"
     bl_category="PuzzleUrPrint"
-    
-    
-    
+
+
+
     # schreibe auf den Bildschirm
     def draw(self, context):
-        
 
-        data = bpy.data 
-        
+
+        data = bpy.data
+
         layout = self.layout ;
-        
+
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        flow = layout.grid_flow(row_major=True, columns=0, even_columns=False, even_rows=False, align=True)
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
         col = flow.column()
         row = layout.row()
-        
+
 
         col.operator("pup.modup", text = 'Move Modifiers Up')
         col.operator("pup.moddown", text = 'Move Modifiers Down')

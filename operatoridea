@@ -29,8 +29,7 @@ general operator bug:
 
 
 
-[ ] single to Multiple: MF Error when mainplane not ignored 
-                        MF direction of apply wrong when mainplane not ignored
+[ ] single to Multiple: problem when maincut also cuts other CObs 
 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [?] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
