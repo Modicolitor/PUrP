@@ -2590,8 +2590,9 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
 
         # add inlay mods to CenterObjs
         print(CenterObjs)
-
+        foundBase = None
         for num, Cob in enumerate(CenterObjs):
+            print(f"Processing now Cob {Cob.name}")
             context.view_layer.objects.active = Cob
             if couptype == 'STICK':
                 # stick case
@@ -2666,17 +2667,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 if origin_in_bb(context, coup, Cob):
                     print(f"Detected {Cob} as Base CenterObj, adding Inlay ")
                     change_parent(context, coup, Cob)
-                    foundCob = Cob
 
                     if not PUrP.IgnoreMainCut:
-                        ensure_mod(context, coup, Cob, "")
-                        applySingleCoup(
-                            context, coup, Cob, True)
-                        #ensure_mod(context, coup, Cob, "")
-                        # bpy.ops.object.modifier_apply(
-                        #    apply_as='DATA', modifier=coup.name")
-                        #remove_mod(context, coup, Cob, "")
-                        # remove_mod(context, diff, Cob, "")
+                        # applying the base unmapps coup, better apply to base after the last Cob is processed
+                        foundBase = Cob
+
                     else:
                         ensure_mod(context, union, Cob, "union")
                         context.view_layer.objects.active = Cob
@@ -2710,18 +2705,21 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             change_parent(context, coup, None)
                             unmapped_signal(context, coup)
                         else:
-                            # applySingleCoup(
-                            #    context, coup, Cob, PUrP.KeepCoup)  # former foundCob
-                            print("Else?????? not ignored last object")
+                            if foundBase != None:
+                                applySingleCoup(
+                                    context, coup, foundBase, PUrP.KeepCoup)
+                            change_parent(context, coup, None)
+                            unmapped_signal(context, coup)
                     else:
                         # when everything is done apply or remove couple to found Cob
-                        # if PUrP.IgnoreMainCut:
-                        removeCoupling(context, coup)
-                        # else:
-                        # applySingleCoup(
-                        #    context, coup, Cob, True)  # former foundCob
-                        #print("222Else?????? not ignored last object")
-                        # removeCoupling(context, coup)
+                        if PUrP.IgnoreMainCut:
+                            removeCoupling(context, coup)
+                        else:
+                            if foundBase != None:
+                                applySingleCoup(
+                                    context, coup, foundBase, PUrP.KeepCoup)
+
+                            removeCoupling(context, coup)
 
         return {'FINISHED'}
 
@@ -3097,8 +3095,10 @@ def copy_obj(context, child, newname):
 
 def change_parent(context, obj, parent):
     mw = obj.matrix_world.copy()
+    print(f"mw in Change Parent {mw}")
     obj.parent = parent
     obj.matrix_world = mw
+    print(f"mw after Parent change {obj.matrix_world}")
 
 
 def cut_n_separate(context, coup, Cobj):
