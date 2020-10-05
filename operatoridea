@@ -29,7 +29,8 @@ general operator bug:
 
 
 
-[ ] single to Multiple: problem when maincut also cuts other CObs 
+[ ] single to Multiple: unmapp still moves coupling 
+                        mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)
 
 [] duplicated planar end up beeing applied in copies too <-- rename function and remap
 [?] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply

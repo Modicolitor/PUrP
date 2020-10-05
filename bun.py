@@ -2666,7 +2666,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                 print("MF")
                 if origin_in_bb(context, coup, Cob):
                     print(f"Detected {Cob} as Base CenterObj, adding Inlay ")
-                    change_parent(context, coup, Cob)
+                    #change_parent(context, coup, Cob)
 
                     if not PUrP.IgnoreMainCut:
                         # applying the base unmapps coup, better apply to base after the last Cob is processed
@@ -2696,7 +2696,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         bpy.ops.object.modifier_apply(
                             apply_as='DATA', modifier=coup.name)
 
-                # when letzter Cobj
+                # after last Cobj
                 if num == len(CenterObjs)-1:
                     # wenn keep
                     if PUrP.KeepCoup:
@@ -2706,6 +2706,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             unmapped_signal(context, coup)
                         else:
                             if foundBase != None:
+                                foundBase.PUrPCobj = True
+                                change_parent(context, coup, foundBase)
+                                ensure_mod(context, coup, foundBase, "")
+                                ensure_mod(context, union, foundBase, "union")
+                                ensure_mod(context, diff, foundBase, "diff")
                                 applySingleCoup(
                                     context, coup, foundBase, PUrP.KeepCoup)
                             change_parent(context, coup, None)
@@ -2716,6 +2721,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             removeCoupling(context, coup)
                         else:
                             if foundBase != None:
+                                foundBase.PUrPCobj = True
+                                change_parent(context, coup, foundBase)
+                                ensure_mod(context, coup, foundBase, "")
+                                ensure_mod(context, union, foundBase, "union")
+                                ensure_mod(context, diff, foundBase, "diff")
                                 applySingleCoup(
                                     context, coup, foundBase, PUrP.KeepCoup)
 
