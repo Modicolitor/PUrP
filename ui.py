@@ -1,4 +1,5 @@
 import bpy
+from .bun import is_coup, is_planar, is_single
 
 '''UI -Elements'''
 
@@ -98,6 +99,8 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
             subcol.prop(PUrP, "KeepCoup", text="Keep Connector")
+            # subcol.operator_menu_hold(
+            #    "purp.zscalemenu", "ZScale", text="Zscale")
 
         else:
             col.operator("pup.init", icon="SHADERFX")
@@ -226,6 +229,45 @@ class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
                                 "count", text='Build Volume Y Repeat')
                     subcol.prop(mods["PUrP_BuildVol_ArrayZ"],
                                 "count", text='Build Volume Z Repeat')
+
+
+class PP_PT_PuzzlePrintActiveObject(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Active Connector"
+    bl_category = "PuzzleUrPrint"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    @classmethod
+    def poll(cls, context):
+        if (context.view_layer.objects.active != None) and context.mode == 'OBJECT':
+            if is_coup(context, context.object):
+                return True
+        else:
+            return False
+
+    def draw(self, context):
+        PUrP = context.scene.PUrP
+        data = bpy.data
+        layout = self.layout
+
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+
+        if "PuzzleUrPrint" in data.collections:
+            PUrP = context.scene.PUrP
+            subcol = col.column()
+            subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
+
+            subcol.operator("purp.zscalemenu",
+                            text=str(PUrP.zScale)[:5], icon="MESH_CUBE")
+            subcol.operator("purp.roffsetgiz",
+                            text=str(PUrP.OffsetRight)[:5], icon="MESH_CUBE")
 
 
 '''

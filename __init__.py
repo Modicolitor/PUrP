@@ -46,6 +46,7 @@ from .ui import PP_PT_PuzzlePrintAddMenu
 from .ui import PP_PT_PuzzlePrintSApplyMenu
 from .ui import PP_PT_PuzzlePrintOrderMenu
 from .ui import PP_PT_PuzzlePrintBuildVolumeMenu
+from .ui import PP_PT_PuzzlePrintActiveObject
 
 from .properties import PUrPropertyGroup
 from .bun import PP_OT_ApplyAllCouplings
@@ -70,6 +71,10 @@ from .bun import PP_OT_UnmapCoup
 from .bun import PP_OT_ConnectorHide
 from .bun import PP_OT_AllConnectorHide
 from .bvh_overlap import PP_OT_OverlapcheckOperator
+
+from .modalops import PP_OT_PlanarZScaleMenu
+
+
 from bpy.types import Scene, Image, Object
 import bpy
 
@@ -103,6 +108,7 @@ classes = (PP_PT_PuzzlePrintAddMenu,
            PP_PT_PuzzlePrintSApplyMenu,
            PP_PT_PuzzlePrintOrderMenu,
            PP_PT_PuzzlePrintBuildVolumeMenu,
+           PP_PT_PuzzlePrintActiveObject,
            PP_OT_AddSingleCoupling,
            PP_OT_ExChangeCoup,
            PP_OT_ApplyCoupling,
@@ -155,10 +161,8 @@ classes = (PP_PT_PuzzlePrintAddMenu,
            PP_OT_OverlapcheckOperator,
            PP_OT_ConnectorHide,
            PP_OT_AllConnectorHide,
+           PP_OT_PlanarZScaleMenu,
            PUrPropertyGroup
            )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
-
-# if __name__ == "__main__":
-#    register()

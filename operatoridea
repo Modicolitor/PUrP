@@ -27,7 +27,11 @@ after applying
 bugs:
 general operator bug:
 
-
+[] Panel for active object: Linedistance, Line, Modal operators for properties?   
+[-] Linedistance must be absolut, otherwise scale changes it
+[] error in "corect name" (ob == none ) when unmapping duplicated planar
+[] Logo2 problem mit normal puzzle apply all, also multi planar to object fails second completly, also the kept coups are moved
+[] 
 
 [ ] single to Multiple: unmapp still moves coupling 
                         mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)

@@ -35,7 +35,7 @@ def bvhOverlap(context, coup, CenterObj):
             mod.relative_offset_displace = coup.modifiers["PUrP_Array_1"].relative_offset_displace
         elif "PUrP_Array_2" == mod.name:
             mod.count = coup.modifiers["PUrP_Array_2"].count
-            mod.relative_offset_displace = coup.modifiers["PUrP_Array_2"].relative_offset_displace
+            mod.relative_offset_displace = coup.modifiers["PUrP_Array_2"].constant_offset_displace
         bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
 
     # coup_tmp.select_set(True)
