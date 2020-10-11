@@ -24,8 +24,7 @@ def bvhOverlap(context, coup, CenterObj):
     #    print("Planar)
     #    bvhapplyScalRot(coup_tmp)
     # else:
-    #    bpy.ops.object.transform_apply(
-    #        location=True, rotation=True, scale=True)  # why location? because parented?
+    #
 
     # make Solidify to the mainplane, but also more stuff for planar
     context.view_layer.objects.active = coup_tmp
