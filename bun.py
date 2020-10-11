@@ -1211,7 +1211,7 @@ def centerObjDecider(context, CenterObj):
                                         context, Cmod.object, Cobj, True)
                             else:
                                 print(
-                                    f"There is mod {Cmod} in CenterObj {CObj}")
+                                    f"There is mod {Cmod} in CenterObj {Cobj}")
                                 # mid = Cobj.modifiers[mod]
                                 # Cobj.modifiers.remove(mid)
 
@@ -2944,10 +2944,12 @@ def removePUrPOrder():
 
 def copyobject(context, ob, newname):
     ob_dat = ob.data.copy()
-    newob = bpy.data.objects.new(name=newname + "_stick", object_data=ob_dat)
+    newob = bpy.data.objects.new(name=newname, object_data=ob_dat)
     matrix = ob.matrix_world
     newob.parent = ob.parent
     col = in_collection(context, ob)
+    if col == None:
+        col = bpy.data.collections['PuzzleUrPrint']
     col.objects.link(newob)
 
     for ob in context.selected_objects:
@@ -3104,11 +3106,11 @@ def copy_obj(context, child, newname):
 
 
 def change_parent(context, obj, parent):
-    mw = obj.matrix_world.copy()
+    mw = obj.matrix_world
     print(f"mw in Change Parent {mw}")
     obj.parent = parent
     obj.matrix_world = mw
-    print(f"mw after Parent change {obj.matrix_world}")
+    print(f"obj mw after Parent change {obj.matrix_world}")
 
 
 def cut_n_separate(context, coup, Cobj):

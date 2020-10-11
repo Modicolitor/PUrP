@@ -8,6 +8,30 @@
 # You should have received a copy of the GNU General Public License along with Power Sequencer. If
 # not, see <https://www.gnu.org/licenses/>.
 
+
+from .bun import PP_OT_ApplyAllCouplings
+
+from .bun import PP_OT_CouplingOrder
+from .bun import PP_OT_ActiveCoupDefaultOperator
+from .bun import PP_OT_ToggleCoupVisibilityOperator
+from .bun import PP_OT_MoveModUp
+from .bun import PP_OT_MoveModDown
+from .bun import PP_OT_Ini
+from .bun import PP_OT_DeleteCoupling
+from .bun import PP_OT_ApplyCoupling
+from .bun import PP_OT_ExChangeCoup
+from .bun import PP_OT_AddSingleCoupling
+from .bun import PP_OT_ReMapCoups
+from .bun import PP_OT_MakeBuildVolume
+from .bun import PP_OT_ApplyPlanarMultiObj
+from .bun import PP_OT_ApplyMultiplePlanarToObject
+from .bun import PP_OT_ApplySingleToObjects
+from .bun import PP_OT_TestCorrectnameOperator
+from .bun import PP_OT_UnmapCoup
+from .bun import PP_OT_ConnectorHide
+from .bun import PP_OT_AllConnectorHide
+from .bvh_overlap import PP_OT_OverlapcheckOperator
+
 #from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_BevelSegmentGizmo
 from .gizmos import PP_OT_BevelOffsetGizmo
@@ -49,28 +73,7 @@ from .ui import PP_PT_PuzzlePrintBuildVolumeMenu
 from .ui import PP_PT_PuzzlePrintActiveObject
 
 from .properties import PUrPropertyGroup
-from .bun import PP_OT_ApplyAllCouplings
 
-from .bun import PP_OT_CouplingOrder
-from .bun import PP_OT_ActiveCoupDefaultOperator
-from .bun import PP_OT_ToggleCoupVisibilityOperator
-from .bun import PP_OT_MoveModUp
-from .bun import PP_OT_MoveModDown
-from .bun import PP_OT_Ini
-from .bun import PP_OT_DeleteCoupling
-from .bun import PP_OT_ApplyCoupling
-from .bun import PP_OT_ExChangeCoup
-from .bun import PP_OT_AddSingleCoupling
-from .bun import PP_OT_ReMapCoups
-from .bun import PP_OT_MakeBuildVolume
-from .bun import PP_OT_ApplyPlanarMultiObj
-from .bun import PP_OT_ApplyMultiplePlanarToObject
-from .bun import PP_OT_ApplySingleToObjects
-from .bun import PP_OT_TestCorrectnameOperator
-from .bun import PP_OT_UnmapCoup
-from .bun import PP_OT_ConnectorHide
-from .bun import PP_OT_AllConnectorHide
-from .bvh_overlap import PP_OT_OverlapcheckOperator
 
 from .modalops import PP_OT_PlanarZScaleMenu
 

@@ -136,9 +136,10 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
             subcol.operator("object.applysingletoobjects", text='Single Connector To Multiple Objects',
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
-
-            subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
-                            icon="MOD_INSTANCE")
+            subcol.operator("object.pp_ot_overlapcheck",
+                            text='Check Overlap', icon="HIDE_OFF")
+            # subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
+            #                icon="MOD_INSTANCE")
 
 
 class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
@@ -186,9 +187,6 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
             subcol.operator("object.togglecoupvisibility",
                             text='Toggle Modifier Visibility', icon="RESTRICT_VIEW_ON")
             subcol.prop(PUrP, "InlayToggleBool", text='Toggle Inlay')
-
-            # subcol.operator("object.pp_ot_overlapcheck",
-            #                text='Check Overlap', icon="HIDE_OFF")
 
 
 class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):

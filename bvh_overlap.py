@@ -1,5 +1,6 @@
 import bpy
 import mathutils
+#from .bun import is_planar, applyScalRot
 
 
 def bvhOverlap(context, coup, CenterObj):
@@ -16,16 +17,23 @@ def bvhOverlap(context, coup, CenterObj):
     for ob in context.selected_objects:
         ob.select_set(False)
 
-    coup_tmp.select_set(True)
-    context.view_layer.objects.active = coup_tmp
+    # coup_tmp.select_set(True)
+    #context.view_layer.objects.active = coup_tmp
     coup_tmp.matrix_world = matrix
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    # if "Planar" in coup.name:
+    #    print("Planar)
+    #    bvhapplyScalRot(coup_tmp)
+    # else:
+    #    bpy.ops.object.transform_apply(
+    #        location=True, rotation=True, scale=True)  # why location? because parented?
 
     # make Solidify to the mainplane, but also more stuff for planar
+    context.view_layer.objects.active = coup_tmp
 
     for mod in coup.modifiers:
         mod = coup_tmp.modifiers.new(name=mod.name, type=mod.type)
         if "PUrP_Solidify" == mod.name:
+            mod = coup.modifiers["PUrP_Solidify"]
             mod.thickness = coup.modifiers["PUrP_Solidify"].thickness
             mod.offset = coup.modifiers["PUrP_Solidify"].offset
             mod.solidify_mode = coup.modifiers["PUrP_Solidify"].solidify_mode
@@ -35,12 +43,18 @@ def bvhOverlap(context, coup, CenterObj):
             mod.relative_offset_displace = coup.modifiers["PUrP_Array_1"].relative_offset_displace
         elif "PUrP_Array_2" == mod.name:
             mod.count = coup.modifiers["PUrP_Array_2"].count
-            mod.relative_offset_displace = coup.modifiers["PUrP_Array_2"].constant_offset_displace
+            mod.use_relative_offset = False
+            mod.use_constant_offset = True
+            mod.constant_offset_displace = coup.modifiers["PUrP_Array_2"].constant_offset_displace
         bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod.name)
 
-    # coup_tmp.select_set(True)
+    coup_tmp.select_set(True)
+    coup_tmp.matrix_world = matrix
+
     # coup.select_set(False)
-    # bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+    context.view_layer.objects.active = coup_tmp
+    # bvhapplyScalRot(coup_tmp)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
     # BVH Tree creation
     depsgraph = context.evaluated_depsgraph_get()
@@ -54,17 +68,16 @@ def bvhOverlap(context, coup, CenterObj):
     overlaplist = BVHTreeCoup.overlap(BVHTreeCenterObj)
     print("###########################")
     # remove coup tmp
-    bpy.data.objects.remove(coup_tmp)
+    # bpy.data.objects.remove(coup_tmp)
 
     if len(overlaplist) > 0:
-        print("BVH Overlap True")
+        print(
+            f"BVH Overlap True for coup {coup.name}  Cob {CenterObj.name}")
         return True
     else:
-        print("BVH Overlap False")
+        print(
+            f"BVH Overlap False for coup {coup.name}  Cob {CenterObj.name}")
         return False
-
-
-'''coup active, CenterObj selected'''
 
 
 class PP_OT_OverlapcheckOperator(bpy.types.Operator):
@@ -80,3 +93,17 @@ class PP_OT_OverlapcheckOperator(bpy.types.Operator):
         bvhOverlap(context, coup, CenterObj)
 
         return {'FINISHED'}
+
+
+def bvhapplyScalRot(obj):
+    mat = obj.matrix_world
+    # translation/ location vector
+    trans = mathutils.Matrix.Translation(mathutils.Vector(
+        (obj.matrix_world[0][3], obj.matrix_world[1][3], obj.matrix_world[2][3])))
+
+    # ob data
+    me = obj.data
+    for v in me.vertices:
+        v.co = v.co@mat
+    mat.identity()
+    mat @= trans

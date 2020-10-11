@@ -27,6 +27,9 @@ after applying
 bugs:
 general operator bug:
 
+[] Moving origing to the different pieces?
+[] after applying large planar (many pieces) Modifier of second planar sprinkled randomly over the elements
+[] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   
 [-] Linedistance must be absolut, otherwise scale changes it
 [] error in "corect name" (ob == none ) when unmapping duplicated planar
