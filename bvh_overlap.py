@@ -67,7 +67,7 @@ def bvhOverlap(context, coup, CenterObj):
     overlaplist = BVHTreeCoup.overlap(BVHTreeCenterObj)
     print("###########################")
     # remove coup tmp
-    # bpy.data.objects.remove(coup_tmp)
+    bpy.data.objects.remove(coup_tmp)
 
     if len(overlaplist) > 0:
         print(

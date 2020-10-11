@@ -1029,7 +1029,8 @@ def applyRemoveCouplMods(daughter, connector, side):
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_union' == mod.name:
-                print(f'I delete now  {mod.name} from Object {daughter.name}')
+                print(
+                    f'I delete now modifier {mod.name} from Object {daughter.name}')
                 daughter.modifiers.remove(mod)
     elif side == "POSITIV":
         print('Positive Seite')
@@ -1053,7 +1054,8 @@ def applyRemoveCouplMods(daughter, connector, side):
                 bpy.ops.object.modifier_apply(
                     apply_as='DATA', modifier=mod.name)
             elif str(connector.name) + '_diff' == mod.name:
-                print(f'I delete now  {mod.name} from Object {daughter.name}')
+                print(
+                    f'I delete now modifier {mod.name} from Object {daughter.name}')
                 daughter.modifiers.remove(mod)
     else:
         print("Somethings Wrong with side determin")
@@ -1079,7 +1081,7 @@ def in_collection(context, ob):
 
 def removeCoupling(context, Coupl):
     '''removes objects related to the coupling after apllying or when it is a fixed '''
-    print(f"Delete now Coupling {Coupl.name}")
+    print(f"I'm in Delete now Coupling {Coupl.name}")
 
     data = bpy.data
     PUrP = context.scene.PUrP
@@ -1100,6 +1102,14 @@ def removeCoupling(context, Coupl):
                 name="tmp", object_data=childtmpdata)
 
             col = in_collection(context, Coupl)
+            if col == None:
+                if context.collection != None:
+                    col = context.collection
+                else:
+                    collection = bpy.data.collections.new(
+                        name="PUrPNeededThat")  # makes collection
+                    context.scene.collection.children.link(collection)
+
             col.objects.link(child_tmp)
             child_tmp.parent = Coupl
             child_tmp.matrix_world = matrix
@@ -1142,8 +1152,7 @@ def removeCoupling(context, Coupl):
     if keep:
         for num, coup in enumerate(ChildCopies):
             coup.name = ChildNames[num]
-        Coupl.parent = None
-        unmapped_signal(context, Coupl)
+        unmap_coup(context, Coupl)
     else:
         Coupl.select_set(True)
         bpy.ops.object.delete(use_global=False)
@@ -1281,17 +1290,17 @@ def unmapped_signal(context, coup):
     SignalText.scale = mathutils.Vector(
         (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
     context.view_layer.objects.active = coup
-    print(f"coup {coup.name} was false with both daughters")
+    print(f"coup {coup.name} got the unmapped signal")
 
 
-def applySingleCoup(context, Coup, CenterObj, delete):
+def applySingleCoup(context, coup, CenterObj, delete):
     # context = bpy.context
     data = bpy.data
     PUrP = context.scene.PUrP
     # PUrP_name = PUrP.PUrP_name
 
-    obj = Coup
-    oriCoupname = Coup.name[:]
+    obj = coup
+    oriCoupname = coup.name[:]
 
     for sel in context.selected_objects:
         sel.select_set(False)
@@ -1327,8 +1336,8 @@ def applySingleCoup(context, Coup, CenterObj, delete):
         # teste on which side a vertex of one object lays
         context.view_layer.objects.active = obj
         # apply rotation centerplane obj damit die vector rechnung funktioniert
-        bpy.ops.object.transform_apply(
-            location=False, rotation=True, scale=True)
+        # bpy.ops.object.transform_apply(   ###########################################removed while searching for coup unparenting and single to multiple, coup verschieben problem
+        #    location=False, rotation=True, scale=True)
 
         direction = SideOfPlane(context, obj, DaughterOne)
 
@@ -1358,7 +1367,10 @@ def applySingleCoup(context, Coup, CenterObj, delete):
         DOneCoupList = []
         DTwoCoupList = []
         oriCoupNames.remove(oriCoupname)
+        print(
+            f"oriCoupname list shouldnt have {oriCoupname} in it contains {oriCoupNames} ")
         for coupname in oriCoupNames:
+            print(f"coupname {coupname} beim umsortieren in applysingle")
             coup = objects[coupname]
             mw = coup.matrix_world
             print(f"restliche Coup verteilen liste {coupname}")
@@ -1373,9 +1385,12 @@ def applySingleCoup(context, Coup, CenterObj, delete):
                 coup.matrix_world = mw
                 DTwoCoupList.append(coup)
             else:
-                coup.parent = None
-                coup.matrix_world = mw
-                unmapped_signal(context, coup)
+                print(
+                    f"after bvh false in applysingle {coup.name} and Daughter? ")
+                unmap_coup(context, coup)
+                #coup.parent = None
+                #coup.matrix_world = mw
+                #unmapped_signal(context, coup)
 
         # all modifiers of all couplings which are identified as overlapping
         DOneAllMods = AllCoupMods(context, DOneCoupList, DaughterOne)
@@ -1404,6 +1419,7 @@ def applySingleCoup(context, Coup, CenterObj, delete):
         if delete:
             removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
+        print(f"coup parent after applysingle is {coup.parent}")
         return Daughters
 
     elif len(CenterObjDaughters) > 2:  # branch where a planar cuts the Centerobj in many pieces
@@ -2246,7 +2262,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
 
     def execute(self, context):
 
-        selected = context.selected_objects[:]
+        selected = selectedtocouplist(context, context.selected_objects[:])
         active = context.object
         CenterObj = active
         if is_coup(context, active):
@@ -2263,66 +2279,125 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         # remove from original parent
 
         for coup in selected:
-            if coup != CenterObj:
-                correctname(context, coup)
-                # collect all coup mods of the selected to delete from potential parent
-                if coup.parent != None:
-                    if "PUrP" in coup.name:
-                        Couplist = []
-                        # only the one in the list in this case
-                        Couplist.append(coup)
 
-                    AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
-                    for mod in AllCoupmods:
-                        # remove in parent
-                        coup.parent.modifiers.remove(mod)
+            correctname(context, coup)
+            remap_coup(context, coup)
+            '''
+            # collect all coup mods of the selected to delete from potential parent
+            if coup.parent != None:
+                if "PUrP" in coup.name:
+                    Couplist = []
+                    # only the one in the list in this case
+                    Couplist.append(coup)
 
-                if "SingleConnector" in coup.name:
-                    mod = CenterObj.modifiers.new(
-                        name=coup.name, type="BOOLEAN")
+                AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
+                for mod in AllCoupmods:
+                    # remove in parent
+                    coup.parent.modifiers.remove(mod)
 
-                    mod.object = coup
-                    mod.operation = 'DIFFERENCE'
-                    mod.show_viewport = True
-                    set_BoolSolver(context, mod)
+            if "SingleConnector" in coup.name:
+                mod = CenterObj.modifiers.new(
+                    name=coup.name, type="BOOLEAN")
 
-                    # inlay modifiers
-                    for child in coup.children:
-                        if "Order" not in child.name and "fix" not in child.name:
-                            mod = CenterObj.modifiers.new(
-                                name=child.name, type="BOOLEAN")
-                            mod.object = child
-                            mod.show_viewport = False
-                            set_BoolSolver(context, mod)
-                            if "_diff" in child.name:
-                                mod.operation = 'DIFFERENCE'
-                            elif '_union' in child.name:
-                                mod.operation = 'UNION'
-                elif "PlanarConnector" in coup.name:
-                    mod = CenterObj.modifiers.new(
-                        name=coup.name, type="BOOLEAN")
-                    mod.object = coup
-                    mod.operation = 'DIFFERENCE'
-                    mod.show_viewport = True
-                    set_BoolSolver(context, mod)
+                mod.object = coup
+                mod.operation = 'DIFFERENCE'
+                mod.show_viewport = True
+                set_BoolSolver(context, mod)
 
-                matrix_w = coup.matrix_world
-
-                coup.parent = CenterObj
-                coup.matrix_world = matrix_w
-                # remove remap sign
-                for se in context.selected_objects:
-                    se.select_set(False)
-
+                # inlay modifiers
                 for child in coup.children:
-                    if child.type == 'FONT':
-                        print("child")
-                        child.hide_select = False
-                        child.select_set(True)
-                bpy.ops.object.delete(use_global=False)
+                    if "Order" not in child.name and "fix" not in child.name:
+                        mod = CenterObj.modifiers.new(
+                            name=child.name, type="BOOLEAN")
+                        mod.object = child
+                        mod.show_viewport = False
+                        set_BoolSolver(context, mod)
+                        if "_diff" in child.name:
+                            mod.operation = 'DIFFERENCE'
+                        elif '_union' in child.name:
+                            mod.operation = 'UNION'
+            elif "PlanarConnector" in coup.name:
+                mod = CenterObj.modifiers.new(
+                    name=coup.name, type="BOOLEAN")
+                mod.object = coup
+                mod.operation = 'DIFFERENCE'
+                mod.show_viewport = True
+                set_BoolSolver(context, mod)
 
+            matrix_w = coup.matrix_world
+
+            coup.parent = CenterObj
+            coup.matrix_world = matrix_w
+            # remove remap sign
+            for se in context.selected_objects:
+                se.select_set(False)
+
+            for child in coup.children:
+                if child.type == 'FONT':
+                    print("child")
+                    child.hide_select = False
+                    child.select_set(True)
+            bpy.ops.object.delete(use_global=False)
+        '''
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
+
+
+def remap_coup(context, coup, CenterObj):
+    if coup.parent != None:
+        Couplist = [coup]
+        # only the one in the list in this case
+        # Couplist.append(coup)
+
+        AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
+        for mod in AllCoupmods:
+            # remove in parent
+            coup.parent.modifiers.remove(mod)
+
+    if is_single(context, coup):
+        mod = CenterObj.modifiers.new(
+            name=coup.name, type="BOOLEAN")
+
+        mod.object = coup
+        mod.operation = 'DIFFERENCE'
+        mod.show_viewport = True
+        set_BoolSolver(context, mod)
+
+        # inlay modifiers
+        for child in coup.children:
+            if "Order" not in child.name and "fix" not in child.name:
+                mod = CenterObj.modifiers.new(
+                    name=child.name, type="BOOLEAN")
+                mod.object = child
+                mod.show_viewport = False
+                set_BoolSolver(context, mod)
+                if "_diff" in child.name:
+                    mod.operation = 'DIFFERENCE'
+                elif '_union' in child.name:
+                    mod.operation = 'UNION'
+    elif is_planar(context, coup):
+        mod = CenterObj.modifiers.new(
+            name=coup.name, type="BOOLEAN")
+        mod.object = coup
+        mod.operation = 'DIFFERENCE'
+        mod.show_viewport = True
+        set_BoolSolver(context, mod)
+
+    matrix_w = coup.matrix_world
+
+    coup.parent = CenterObj
+    coup.matrix_world = matrix_w
+    # remove remap sign
+    for se in context.selected_objects:
+        se.select_set(False)
+
+    for child in coup.children:
+        if child.type == 'FONT':
+            print("delete order text in remap_coup")
+            child.hide_select = False
+            child.select_set(True)
+
+    bpy.ops.object.delete(use_global=False)
 
 
 class PP_OT_UnmapCoup(bpy.types.Operator):
@@ -2343,21 +2418,34 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        selected = selectedtocouplist(context, context.selected_objects)
+        coups = selectedtocouplist(context, context.selected_objects)
 
-        for coup in selected:
+        for coup in coups:
             correctname(context, coup)
             if not is_unmapped(context, coup):
                 # if is_planar(context, coup) or is_single(context, coup):
-                mw = coup.matrix_world
-                coup.parent = None
-                coup.matrix_world = mw
-                remove_coupmods(context, coup)
-                unmapped_signal(context, coup)
+
+                unmap_coup(context, coup)
+                #mw = coup.matrix_world
+
+                #change_parent(context, coup, None)
+                #coup.parent = None
+                #coup.matrix_world = mw
+                #remove_coupmods(context, coup)
+                #unmapped_signal(context, coup)
 
         return {'FINISHED'}
 
-# goes through all objects and removes coup related modifiers
+
+def unmap_coup(context, coup):
+    # if not is_unmapped
+    # if is_planar(context, coup) or is_single(context, coup):
+    mw = coup.matrix_world
+    change_parent(context, coup, None)
+    #coup.parent = None
+    coup.matrix_world = mw
+    remove_coupmods(context, coup)
+    unmapped_signal(context, coup)
 
 
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
@@ -2596,7 +2684,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
             context.view_layer.objects.active = Cob
             if couptype == 'STICK':
                 # stick case
-                # print("Stick")
+                print("Stick")
                 # mainplane
                 if bvhOverlap(context, coup, Cob):
                     # ignore mainplane
@@ -2644,9 +2732,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         newfix.display_type = 'SOLID'
                         newfix.show_in_front = True
 
-                        change_parent(context, coup, None)
-                        unmapped_signal(context, coup)
-                        context.view_layer.objects.active = coup
+                        if not is_unmapped:
+                            unmap_coup(context, coup)
+                            #change_parent(context, coup, None)
+                            #unmapped_signal(context, coup)
+
                     else:
                         data.objects.remove(
                             data.objects[coup.name + "_stick_diff"])
@@ -2661,11 +2751,11 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         data.objects.remove(coup)
 
             elif couptype == 'MF':
-                #foundCob = None
+                foundCob = None
                 # MF case
                 print("MF")
                 if origin_in_bb(context, coup, Cob):
-                    print(f"Detected {Cob} as Base CenterObj, adding Inlay ")
+                    print(f"Detected {Cob} as Base CenterObj")
                     #change_parent(context, coup, Cob)
 
                     if not PUrP.IgnoreMainCut:
@@ -2673,6 +2763,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         foundBase = Cob
 
                     else:
+                        print(f"ignore mainplane --> apply  ")
                         ensure_mod(context, union, Cob, "union")
                         context.view_layer.objects.active = Cob
                         bpy.ops.object.modifier_apply(
@@ -2683,38 +2774,49 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         #applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
                 else:  # wenn nicht zentraler CObj mach ein loch und zieh die mainplane ab
                     # erst diff
+                    print(f"{Cob} is not foundBase  ")
+                    context.view_layer.objects.active = Cob
+                    if not PUrP.IgnoreMainCut:
+                        ensure_mod(context, coup, Cob, "")
+
+                        bpy.ops.object.modifier_apply(
+                            apply_as='DATA', modifier=coup.name)
+
                     ensure_mod(context, diff, Cob, "diff")
                     Cob.select_set(True)
                     # apply modifier
-                    context.view_layer.objects.active = Cob
+
                     bpy.ops.object.modifier_apply(
                         apply_as='DATA', modifier=coup.name + "_diff")
 
                     # the mainplane for MF when not the base Cob
-                    if not PUrP.IgnoreMainCut:
-                        ensure_mod(context, coup, Cob, "")
-                        bpy.ops.object.modifier_apply(
-                            apply_as='DATA', modifier=coup.name)
 
                 # after last Cobj
                 if num == len(CenterObjs)-1:
+                    print(
+                        "Operation after last Cob Cycle Last, heres should apply and delete/unmapp ")
                     # wenn keep
                     if PUrP.KeepCoup:
                         # unmap coup
                         if PUrP.IgnoreMainCut:
-                            change_parent(context, coup, None)
-                            unmapped_signal(context, coup)
+                            if not is_unmapped:
+                                unmap_coup(context, coup)
+                            #change_parent(context, coup, None)
+                            #unmapped_signal(context, coup)
                         else:
                             if foundBase != None:
-                                foundBase.PUrPCobj = True
-                                change_parent(context, coup, foundBase)
-                                ensure_mod(context, coup, foundBase, "")
-                                ensure_mod(context, union, foundBase, "union")
-                                ensure_mod(context, diff, foundBase, "diff")
+                                #foundBase.PUrPCobj = True
+                                #change_parent(context, coup, foundBase)
+                                #ensure_mod(context, coup, foundBase, "")
+                                #ensure_mod(context, union, foundBase, "union")
+                                #ensure_mod(context, diff, foundBase, "diff")
+                                remap_coup(context, coup, foundBase)
                                 applySingleCoup(
                                     context, coup, foundBase, PUrP.KeepCoup)
-                            change_parent(context, coup, None)
-                            unmapped_signal(context, coup)
+                            if not is_unmapped(context, coup):
+                                unmap_coup(context, coup)
+                            #change_parent(context, coup, None)
+                            #unmapped_signal(context, coup)
                     else:
                         # when everything is done apply or remove couple to found Cob
                         if PUrP.IgnoreMainCut:
@@ -2943,13 +3045,19 @@ def removePUrPOrder():
 
 
 def copyobject(context, ob, newname):
+    print(f"copy i make a copy of {ob} with the name {newname} ")
     ob_dat = ob.data.copy()
     newob = bpy.data.objects.new(name=newname, object_data=ob_dat)
     matrix = ob.matrix_world
     newob.parent = ob.parent
     col = in_collection(context, ob)
     if col == None:
-        col = bpy.data.collections['PuzzleUrPrint']
+        if context.collection != None:
+            col = context.collection
+        else:
+            collection = bpy.data.collections.new(
+                name="PUrPNeededThat")  # makes collection
+            context.scene.collection.children.link(collection)
     col.objects.link(newob)
 
     for ob in context.selected_objects:
@@ -3023,13 +3131,11 @@ def set_BoolSolver(context, mod):
 
 def remove_coupmods(context, coup):
     data = bpy.data
-
+    print(f"remove coup mods of {coup.name} from all objects")
     for ob in data.objects:
         if not is_inlay(context, ob):
-            print(f"not is_inlay object {coup.name}")
             for mod in ob.modifiers:
                 if coup.name in mod.name:
-
                     ob.modifiers.remove(mod)
 
 
@@ -3106,6 +3212,7 @@ def copy_obj(context, child, newname):
 
 
 def change_parent(context, obj, parent):
+    print(f"I change the parent of {obj.name} in {parent}")
     mw = obj.matrix_world
     print(f"mw in Change Parent {mw}")
     obj.parent = parent
@@ -3199,7 +3306,7 @@ def origin_in_bb(context, union, CObj):
     zhighest = highest_value(bbox_corners, 2)
     zlowest = lowest_value(bbox_corners, 2)
 
-    print(f"xhighest {xhighest} yhighest {yhighest} zhighest {zhighest} xlowest {xlowest} ylowest {ylowest} zlowest {zlowest}")
+    #print(f"xhighest {xhighest} yhighest {yhighest} zhighest {zhighest} xlowest {xlowest} ylowest {ylowest} zlowest {zlowest}")
 
     answer = False
     # union.location@union.matrix_world
