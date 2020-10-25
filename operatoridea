@@ -27,9 +27,9 @@ after applying
 bugs:
 general operator bug:
 
-[] after apply + keep bevel modifiers lost from inlays
+
 []? Moving origing to the different pieces?
-[] single to multiple: no positiv part when "keep connector" False with ignore and not ignore maincut (working when keep connector True)
+[] adding has a order on
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   
@@ -86,6 +86,8 @@ Publishing:
 
 
 resolved bug:
+[+] after apply + keep bevel modifiers lost from inlays
+[+] single to multiple: no positiv part when "keep connector" False with ignore and not ignore maincut (working when keep connector True)
  [x] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
 [+] icons visibility
 [+] unmap op moves coup

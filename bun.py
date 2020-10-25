@@ -1091,63 +1091,72 @@ def removeCoupling(context, Coupl):
     Coupl_children = Coupl.children[:]
     ChildCopies = []
     ChildNames = []
+
     for child in Coupl_children:
         # make a copy of the inlays to reconnect and keep them later is Keep Bool is set
+        if not is_order(context, child):
+            if keep:
+                # make a copy of the inlays
+                matrix = child.matrix_world
+                childtmpdata = child.data.copy()
+                child_tmp = bpy.data.objects.new(
+                    name="tmp", object_data=childtmpdata)
 
-        if keep:
-            # make a copy of the inlays
-            matrix = child.matrix_world
-            childtmpdata = child.data.copy()
-            child_tmp = bpy.data.objects.new(
-                name="tmp", object_data=childtmpdata)
+                col = in_collection(context, Coupl)
+                if col == None:
+                    if context.collection != None:
+                        col = context.collection
+                    else:
+                        collection = bpy.data.collections.new(
+                            name="PUrPNeededThat")  # makes collection
+                        context.scene.collection.children.link(collection)
 
-            col = in_collection(context, Coupl)
-            if col == None:
-                if context.collection != None:
-                    col = context.collection
-                else:
-                    collection = bpy.data.collections.new(
-                        name="PUrPNeededThat")  # makes collection
-                    context.scene.collection.children.link(collection)
+                col.objects.link(child_tmp)
+                child_tmp.parent = Coupl
+                child_tmp.matrix_world = matrix
+                child_tmp.display_type = 'WIRE'
+                print("remove coup keep mache Bevel mod ")
+                mod = child_tmp.modifiers.new(
+                    name=Coupl.name + "Bevel", type="BEVEL")
+                mod.width = child.modifiers[child.name + "Bevel"].width
+                mod.segments = child.modifiers[child.name + "Bevel"].segments
+                mod.limit_method = 'WEIGHT'
 
-            col.objects.link(child_tmp)
-            child_tmp.parent = Coupl
-            child_tmp.matrix_world = matrix
-            child_tmp.display_type = 'WIRE'
-            ChildCopies.append(child_tmp)
-            ChildNames.append(child.name)
+                ChildCopies.append(child_tmp)
+                ChildNames.append(child.name)
 
-        if "fix" not in child.name:  # alle normalen couplings die applied sind
-            child.hide_select = False
-            for ob in context.selected_objects:
-                ob.select_set(False)
-            child.select_set(True)
+            if "fix" not in child.name:  # alle normalen couplings die applied sind
+                child.hide_select = False
+                for ob in context.selected_objects:
+                    ob.select_set(False)
+                child.select_set(True)
 
-            bpy.ops.object.delete(use_global=False)
-        elif 'fix' in child.name:
-            child.hide_select = False
-            # apply bevel and stuff
-            for mod in child.modifiers:
-                print(f"fix stick active {active} mod {mod.name}")
-                context.view_layer.objects.active = child
-                bpy.ops.object.modifier_apply(
-                    apply_as='DATA', modifier=mod.name)
-            child.name = Coupl.parent.name
-            child.display_type = 'SOLID'
-            # child.location = mathutils.Vector((0,0,0))
-            globloc = Coupl.matrix_world
-            print(f" Matrix World  von Coupl {globloc}")
+                bpy.ops.object.delete(use_global=False)
+            elif 'fix' in child.name:
+                child.hide_select = False
+                # apply bevel and stuff
+                for mod in child.modifiers:
+                    print(f"fix stick active {active} mod {mod.name}")
+                    context.view_layer.objects.active = child
+                    bpy.ops.object.modifier_apply(
+                        apply_as='DATA', modifier=mod.name)
+                child.name = Coupl.parent.name
+                child.display_type = 'SOLID'
+                # child.location = mathutils.Vector((0,0,0))
+                globloc = Coupl.matrix_world
+                print(f" Matrix World  von Coupl {globloc}")
 
-            child.parent = None
-            child.matrix_world = globloc
-            # child.parent = context.scene.PUrP.CenterObj
-            # child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
+                child.parent = None
+                child.matrix_world = globloc
+                # child.parent = context.scene.PUrP.CenterObj
+                # child.name = context.scene.PUrP.PUrP_name + "CoupleStick"
 
     for ob in data.objects:
         ob.select_set(False)  # for deleting after this modifier removal
-        for mod in ob.modifiers:
-            if Coupl.name in mod.name:
-                ob.modifiers.remove(mod)
+        if ob not in ChildCopies:
+            for mod in ob.modifiers:
+                if Coupl.name in mod.name:
+                    ob.modifiers.remove(mod)
 
     if keep:
         for num, coup in enumerate(ChildCopies):
@@ -1369,6 +1378,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
         oriCoupNames.remove(oriCoupname)
         print(
             f"oriCoupname list shouldnt have {oriCoupname} in it contains {oriCoupNames} ")
+
         for coupname in oriCoupNames:
             print(f"coupname {coupname} beim umsortieren in applysingle")
             coup = objects[coupname]
@@ -1416,10 +1426,12 @@ def applySingleCoup(context, coup, CenterObj, delete):
         # delete Coupling
 
         context.view_layer.objects.active = obj
+
         if delete:
             removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
         print(f"coup parent after applysingle is {coup.parent}")
+
         return Daughters
 
     elif len(CenterObjDaughters) > 2:  # branch where a planar cuts the Centerobj in many pieces
@@ -1455,6 +1467,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
         if delete:
             removeCoupling(context, obj)
         Daughters = CenterObjDaughters
+        #print(f"blub blub remove coup mod {mod.fail} 2")
         return Daughters
 
 
@@ -2281,7 +2294,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         for coup in selected:
 
             correctname(context, coup)
-            remap_coup(context, coup)
+            remap_coup(context, coup, CenterObj)
             '''
             # collect all coup mods of the selected to delete from potential parent
             if coup.parent != None:
@@ -2352,6 +2365,7 @@ def remap_coup(context, coup, CenterObj):
         AllCoupmods = AllCoupMods(context, Couplist, coup.parent)
         for mod in AllCoupmods:
             # remove in parent
+            print(f"blieb remove coup mod {mod.name} from {CenterObj}")
             coup.parent.modifiers.remove(mod)
 
     if is_single(context, coup):
@@ -3143,6 +3157,8 @@ def remove_coupmods(context, coup):
         if not is_inlay(context, ob):
             for mod in ob.modifiers:
                 if coup.name in mod.name:
+                    print(
+                        f"blub blub remove coup mod {mod.name} from {ob.name}")
                     ob.modifiers.remove(mod)
 
 
@@ -3195,6 +3211,13 @@ def is_unmapped(context, coup):
     elif coup.name not in coup.parent.modifiers:
         return True
     return False
+
+
+def is_order(context, coup):
+    if "Order" in coup.name:
+        return True
+    else:
+        return False
 
 
 def is_inlay(context, coup):
