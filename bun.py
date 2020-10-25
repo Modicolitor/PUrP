@@ -2680,8 +2680,10 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         print(CenterObjs)
         foundBase = None
         for num, Cob in enumerate(CenterObjs):
+
             print(f"Processing now Cob {Cob.name}")
             context.view_layer.objects.active = Cob
+            Cob.select_set(True)
             if couptype == 'STICK':
                 # stick case
                 print("Stick")
@@ -2763,11 +2765,14 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         foundBase = Cob
 
                     else:
-                        print(f"ignore mainplane --> apply  ")
+                        print(f"ignore mainplane --> apply {union.name} ")
+                        foundBase = Cob
                         ensure_mod(context, union, Cob, "union")
+                        # print(f"{union.fail}")
                         context.view_layer.objects.active = Cob
                         bpy.ops.object.modifier_apply(
                             apply_as='DATA', modifier=coup.name + "_union")
+
                         # union + das Cobjs
                         # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
                         #foundCob = Cob
@@ -2823,11 +2828,13 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             removeCoupling(context, coup)
                         else:
                             if foundBase != None:
+
                                 foundBase.PUrPCobj = True
-                                change_parent(context, coup, foundBase)
-                                ensure_mod(context, coup, foundBase, "")
-                                ensure_mod(context, union, foundBase, "union")
-                                ensure_mod(context, diff, foundBase, "diff")
+                                #change_parent(context, coup, foundBase)
+                                remap_coup(context, coup, foundBase)
+                                #ensure_mod(context, coup, foundBase, "")
+                                #ensure_mod(context, union, foundBase, "union")
+                                #ensure_mod(context, diff, foundBase, "diff")
                                 applySingleCoup(
                                     context, coup, foundBase, PUrP.KeepCoup)
 
@@ -3270,9 +3277,16 @@ def ensure_mod(context, ele, CObj, nameadd):
 
     mod = CObj.modifiers.new(
         type='BOOLEAN', name=modname)
-    mod.object = data.objects[modname]
-    mod.operation = "DIFFERENCE"
+
     set_BoolSolver(context, mod)
+    if "diff" in nameadd:
+        mod.operation = "DIFFERENCE"
+    elif "union" in nameadd:
+        mod.operation = "UNION"
+    elif "" == namead:
+        mod.operation = "DIFFERENCE"
+
+    mod.object = data.objects[modname]
 
 
 def lowest_value(vectorlist, dim):

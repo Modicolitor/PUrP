@@ -28,8 +28,9 @@ bugs:
 general operator bug:
 
 [] after apply + keep bevel modifiers lost from inlays
-[] Moving origing to the different pieces?
-[] after applying large planar (many pieces) Modifier of second planar sprinkled randomly over the elements
+[]? Moving origing to the different pieces?
+[] single to multiple: no positiv part when "keep connector" False with ignore and not ignore maincut (working when keep connector True)
+
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   
 [-] Linedistance must be absolut, otherwise scale changes it
