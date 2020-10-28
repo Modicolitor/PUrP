@@ -30,12 +30,10 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                 pass
 
             subcol = col.column()
-            # subcol.label(text="Coupling Mode")
-            # subcol.label(text="AddingCouplings")
 
-            subcol.operator("add.coup", text="Add Coupling",
+            subcol.operator("add.coup", text="Add Connector",
                             icon="PLUS")  # zeige button an
-            subcol.operator("rem.coup", text="Delete Coupling",
+            subcol.operator("rem.coup", text="Delete Connector",
                             icon="CANCEL")  # zeige button an
             subcol.label(text="Adjust")
             subcol.operator("object.exchangecoup",
@@ -43,11 +41,12 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.operator("object.activecoupdefault",
                             text='Active to Settings', icon="EXPORT")  # zeige button an
 
-            subcol.prop(PUrP, "SingleCouplingModes", expand=True)
+            subcol.prop(PUrP, "SingleCouplingModes",
+                        expand=True, text='Connector Modes')
             if context.scene.PUrP.SingleCouplingModes != '4':
-                subcol.prop(PUrP, "SingleCouplingTypes", text='Coupling Type')
+                subcol.prop(PUrP, "SingleCouplingTypes", text='Connector Type')
             else:
-                subcol.prop(PUrP, "PlanarCouplingTypes", text='Coupling Type')
+                subcol.prop(PUrP, "PlanarCouplingTypes", text='Connector Type')
             if context.scene.PUrP.ExactOptBool:
                 subcol.prop(PUrP, "BoolModSettings", text='Solver')
             subcol.prop(PUrP, "GlobalScale", text='Global Scale')
@@ -94,7 +93,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.prop(PUrP, "AddUnmapped",
                         text='Add Unmapped')
             subcol = col.box()
-            subcol.operator("apl.coup", text="Apply Coupling",
+            subcol.operator("apl.coup", text="Apply Connector(s)",
                             icon="MOD_DYNAMICPAINT")  # zeige button an
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
@@ -170,12 +169,12 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
             subcol.operator("object.pp_ot_unmapcoup",
                             text='Unmap Connector', icon="FILE_REFRESH")
             subcol = col.box()
-            subcol.label(text="Mapping")
+            subcol.label(text="Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
             subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
             subcol.operator(
-                "pup.moddown", text='Down in Couplingorder', icon="TRIA_DOWN")
+                "pup.moddown", text='Down in Connectororder', icon="TRIA_DOWN")
 
             subcol = col.box()
             subcol.label(text="Connector Visibility Toggles")
