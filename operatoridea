@@ -29,7 +29,14 @@ general operator bug:
 
 
 []? Moving origing to the different pieces?
-[] adding has a order on
+[] adding has order on
+[] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
+[] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore
+[] adding unmapped should work with know other object in the scene, (check for PUrP.CObj exists)
+[] inlays selectable
+
+
+[] adding a planar while another planar is selected/active applys rotation to the the active planar (New planar is stil applied to CObj)
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   
@@ -63,6 +70,7 @@ Known Issues
 New Option
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
 [] shift increase precision of Gizmos
+[] create random planar array with random planar parts (with category chooser)
 
 
 Tests
