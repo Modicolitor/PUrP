@@ -31,8 +31,7 @@ general operator bug:
 []? Moving origing to the different pieces?
 [] adding has order on
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
-[] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore
-[] adding unmapped should work with know other object in the scene, (check for PUrP.CObj exists)
+
 [] inlays selectable
 
 
@@ -94,6 +93,8 @@ Publishing:
 
 
 resolved bug:
+[+] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore (check for PUrP.CObj exists, check if PUrP.CObj is coup)
+[+] adding unmapped should work with know other object in the scene, 
 [+] after apply + keep bevel modifiers lost from inlays
 [+] single to multiple: no positiv part when "keep connector" False with ignore and not ignore maincut (working when keep connector True)
  [x] planar last in order it gets moved away and not applied or deleted (also not remains in Mod stack, but is unmapped)
