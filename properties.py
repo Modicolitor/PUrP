@@ -61,6 +61,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Add with Connector without center object", default=False)
     ExactOptBool = bpy.props.BoolProperty(
         name="Is Exactoption in Bool available", default=True)
+    OrderBool = bpy.props.BoolProperty(
+        name="Is Order on or off", default=False)
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

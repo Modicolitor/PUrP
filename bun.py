@@ -148,14 +148,8 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         # order refreshing
         if not add_unmap:
-            data = bpy.data
-            Orderbool = False
-            for ob in data.objects:
-                if "PUrP" in ob.name and "_Order" in ob.name:
-                    Orderbool = True
-                    bpy.ops.pup.couplingorder()
-                    bpy.ops.pup.couplingorder()
-                    break
+            if PUrP.OrderBool:
+                update_order(context, CenterObj)
         else:
             unmapped_signal(context, data.objects[newname_mainplane])
 
@@ -194,20 +188,22 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped, visibil
         # add negativ object
         # loc.z += 0.45
         ob0 = genPrimitive(CenterObj, newname_mainplane, '_diff', is_unmapped)
+        ob0.hide_select = True
 
         # add positiv object
         ob1 = genPrimitive(CenterObj, newname_mainplane, '_union', is_unmapped)
         oversizeToPrim(context, singcoupmode(context, "2", None), ob0, ob1)
+        ob1.hide_select = True
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "1":  # stick
         bpy.data.objects[newname_mainplane].scale = mathutils.Vector((1, 1, 1))
         ob0 = genPrimitive(CenterObj, newname_mainplane,
                            '_stick_diff', is_unmapped)
-
+        ob0.hide_select = True
         ob1 = genPrimitive(CenterObj, newname_mainplane,
                            '_stick_fix', is_unmapped)
-
+        ob1.hide_select = True
         oversizeToPrim(context, singcoupmode(context, "1", None), ob0, ob1)
 
         newMain = data.objects[newname_mainplane]
@@ -913,9 +909,12 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.view_layer.objects.active = obj
                     bpy.ops.object.transform_apply(
                         location=False, rotation=False, scale=True)
+
                     if is_unmap:
                         unmapped_signal(context, obj)
-                '''
+
+            hideselectinlay(context, obj)
+            '''
                 if not is_unmap:
                     mod = CenterObj.modifiers.new(
                         name=obj.name, type="BOOLEAN")
@@ -925,18 +924,19 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     mod.operation = 'DIFFERENCE'
                     set_BoolSolver(context, mod)
                 '''
-            if not is_unmap:
-                Orderbool = False
-                for ob in data.objects:
-                    if "PUrP" in ob.name and "_Order":
-                        Orderbool = True
-                        bpy.ops.pup.couplingorder()
-                        bpy.ops.pup.couplingorder()
-                        break
+            PUrP = context.scene.PUrP
+            if PUrP.OrderBool:
+                update_order(context, CenterObj)
 
         return {'FINISHED'}
 
 # returns a list of
+
+
+def hideselectinlay(context, obj):
+    for child in obj.children:
+        if is_inlay(context, child):
+            child.hide_select = True
 
 
 def otherparents(context, coup):
@@ -1031,14 +1031,9 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                         applySingleCoup(context, coup, CenterObj, True)
 
         data = bpy.data
-        Orderbool = False
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order" in ob.name:
-                Orderbool = True
-                ob.select_set(True)
-                # bpy.ops.pup.couplingorder()
-                # bpy.ops.pup.couplingorder()
-                break
+        PUrP = context.scene.PUrP
+        if PUrP.OrderBool:
+            update_order(context, CenterObj)
         return{"FINISHED"}
 
 
@@ -1636,14 +1631,9 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
             context.view_layer.objects.active = context.scene.PUrP.CenterObj
             # order part
-            data = bpy.data
-            Orderbool = False
-            for ob in data.objects:
-                if "PUrP" in ob.name and "_Order":
-                    Orderbool = True
-                    bpy.ops.pup.couplingorder()
-                    bpy.ops.pup.couplingorder()
-                    break
+            PUrP = context.scene.PUrP
+            if PUrP.OrderBool:
+                update_order(context, CenterObj)
 
         return{"FINISHED"}
 
@@ -1794,21 +1784,19 @@ class PP_OT_MoveModDown(bpy.types.Operator):
             return False
 
     def execute(self, context):
-
+        PUrP = context.scene.PUrP
         Coup = bpy.data.objects[context.object.name]
         CenterObj = Coup.parent
+        data = bpy.data
+        initialActivename = context.object.name[:]
 
         moveModdown(Coup, CenterObj)
-
-        data = bpy.data
-        Orderbool = False
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order":
-                Orderbool = True
-                bpy.ops.pup.couplingorder()
-                bpy.ops.pup.couplingorder()
-                break
-
+        PUrP = context.scene.PUrP
+        if PUrP.OrderBool:
+            update_order(context, CenterObj)
+        deselectall(context)
+        context.view_layer.objects.active = data.objects[initialActivename]
+        context.view_layer.objects.active.select_set(True)
         return {'FINISHED'}
 
 
@@ -1829,7 +1817,9 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
     def execute(self, context):
         Coup = bpy.data.objects[context.object.name]
+        data = bpy.data
         CenterObj = Coup.parent
+        PUrP = context.scene.PUrP
         PUrP_Modsnames, mods = couplingList(CenterObj)
         active = context.object
         initialActivename = active.name[:]
@@ -1851,18 +1841,13 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
             moveModdown(Coup, CenterObj)
 
+        #data = bpy.data
+
+        if PUrP.OrderBool:
+            update_order(context, CenterObj)
+
+        deselectall(context)
         data = bpy.data
-        Orderbool = False
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order":
-                Orderbool = True
-                bpy.ops.pup.couplingorder()
-                bpy.ops.pup.couplingorder()
-                break
-
-        for ob in data.objects:
-            ob.select_set(False)
-
         context.view_layer.objects.active = data.objects[initialActivename]
         context.view_layer.objects.active.select_set(True)
         return {'FINISHED'}
@@ -2216,12 +2201,9 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
             return False
 
     def execute(self, context):
-
-        data = bpy.data
         active = context.object
         PUrP = context.scene.PUrP
         initialActivename = active.name[:]
-
         # determine CenterObj from active CenterObj or Coupling
         CenterObj = PUrP.CenterObj
         if active.PUrPCobj:
@@ -2233,46 +2215,65 @@ class PP_OT_CouplingOrder(bpy.types.Operator):
                 CenterObj = PUrP.CenterObj
 
         # toggle mechanism
-        Orderbool = True
-        for ob in data.objects:
-            if "PUrP" in ob.name and "_Order" in ob.name:  # gibt es objecte mit order -- > dann lösche nur
-                Orderbool = False
-                break
+        OrderBool = PUrP.OrderBool
+        if OrderBool:
+            PUrP.OrderBool = False
+        else:
+            PUrP.OrderBool = True
 
-        if Orderbool:
-            # garbage run
-            removePUrPOrder()
-            # new numbers
-            PUrPlist, mods = couplingList(CenterObj)
-            for num, modname in enumerate(PUrPlist):
-                matrixWorld = data.objects[modname].matrix_world
-                bpy.ops.object.text_add(
-                    enter_editmode=False, location=(0, 0, 0))
-                obj = context.object
-                obj.name = modname + "_Order"
+       # for ob in data.objects:
+       #     if "PUrP" in ob.name and "_Order" in ob.name:  # gibt es objecte mit order -- > dann lösche nur
+       #         Orderbool = False
+       #         break
 
-                obj.location.z += 0.5 * PUrP.GlobalScale
-
-                obj.data.body = str(num+1)
-                obj.data.extrude = 0.05
-                obj.show_in_front = True
-                obj.display_type = 'WIRE'
-                obj.hide_select = True
-                obj.parent = data.objects[modname]
-                obj.matrix_world = matrixWorld
-                obj.rotation_euler.x = 1.5708
-                obj.location.x -= 0.3
-                obj.scale = mathutils.Vector(
-                    (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
-                bpy.ops.object.transform_apply(
-                    location=False, rotation=False, scale=True)
-
-                context.view_layer.objects.active = CenterObj
+        # update or delete order
+        data = bpy.data
+        deselectall(context)
+        if PUrP.OrderBool:
+            update_order(context, CenterObj)
         else:
             removePUrPOrder()
         context.view_layer.objects.active = data.objects[initialActivename]
         context.view_layer.objects.active.select_set(True)
         return {'FINISHED'}
+
+
+def update_order(context, CenterObj):
+    data = bpy.data
+    active = context.object
+    PUrP = context.scene.PUrP
+    initialActivename = active.name[:]
+    # garbage run
+    removePUrPOrder()
+    # new numbers
+    PUrPlist, mods = couplingList(CenterObj)
+    for num, modname in enumerate(PUrPlist):
+        matrixWorld = data.objects[modname].matrix_world
+        bpy.ops.object.text_add(
+            enter_editmode=False, location=(0, 0, 0))
+        obj = context.object
+        obj.name = modname + "_Order"
+
+        obj.location.z += 0.5 * PUrP.GlobalScale
+
+        obj.data.body = str(num+1)
+        obj.data.extrude = 0.05
+        obj.show_in_front = True
+        obj.display_type = 'WIRE'
+        obj.hide_select = True
+        obj.parent = data.objects[modname]
+        obj.matrix_world = matrixWorld
+        obj.rotation_euler.x = 1.5708
+        obj.location.x -= 0.3
+        obj.scale = mathutils.Vector(
+            (PUrP.GlobalScale, PUrP.GlobalScale, PUrP.GlobalScale))
+        bpy.ops.object.transform_apply(
+            location=False, rotation=False, scale=True)
+
+        #context.view_layer.objects.active = CenterObj
+
+    context.view_layer.objects.active = data.objects[initialActivename]
+    context.view_layer.objects.active.select_set(True)
 
 
 class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
