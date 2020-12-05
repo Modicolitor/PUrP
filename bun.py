@@ -913,7 +913,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     if is_unmap:
                         unmapped_signal(context, obj)
 
-            hideselectinlay(context, obj)
+            #hideselectinlay(context, obj)
             '''
                 if not is_unmap:
                     mod = CenterObj.modifiers.new(
@@ -933,10 +933,11 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 # returns a list of
 
 
-def hideselectinlay(context, obj):
-    for child in obj.children:
-        if is_inlay(context, child):
-            child.hide_select = True
+# def hideselectinlay(context, obj):
+#   children =  obj.children[:]
+#   for child in obj.children:
+#        if is_inlay(context, child):
+#            child.hide_select = True
 
 
 def otherparents(context, coup):

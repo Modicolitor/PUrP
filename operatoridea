@@ -28,11 +28,11 @@ bugs:
 general operator bug:
 
 
-[]? Moving origing to the different pieces?
+
 [] adding has order on
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
 
-[] inlays selectable
+
 
 
 [] adding a planar while another planar is selected/active applys rotation to the the active planar (New planar is stil applied to CObj)
@@ -67,6 +67,7 @@ Known Issues
 [] sometime unmap jumps connector? ground weird parenting ding
 
 New Option
+[]? Moving origing to the different pieces?
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
 [] shift increase precision of Gizmos
 [] create random planar array with random planar parts (with category chooser)
@@ -93,6 +94,8 @@ Publishing:
 
 
 resolved bug:
+[+] inlays selectable
+[+] refactor order system
 [+] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore (check for PUrP.CObj exists, check if PUrP.CObj is coup)
 [+] adding unmapped should work with know other object in the scene, 
 [+] after apply + keep bevel modifiers lost from inlays

@@ -71,7 +71,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
 
             if context.scene.PUrP.SingleCouplingModes == '4':
                 subcol.prop(PUrP, "Oversize", text='Oversize')
-                subcol.prop(PUrP, "CoupSize", text='Coup Scale')
+                #subcol.prop(PUrP, "CoupSize", text='Coup Scale')
                 subcol.prop(PUrP, "zScale", text='z-Scale')
                 subcol.prop(PUrP, "LineLength", text='LineLength')
                 subcol.prop(PUrP, "LineCount", text='Linecount')
