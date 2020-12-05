@@ -156,481 +156,113 @@ p5 = Vector((0.1815710812807083, -1.9427282893502706e-08, 1.1021496057510376))
 p6 = Vector((-0.45311158895492554, -1.9427282893502706e-08, 0.7498091459274292))
 p7 = Vector((0.4567919075489044, -1.9427282893502706e-08, 0.7498091459274292))
 p8 = Vector((-0.0005257626180537045, -1.9427282893502706e-08, 1.342955231666565))
-p9 = Vector((-0.18262259662151337, -4.856819835197257e-09, 0.4164758026599884))
-p10 = Vector((-0.18262259662151337, 9.713643223108193e-09, 0.08314245939254761))
-p11 = Vector(
-    (-0.18262259662151337, 2.4284105393235222e-08, -0.2501908540725708))
-p12 = Vector((-0.18262259662151337, 3.885456933971909e-08, -0.583524227142334))
-p13 = Vector((-0.18262259662151337, 5.342503328620296e-08, -0.9168575406074524))
-p14 = Vector((0.1815710812807083, 5.342502973348928e-08, -0.9168574810028076))
-p15 = Vector((0.1815710812807083, 3.885456578700541e-08, -0.5835241079330444))
-p16 = Vector((0.1815710812807083, 2.4284103616878383e-08, -0.250190794467926))
-p17 = Vector((0.1815710812807083, 9.713640558572934e-09, 0.08314251899719238))
-p18 = Vector((0.1815710812807083, -4.856821611554096e-09, 0.4164758324623108))
-p19 = Vector((-0.18262259662151337, 5.82818522332218e-08, -1.0279686450958252))
-p20 = Vector((-0.18262259662151337, 6.313867118024064e-08, -1.1390798091888428))
-p21 = Vector((-0.06122469902038574, 6.799549367997315e-08, -1.2501908540725708))
-p22 = Vector((0.060173191130161285, 6.799549367997315e-08, -1.2501908540725708))
-p23 = Vector((0.1815710812807083, -9.713642334929773e-09, 0.5275869369506836))
-p24 = Vector((0.1815710812807083, -1.457046217012703e-08, 0.6386980414390564))
-p25 = Vector((0.06017318367958069, -1.9427282893502706e-08, 0.7498091459274292))
-p26 = Vector(
-    (-0.06122470647096634, -1.9427282893502706e-08, 0.7498091459274292))
-p27 = Vector((0.06017318367958069, -1.9427282893502706e-08, 1.1021496057510376))
-p28 = Vector(
-    (-0.06122470647096634, -1.9427282893502706e-08, 1.1021496057510376))
-p29 = Vector(
-    (-0.18262259662151337, -1.9427282893502706e-08, 0.9847027659416199))
-p30 = Vector(
-    (-0.18262259662151337, -1.9427282893502706e-08, 0.8672559261322021))
-p31 = Vector((0.1815710812807083, -1.9427282893502706e-08, 0.8672559857368469))
-p32 = Vector((0.1815710812807083, -1.9427282893502706e-08, 0.9847028255462646))
-p33 = Vector(
-    (-0.06122471019625664, -1.9427282893502706e-08, 1.2626867294311523))
-p34 = Vector(
-    (-0.12192365527153015, -1.9427282893502706e-08, 1.1824181079864502))
-p35 = Vector(
-    (-0.36294859647750854, -1.9427282893502706e-08, 0.7498091459274292))
-p36 = Vector(
-    (-0.27278560400009155, -1.9427282893502706e-08, 0.7498091459274292))
-p37 = Vector(
-    (-0.27278560400009155, -1.9427282893502706e-08, 0.9847027659416199))
-p38 = Vector(
-    (-0.36294859647750854, -1.9427282893502706e-08, 0.8672559261322021))
-p39 = Vector((0.2733113467693329, -1.9427282893502706e-08, 0.7498091459274292))
-p40 = Vector((0.36505162715911865, -1.9427282893502706e-08, 0.7498091459274292))
-p41 = Vector((0.36505162715911865, -1.9427282893502706e-08, 0.8672559857368469))
-p42 = Vector((0.2733113467693329, -1.9427282893502706e-08, 0.9847028255462646))
-p43 = Vector((0.1208721324801445, -1.9427282893502706e-08, 1.1824181079864502))
-p44 = Vector((0.06017318367958069, -1.9427282893502706e-08, 1.2626867294311523))
-p45 = Vector((-0.18262259662151337, -1.457046217012703e-08, 0.6386980414390564))
-p46 = Vector((-0.18262259662151337, -9.713641446751353e-09, 0.5275869369506836))
-p47 = Vector((-0.18262259662151337, 1.3322676295501878e-15, 0.3053646683692932))
-p48 = Vector((-0.18262259662151337, 4.856822055643306e-09, 0.1942535638809204))
-p49 = Vector(
-    (-0.18262259662151337, 1.457046394648387e-08, -0.027968645095825195))
-p50 = Vector((-0.18262259662151337, 1.9427284669859546e-08, -0.139079749584198))
-p51 = Vector((-0.18262259662151337, 2.914092789296774e-08, -0.361301988363266))
-p52 = Vector(
-    (-0.18262259662151337, 3.3997750392700254e-08, -0.4724131226539612))
-p53 = Vector((-0.18262259662151337, 4.371139183945161e-08, -0.6946353316307068))
-p54 = Vector(
-    (-0.18262259662151337, 4.8568210786470445e-08, -0.8057464361190796))
-p55 = Vector((0.1815710812807083, 6.313867118024064e-08, -1.1390796899795532))
-p56 = Vector((0.1815710812807083, 5.828184868050812e-08, -1.0279686450958252))
-p57 = Vector((0.1815710812807083, 4.8568207233756766e-08, -0.8057463765144348))
-p58 = Vector((0.1815710812807083, 4.371138828673793e-08, -0.694635272026062))
-p59 = Vector((0.1815710812807083, 3.39977432872729e-08, -0.47241300344467163))
-p60 = Vector((0.1815710812807083, 2.914092434025406e-08, -0.36130189895629883))
-p61 = Vector((0.1815710812807083, 1.9427282893502706e-08, -0.13907968997955322))
-p62 = Vector((0.1815710812807083, 1.457046217012703e-08, -0.02796858549118042))
-p63 = Vector((0.1815710812807083, 4.856819835197257e-09, 0.19425362348556519))
-p64 = Vector((0.1815710812807083, -8.881784197001252e-16, 0.305364727973938))
-p65 = Vector((0.06017318367958069, 5.342502973348928e-08, -0.9168574810028076))
-p66 = Vector((-0.06122470647096634, 5.342503328620296e-08, -0.9168574810028076))
-p67 = Vector((0.06017318367958069, 3.885456578700541e-08, -0.5835241675376892))
-p68 = Vector((-0.06122470647096634, 3.885456578700541e-08, -0.583524227142334))
-p69 = Vector((0.06017318367958069, 2.4284103616878383e-08, -0.2501908242702484))
-p70 = Vector(
-    (-0.06122470647096634, 2.4284105393235222e-08, -0.2501908540725708))
-p71 = Vector((0.06017318367958069, 9.713641446751353e-09, 0.08314249664545059))
-p72 = Vector((-0.06122470647096634, 9.713642334929773e-09, 0.0831424742937088))
-p73 = Vector((0.06017318367958069, -4.8568211674648865e-09, 0.4164758324623108))
-p74 = Vector((-0.06122470647096634, -4.856820723375677e-09, 0.4164758324623108))
-p75 = Vector((-0.06122470647096634, 4.8568211674648865e-09, 0.1942535936832428))
-p76 = Vector((-0.06122470647096634, 4.440892098500626e-16, 0.305364727973938))
-p77 = Vector((0.06017318367958069, 4.856820723375677e-09, 0.19425362348556519))
-p78 = Vector((0.06017318367958069, 0.0, 0.305364727973938))
-p79 = Vector((-0.06122470647096634, 1.9427284669859546e-08, -0.139079749584198))
-p80 = Vector((-0.06122470647096634, 1.457046394648387e-08, -0.0279686376452446))
-p81 = Vector((0.06017318367958069, 1.9427282893502706e-08, -0.1390797197818756))
-p82 = Vector(
-    (0.06017318367958069, 1.457046217012703e-08, -0.027968615293502808))
-p83 = Vector(
-    (-0.06122470647096634, 3.3997746839986576e-08, -0.4724130928516388))
-p84 = Vector((-0.06122470647096634, 2.91409261166109e-08, -0.3613019585609436))
-p85 = Vector((0.06017318367958069, 3.39977432872729e-08, -0.4724130630493164))
-p86 = Vector((0.06017318367958069, 2.914092434025406e-08, -0.3613019585609436))
-p87 = Vector(
-    (-0.06122470647096634, 4.8568210786470445e-08, -0.8057463765144348))
-p88 = Vector((-0.06122470647096634, 4.371138828673793e-08, -0.694635272026062))
-p89 = Vector((0.06017318367958069, 4.8568207233756766e-08, -0.8057463765144348))
-p90 = Vector((0.06017318367958069, 4.371138828673793e-08, -0.694635272026062))
-p91 = Vector((-0.06122470274567604, 6.313867118024064e-08, -1.1390796899795532))
-p92 = Vector((-0.06122470647096634, 5.82818522332218e-08, -1.0279686450958252))
-p93 = Vector((0.06017318740487099, 6.313867118024064e-08, -1.1390796899795532))
-p94 = Vector((0.06017318367958069, 5.828184868050812e-08, -1.0279686450958252))
-p95 = Vector((-0.0005257576704025269, -
-              1.9427282893502706e-08, 1.1824181079864502))
-p96 = Vector((0.2733113467693329, -1.9427282893502706e-08, 0.8672559857368469))
-p97 = Vector(
-    (-0.27278560400009155, -1.9427282893502706e-08, 0.8672559261322021))
-p98 = Vector(
-    (-0.06122470647096634, -1.9427282893502706e-08, 0.8672559857368469))
-p99 = Vector(
-    (-0.06122470647096634, -1.9427282893502706e-08, 0.9847028255462646))
-p100 = Vector(
-    (0.06017318367958069, -1.9427282893502706e-08, 0.8672559857368469))
-p101 = Vector(
-    (0.06017318367958069, -1.9427282893502706e-08, 0.9847028255462646))
-p102 = Vector(
-    (-0.06122470647096634, -9.713641446751353e-09, 0.5275869369506836))
-p103 = Vector(
-    (-0.06122470647096634, -1.457046217012703e-08, 0.6386980414390564))
-p104 = Vector(
-    (0.06017318367958069, -9.713641446751353e-09, 0.5275869369506836))
-p105 = Vector(
-    (0.06017318367958069, -1.457046217012703e-08, 0.6386980414390564))
+p9 = Vector((-0.18262259662151337, 0.06851532310247421, -1.2501908540725708))
+p10 = Vector((0.1815710812807083, 0.06851532310247421, -1.2501908540725708))
+p11 = Vector((-0.18262259662151337, 0.06851523369550705, 0.7498091459274292))
+p12 = Vector((0.1815710812807083, 0.06851523369550705, 0.7498091459274292))
+p13 = Vector((-0.18262259662151337, 0.06851523369550705, 1.1021496057510376))
+p14 = Vector((0.1815710812807083, 0.06851523369550705, 1.1021496057510376))
+p15 = Vector((-0.45311158895492554, 0.06851523369550705, 0.7498091459274292))
+p16 = Vector((0.4567919075489044, 0.06851523369550705, 0.7498091459274292))
+p17 = Vector((-0.0005257626180537045, 0.06851523369550705, 1.342955231666565))
 
 arrowup_shape_verts = (
-    p24, p25, p105,
-    p32, p27, p101,
-    p2, p30, p36,
-    p5, p32, p42,
-    p4, p28, p34,
-    p56, p65, p94,
-    p58, p67, p90,
-    p60, p69, p86,
-    p62, p71, p82,
-    p64, p73, p78,
-    p76, p9, p47,
-    p78, p74, p76,
-    p72, p48, p10,
-    p75, p47, p48,
-    p71, p75, p72,
-    p77, p76, p75,
-    p17, p77, p71,
-    p63, p78, p77,
-    p80, p10, p49,
-    p82, p72, p80,
-    p70, p50, p11,
-    p79, p49, p50,
-    p69, p79, p70,
-    p81, p80, p79,
-    p16, p81, p69, p61, p82, p81, p84, p11, p51, p86, p70, p84,    p68,    p52,    p12,    p83,    p51,    p52,    p67,    p83,    p68,    p85,    p84,    p83,    p15,    p85,    p67,    p59,
-    p86, p85, p88, p12, p53, p90, p68,  p88, p66, p54, p13, p87, p53, p54, p65, p87, p66, p89, p88, p87, p14, p89, p65, p57, p90, p89, p92, p13, p19, p94,    p66, p92, p21, p20, p0,  p91, p19,
-    p20,
-    p22,
-    p91,
-    p21,
-    p93,
-    p92,
-    p91,
+    p2,
     p1,
-    p93,
-    p22,
-    p55,
-    p94,
-    p93,
-    p33,
-    p44,
-    p8,
-    p34,
-    p95,
-    p33,
-    p33,
-    p95,
-    p44,
-    p95,
-    p43,
-    p44,
-    p34,
-    p28,
-    p95,
-    p28,
-    p27,
-    p95,
-    p95,
-    p27,
-    p43,
-    p27,
-    p5,
-    p43,
-    p41,
-    p40,
-    p7,
-    p42,
-    p96,
-    p41,
-    p41,
-    p96,
-    p40,
-    p96,
-    p39,
-    p40,
-    p42,
-    p32,
-    p96,
-    p32,
-    p31,
-    p96,
-    p96,
-    p31,
-    p39,
-    p31,
+    p0,
+    p4,
     p3,
-    p39,
-    p35,
-    p38,
+    p2,
+    p2,
     p6,
-    p36,
-    p97,
-    p35,
-    p35,
-    p97,
-    p38,
-    p97,
-    p37,
-    p38,
-    p36,
-    p30,
-    p97,
-    p30,
-    p29,
-    p97,
-    p97,
-    p29,
-    p37,
-    p29,
     p4,
-    p37,
-    p99,
-    p4,
-    p29,
-    p101,
-    p28,
-    p99,
-    p26,
-    p30,
-    p2,
-    p98,
-    p29,
-    p30,
-    p25,
-    p98,
-    p26,
-    p100,
-    p99,
-    p98,
-    p3,
-    p100,
-    p25,
-    p31,
-    p101,
-    p100,
-    p103,
-    p2,
-    p45,
-    p105,
-    p26,
-    p103,
-    p74,
-    p46,
-    p9,
-    p102,
-    p45,
-    p46,
-    p73,
-    p102,
-    p74,
-    p104,
-    p103,
-    p102,
-    p18,
-    p104,
-    p73,
-    p23,
-    p105,
-    p104,
-    p24,
-    p3,
-    p25,
-    p32,
     p5,
-    p27,
-    p56,
-    p14,
-    p65,
-    p58,
-    p15,
-    p67,
-    p60,
-    p16,
-    p69,
-    p62,
-    p17,
-    p71,
-    p64,
-    p18,
-    p73,
-    p76,
-    p74,
-    p9,
-    p78,
-    p73,
-    p74,
-    p72,
-    p75,
-    p48,
-    p75,
-    p76,
-    p47,
-    p71,
-    p77,
-    p75,
-    p77,
-    p78,
-    p76,
-    p17,
-    p63,
-    p77,
-    p63,
-    p64,
-    p78,
-    p80,
-    p72,
-    p10,
-    p82,
-    p71,
-    p72,
-    p70,
-    p79,
-    p50,
-    p79,
-    p80,
-    p49,
-    p69,
-    p81,
-    p79,
-    p81,
-    p82,
-    p80,
-    p16,
-    p61,
-    p81,
-    p61,
-    p62,
-    p82,
-    p84,
-    p70,
-    p11,
-    p86,
-    p69,
-    p70,
-    p68,
-    p83,
-    p52,
-    p83,
-    p84,
-    p51,
-    p67,
-    p85,
-    p83,
-    p85,
-    p86,
-    p84,
-    p15,
-    p59,
-    p85,
-    p59,
-    p60,
-    p86,
-    p88,
-    p68,
-    p12,
-    p90,
-    p67,
-    p68,
-    p66,
-    p87,
-    p54,
-    p87,
-    p88,
-    p53,
-    p65,
-    p89,
-    p87,
-    p89,
-    p90,
-    p88,
-    p14,
-    p57,
-    p89,
-    p57,
-    p58,
-    p90,
-    p92,
-    p66,
-    p13,
-    p94,
-    p65,
-    p66,
-    p21,
-    p91,
-    p20,
-    p91,
-    p92,
-    p19,
-    p22,
-    p93,
-    p91,
-    p93,
-    p94,
-    p92,
-    p1,
-    p55,
-    p93,
-    p55,
-    p56,
-    p94,
-    p99,
-    p28,
-    p4,
-    p101,
-    p27,
-    p28,
-    p26,
-    p98,
-    p30,
-    p98,
-    p99,
-    p29,
-    p25,
-    p100,
-    p98,
-    p100,
-    p101,
-    p99,
+    p7,
     p3,
-    p31,
-    p100,
-    p31,
-    p32,
-    p101,
-    p103,
-    p26,
+    p4,
+    p8,
+    p5,
+    p10,
+    p11,
+    p9,
+    p12,
+    p13,
+    p11,
+    p11,
+    p13,
+    p15,
+    p14,
+    p12,
+    p16,
+    p13,
+    p14,
+    p17,
+    p1,
+    p9,
+    p0,
     p2,
-    p105,
-    p25,
-    p26,
-    p74,
-    p102,
-    p46,
-    p102,
-    p103,
-    p45,
-    p73,
-    p104,
-    p102,
-    p104,
-    p105,
-    p103,
-    p18,
-    p23,
-    p104,
-    p23,
-    p24,
-    p105)
+    p15,
+    p6,
+    p8,
+    p14,
+    p5,
+    p3,
+    p10,
+    p1,
+    p6,
+    p13,
+    p4,
+    p7,
+    p12,
+    p3,
+    p0,
+    p11,
+    p2,
+    p4,
+    p17,
+    p8,
+    p5,
+    p16,
+    p7,
+    p2,
+    p3,
+    p1,
+    p4,
+    p5,
+    p3,
+    p10,
+    p12,
+    p11,
+    p12,
+    p14,
+    p13,
+    p1,
+    p10,
+    p9,
+    p2,
+    p11,
+    p15,
+    p8,
+    p17,
+    p14,
+    p3,
+    p12,
+    p10,
+    p6,
+    p15,
+    p13,
+    p7,
+    p16,
+    p12,
+    p0,
+    p9,
+    p11,
+    p4,
+    p13,
+    p17,
+    p5,
+    p14,
+    p16,)
 
 
 class PUrP_ArrowUpShapeWidget(Gizmo):
@@ -713,16 +345,141 @@ linecount10 = Vector(
     (-0.47405409812927246, 0.2999997138977051, 0.2793097496032715))
 linecount11 = Vector(
     (0.47405409812927246, 0.2999997138977051, 0.2793097496032715))
+linecount12 = Vector(
+    (-0.47405409812927246, -0.26971444487571716, -0.27930986881256104))
+linecount13 = Vector(
+    (0.47405409812927246, -0.26971444487571716, -0.27930986881256104))
+linecount14 = Vector(
+    (-0.47405409812927246, -0.26971444487571716, 0.2793097496032715))
+linecount15 = Vector(
+    (0.47405409812927246, -0.26971444487571716, 0.2793097496032715))
+linecount16 = Vector(
+    (-0.47405409812927246, 0.030285514891147614, -0.27930986881256104))
+linecount17 = Vector(
+    (0.47405409812927246, 0.030285514891147614, -0.27930986881256104))
+linecount18 = Vector(
+    (-0.47405409812927246, 0.030285514891147614, 0.2793097496032715))
+linecount19 = Vector(
+    (0.47405409812927246, 0.030285514891147614, 0.2793097496032715))
+linecount20 = Vector(
+    (-0.47405409812927246, 0.3302854597568512, -0.27930986881256104))
+linecount21 = Vector(
+    (0.47405409812927246, 0.3302854597568512, -0.27930986881256104))
+linecount22 = Vector(
+    (-0.47405409812927246, 0.3302854597568512, 0.2793097496032715))
+linecount23 = Vector(
+    (0.47405409812927246, 0.3302854597568512, 0.2793097496032715))
 
 
 linecount_shape_verts = (
-    linecount0, linecount1, linecount2,
-    linecount1, linecount2, linecount3,
-    linecount6, linecount4, linecount5,
-    linecount6, linecount7, linecount5,
-    linecount9, linecount8, linecount10,
-    linecount9, linecount11, linecount10,
-)
+    linecount1,
+    linecount0,
+    linecount2,
+    linecount5,
+    linecount4,
+    linecount6,
+    linecount9,
+    linecount8,
+    linecount10,
+    linecount1,
+    linecount2,
+    linecount3,
+    linecount5,
+    linecount6,
+    linecount7,
+    linecount9,
+    linecount10,
+    linecount11,
+    linecount13,
+    linecount14,
+    linecount12,
+    linecount17,
+    linecount18,
+    linecount16,
+    linecount21,
+    linecount22,
+    linecount20,
+    linecount13,
+    linecount15,
+    linecount14,
+    linecount17,
+    linecount19,
+    linecount18,
+    linecount21,
+    linecount23,
+    linecount22,
+    linecount3,
+    linecount13,
+    linecount1,
+    linecount9,
+    linecount20,
+    linecount8,
+    linecount7,
+    linecount17,
+    linecount5,
+    linecount2,
+    linecount15,
+    linecount3,
+    linecount11,
+    linecount21,
+    linecount9,
+    linecount0,
+    linecount14,
+    linecount2,
+    linecount6,
+    linecount19,
+    linecount7,
+    linecount4,
+    linecount18,
+    linecount6,
+    linecount10,
+    linecount23,
+    linecount11,
+    linecount1,
+    linecount12,
+    linecount0,
+    linecount8,
+    linecount22,
+    linecount10,
+    linecount5,
+    linecount16,
+    linecount4,
+    linecount3,
+    linecount15,
+    linecount13,
+    linecount9,
+    linecount21,
+    linecount20,
+    linecount7,
+    linecount19,
+    linecount17,
+    linecount2,
+    linecount14,
+    linecount15,
+    linecount11,
+    linecount23,
+    linecount21,
+    linecount0,
+    linecount12,
+    linecount14,
+    linecount6,
+    linecount18,
+    linecount19,
+    linecount4,
+    linecount16,
+    linecount18,
+    linecount10,
+    linecount22,
+    linecount23,
+    linecount1,
+    linecount13,
+    linecount12,
+    linecount8,
+    linecount20,
+    linecount22,
+    linecount5,
+    linecount17,
+    linecount16,)
 
 
 class PUrP_linecountShapeWidget(Gizmo):
@@ -822,26 +579,276 @@ linelength18 = Vector(
     (-0.34048211574554443, 0.09439557790756226, -0.27930986881256104))
 linelength19 = Vector(
     (-0.1508604735136032, 0.09439557790756226, -0.27930986881256104))
+linelength20 = Vector(
+    (-0.5301038026809692, -0.032930389046669006, -0.27930986881256104))
+linelength21 = Vector(
+    (0.5301038026809692, -0.03293130546808243, -0.27930986881256104))
+linelength22 = Vector(
+    (-0.5301038026809692, -0.032930389046669006, 0.27930986881256104))
+linelength23 = Vector(
+    (0.5301038026809692, -0.032930389046669006, 0.27930986881256104))
+linelength24 = Vector(
+    (-0.3616946041584015, -0.04171789065003395, 0.27930986881256104))
+linelength25 = Vector(
+    (-0.12964800000190735, -0.04171789065003395, 0.27930986881256104))
+linelength26 = Vector(
+    (0.12964797019958496, -0.04171789065003395, 0.27930986881256104))
+linelength27 = Vector(
+    (0.3616946339607239, -0.04171789065003395, 0.27930986881256104))
+linelength28 = Vector(
+    (0.3616946339607239, -0.04171789065003395, -0.27930986881256104))
+linelength29 = Vector(
+    (0.12964800000190735, -0.04171789065003395, -0.27930986881256104))
+linelength30 = Vector(
+    (-0.12964797019958496, -0.04171789065003395, -0.27930986881256104))
+linelength31 = Vector(
+    (-0.3616946041584015, -0.04171789065003395, -0.27930986881256104))
+linelength32 = Vector(
+    (-0.12964800000190735, 0.1156080812215805, 0.27930986881256104))
+linelength33 = Vector(
+    (-0.3616946041584015, 0.1156080812215805, 0.27930986881256104))
+linelength34 = Vector(
+    (0.3616946339607239, 0.1156080812215805, 0.27930986881256104))
+linelength35 = Vector(
+    (0.12964797019958496, 0.1156080812215805, 0.27930986881256104))
+linelength36 = Vector(
+    (0.12964800000190735, 0.1156080812215805, -0.27930986881256104))
+linelength37 = Vector(
+    (0.3616946339607239, 0.1156080812215805, -0.27930986881256104))
+linelength38 = Vector(
+    (-0.3616946041584015, 0.1156080812215805, -0.27930986881256104))
+linelength39 = Vector(
+    (-0.12964797019958496, 0.1156080812215805, -0.27930986881256104))
 
 linelength_shape_verts = (
-    linelength0, linelength2, linelength11,
-    linelength4, linelength2, linelength11,
-    linelength13, linelength4, linelength11,
-    linelength13, linelength11, linelength18,
-    linelength12, linelength13, linelength18,
-    linelength12, linelength19, linelength18,
-    linelength12, linelength19, linelength5,
-    linelength19, linelength5, linelength10,
-    linelength9, linelength5, linelength10,
-    linelength9, linelength5, linelength6,
-    linelength9, linelength15, linelength6,
-    linelength9, linelength16, linelength15,
-    linelength14, linelength15, linelength16,
-    linelength14, linelength17, linelength16,
-    linelength14, linelength17, linelength7,
-    linelength8, linelength17, linelength7,
-    linelength8, linelength1, linelength7,
-    linelength3, linelength1, linelength7,
+    linelength1,
+    linelength7,
+    linelength8,
+    linelength11,
+    linelength2,
+    linelength0,
+    linelength9,
+    linelength5,
+    linelength10,
+    linelength18,
+    linelength12,
+    linelength13,
+    linelength16,
+    linelength14,
+    linelength15,
+    linelength7,
+    linelength17,
+    linelength8,
+    linelength5,
+    linelength19,
+    linelength10,
+    linelength9,
+    linelength15,
+    linelength6,
+    linelength11,
+    linelength13,
+    linelength4,
+    linelength1,
+    linelength3,
+    linelength7,
+    linelength11,
+    linelength4,
+    linelength2,
+    linelength9,
+    linelength6,
+    linelength5,
+    linelength18,
+    linelength19,
+    linelength12,
+    linelength16,
+    linelength17,
+    linelength14,
+    linelength7,
+    linelength14,
+    linelength17,
+    linelength5,
+    linelength12,
+    linelength19,
+    linelength9,
+    linelength16,
+    linelength15,
+    linelength11,
+    linelength18,
+    linelength13,
+    linelength21,
+    linelength28,
+    linelength27,
+    linelength31,
+    linelength20,
+    linelength22,
+    linelength29,
+    linelength30,
+    linelength25,
+    linelength38,
+    linelength33,
+    linelength32,
+    linelength36,
+    linelength35,
+    linelength34,
+    linelength27,
+    linelength28,
+    linelength37,
+    linelength25,
+    linelength30,
+    linelength39,
+    linelength29,
+    linelength26,
+    linelength35,
+    linelength31,
+    linelength24,
+    linelength33,
+    linelength21,
+    linelength27,
+    linelength23,
+    linelength31,
+    linelength22,
+    linelength24,
+    linelength29,
+    linelength25,
+    linelength26,
+    linelength38,
+    linelength32,
+    linelength39,
+    linelength36,
+    linelength34,
+    linelength37,
+    linelength27,
+    linelength37,
+    linelength34,
+    linelength25,
+    linelength39,
+    linelength32,
+    linelength29,
+    linelength35,
+    linelength36,
+    linelength31,
+    linelength33,
+    linelength38,
+    linelength2,
+    linelength20,
+    linelength0,
+    linelength1,
+    linelength28,
+    linelength21,
+    linelength3,
+    linelength21,
+    linelength23,
+    linelength2,
+    linelength24,
+    linelength22,
+    linelength6,
+    linelength25,
+    linelength5,
+    linelength3,
+    linelength27,
+    linelength7,
+    linelength10,
+    linelength29,
+    linelength9,
+    linelength0,
+    linelength31,
+    linelength11,
+    linelength12,
+    linelength33,
+    linelength13,
+    linelength14,
+    linelength35,
+    linelength15,
+    linelength16,
+    linelength37,
+    linelength17,
+    linelength18,
+    linelength39,
+    linelength19,
+    linelength19,
+    linelength30,
+    linelength10,
+    linelength18,
+    linelength31,
+    linelength38,
+    linelength17,
+    linelength28,
+    linelength8,
+    linelength16,
+    linelength29,
+    linelength36,
+    linelength15,
+    linelength26,
+    linelength6,
+    linelength14,
+    linelength27,
+    linelength34,
+    linelength13,
+    linelength24,
+    linelength4,
+    linelength12,
+    linelength25,
+    linelength32,
+    linelength2,
+    linelength22,
+    linelength20,
+    linelength1,
+    linelength8,
+    linelength28,
+    linelength3,
+    linelength1,
+    linelength21,
+    linelength2,
+    linelength4,
+    linelength24,
+    linelength6,
+    linelength26,
+    linelength25,
+    linelength3,
+    linelength23,
+    linelength27,
+    linelength10,
+    linelength30,
+    linelength29,
+    linelength0,
+    linelength20,
+    linelength31,
+    linelength12,
+    linelength32,
+    linelength33,
+    linelength14,
+    linelength34,
+    linelength35,
+    linelength16,
+    linelength36,
+    linelength37,
+    linelength18,
+    linelength38,
+    linelength39,
+    linelength19,
+    linelength39,
+    linelength30,
+    linelength18,
+    linelength11,
+    linelength31,
+    linelength17,
+    linelength37,
+    linelength28,
+    linelength16,
+    linelength9,
+    linelength29,
+    linelength15,
+    linelength35,
+    linelength26,
+    linelength14,
+    linelength7,
+    linelength27,
+    linelength13,
+    linelength33,
+    linelength24,
+    linelength12,
+    linelength5,
+    linelength25,
 )
 
 
@@ -902,46 +909,228 @@ class PUrP_LineLengthShapeWidget(Gizmo):
 
 # linedistance
 
-linedistance0 = Vector((-0.47405412793159485, 0.0, -0.27930986881256104))
-linedistance1 = Vector((0.47405412793159485, 0.0, -0.27930986881256104))
-linedistance2 = Vector((-0.47405412793159485, 0.0, 0.27930986881256104))
-linedistance3 = Vector((0.47405412793159485, 0.0, 0.27930986881256104))
+linedistance0 = Vector(
+    (-0.47405412793159485, -0.015096773393452168, -0.27930986881256104))
+linedistance1 = Vector(
+    (0.47405412793159485, -0.015096773393452168, -0.27930986881256104))
+linedistance2 = Vector(
+    (-0.47405412793159485, -0.015096773393452168, 0.27930986881256104))
+linedistance3 = Vector(
+    (0.47405412793159485, -0.015096773393452168, 0.27930986881256104))
 linedistance4 = Vector(
-    (-0.47405412793159485, 0.30000001192092896, -0.27930986881256104))
+    (-0.47405412793159485, 0.28490322828292847, -0.27930986881256104))
 linedistance5 = Vector(
-    (0.47405412793159485, 0.30000001192092896, -0.27930986881256104))
+    (0.47405412793159485, 0.28490322828292847, -0.27930986881256104))
 linedistance6 = Vector(
-    (-0.47405412793159485, 0.30000001192092896, 0.27930986881256104))
+    (-0.47405412793159485, 0.28490322828292847, 0.27930986881256104))
 linedistance7 = Vector(
-    (0.47405412793159485, 0.30000001192092896, 0.27930986881256104))
+    (0.47405412793159485, 0.28490322828292847, 0.27930986881256104))
 linedistance8 = Vector(
-    (0.07070715725421906, 0.3000657558441162, 0.44158151745796204))
+    (0.07070715725421906, 0.3107404410839081, 0.4522562026977539))
 linedistance9 = Vector(
-    (-0.19720323383808136, 0.3000657558441162, 0.44158151745796204))
+    (-0.19720323383808136, 0.3107404410839081, 0.4522562026977539))
 linedistance10 = Vector(
-    (0.07070715725421906, 0.0002984553575515747, 0.44158151745796204))
+    (0.07070715725421906, -0.010376221500337124, 0.4522562026977539))
 linedistance11 = Vector(
-    (-0.19720323383808136, 0.0002984553575515747, 0.44158151745796204))
+    (-0.19720323383808136, -0.010376221500337124, 0.4522562026977539))
 linedistance12 = Vector(
-    (0.07070715725421906, 0.3000657558441162, 0.33240607380867004))
+    (0.07070715725421906, 0.3151625394821167, 0.33240607380867004))
 linedistance13 = Vector(
-    (-0.19720323383808136, 0.3000657558441162, 0.33240607380867004))
+    (-0.19720323383808136, 0.3151625394821167, 0.33240607380867004))
 linedistance14 = Vector(
-    (0.07070715725421906, 0.0002984553575515747, 0.33240607380867004))
+    (0.07070715725421906, -0.014798318035900593, 0.33240607380867004))
 linedistance15 = Vector(
-    (-0.19720323383808136, 0.0002984553575515747, 0.33240607380867004))
+    (-0.19720323383808136, -0.014798318035900593, 0.33240607380867004))
+linedistance16 = Vector(
+    (-0.47405412793159485, 0.014903225935995579, -0.27930986881256104))
+linedistance17 = Vector(
+    (0.47405412793159485, 0.014903225935995579, -0.27930986881256104))
+linedistance18 = Vector(
+    (-0.47405412793159485, 0.014903225935995579, 0.27930986881256104))
+linedistance19 = Vector(
+    (0.47405412793159485, 0.014903225935995579, 0.27930986881256104))
+linedistance20 = Vector(
+    (-0.47405412793159485, 0.31490322947502136, -0.27930986881256104))
+linedistance21 = Vector(
+    (0.47405412793159485, 0.31490322947502136, -0.27930986881256104))
+linedistance22 = Vector(
+    (-0.47405412793159485, 0.31490322947502136, 0.27930986881256104))
+linedistance23 = Vector(
+    (0.47405412793159485, 0.31490322947502136, 0.27930986881256104))
+linedistance24 = Vector(
+    (0.07070715725421906, 0.28952792286872864, 0.43104368448257446))
+linedistance25 = Vector(
+    (-0.19720323383808136, 0.28952792286872864, 0.43104368448257446))
+linedistance26 = Vector(
+    (0.07070715725421906, 0.010836278088390827, 0.43104368448257446))
+linedistance27 = Vector(
+    (-0.19720323383808136, 0.010836278088390827, 0.43104368448257446))
+linedistance28 = Vector(
+    (0.07070715725421906, 0.2851625382900238, 0.33240607380867004))
+linedistance29 = Vector(
+    (-0.19720323383808136, 0.2851625382900238, 0.33240607380867004))
+linedistance30 = Vector(
+    (0.07070715725421906, 0.015201681293547153, 0.33240607380867004))
+linedistance31 = Vector(
+    (-0.19720323383808136, 0.015201681293547153, 0.33240607380867004))
 
 linedistant_shape_verts = (
-    linedistance0, linedistance1, linedistance2,
-    linedistance3, linedistance1, linedistance2,
-    linedistance4, linedistance6, linedistance5,
-    linedistance7, linedistance6, linedistance5,
-    linedistance11, linedistance14, linedistance15,
-    linedistance11, linedistance14, linedistance10,
-    linedistance11, linedistance9, linedistance10,
-    linedistance8, linedistance9, linedistance10,
-    linedistance8, linedistance9, linedistance12,
-    linedistance13, linedistance9, linedistance12,
+    linedistance1,
+    linedistance2,
+    linedistance0,
+    linedistance5,
+    linedistance6,
+    linedistance4,
+    linedistance11,
+    linedistance14,
+    linedistance10,
+    linedistance1,
+    linedistance3,
+    linedistance2,
+    linedistance5,
+    linedistance7,
+    linedistance6,
+    linedistance10,
+    linedistance9,
+    linedistance11,
+    linedistance8,
+    linedistance13,
+    linedistance9,
+    linedistance11,
+    linedistance15,
+    linedistance14,
+    linedistance10,
+    linedistance8,
+    linedistance9,
+    linedistance8,
+    linedistance12,
+    linedistance13,
+    linedistance17,
+    linedistance16,
+    linedistance18,
+    linedistance21,
+    linedistance20,
+    linedistance22,
+    linedistance27,
+    linedistance26,
+    linedistance30,
+    linedistance17,
+    linedistance18,
+    linedistance19,
+    linedistance21,
+    linedistance22,
+    linedistance23,
+    linedistance26,
+    linedistance27,
+    linedistance25,
+    linedistance24,
+    linedistance25,
+    linedistance29,
+    linedistance27,
+    linedistance30,
+    linedistance31,
+    linedistance26,
+    linedistance25,
+    linedistance24,
+    linedistance24,
+    linedistance29,
+    linedistance28,
+    linedistance2,
+    linedistance16,
+    linedistance0,
+    linedistance0,
+    linedistance17,
+    linedistance1,
+    linedistance1,
+    linedistance19,
+    linedistance3,
+    linedistance3,
+    linedistance18,
+    linedistance2,
+    linedistance6,
+    linedistance20,
+    linedistance4,
+    linedistance4,
+    linedistance21,
+    linedistance5,
+    linedistance5,
+    linedistance23,
+    linedistance7,
+    linedistance7,
+    linedistance22,
+    linedistance6,
+    linedistance12,
+    linedistance29,
+    linedistance13,
+    linedistance10,
+    linedistance24,
+    linedistance8,
+    linedistance9,
+    linedistance27,
+    linedistance11,
+    linedistance15,
+    linedistance30,
+    linedistance14,
+    linedistance14,
+    linedistance26,
+    linedistance10,
+    linedistance15,
+    linedistance27,
+    linedistance31,
+    linedistance13,
+    linedistance25,
+    linedistance9,
+    linedistance12,
+    linedistance24,
+    linedistance28,
+    linedistance2,
+    linedistance18,
+    linedistance16,
+    linedistance0,
+    linedistance16,
+    linedistance17,
+    linedistance1,
+    linedistance17,
+    linedistance19,
+    linedistance3,
+    linedistance19,
+    linedistance18,
+    linedistance6,
+    linedistance22,
+    linedistance20,
+    linedistance4,
+    linedistance20,
+    linedistance21,
+    linedistance5,
+    linedistance21,
+    linedistance23,
+    linedistance7,
+    linedistance23,
+    linedistance22,
+    linedistance12,
+    linedistance28,
+    linedistance29,
+    linedistance10,
+    linedistance26,
+    linedistance24,
+    linedistance9,
+    linedistance25,
+    linedistance27,
+    linedistance15,
+    linedistance31,
+    linedistance30,
+    linedistance14,
+    linedistance30,
+    linedistance26,
+    linedistance15,
+    linedistance11,
+    linedistance27,
+    linedistance13,
+    linedistance29,
+    linedistance25,
+    linedistance12,
+    linedistance8,
+    linedistance24,
 
 )
 
@@ -1023,19 +1212,229 @@ thickness16 = Vector((-0.13929295539855957, 0.0, 0.27930986881256104))
 thickness17 = Vector((-0.13929295539855957, 0.0, -0.2793097496032715))
 thickness18 = Vector((0.02269768714904785, 0.0, 0.27930986881256104))
 thickness19 = Vector((0.24941444396972656, 0.0, 0.27930986881256104))
+thickness20 = Vector(
+    (-0.25504493713378906, 0.016856903210282326, -0.2793097496032715))
+thickness21 = Vector(
+    (-0.30159735679626465, 0.016856903210282326, -0.2793097496032715))
+thickness22 = Vector(
+    (-0.25504493713378906, 0.016856903210282326, 0.27930986881256104))
+thickness23 = Vector(
+    (-0.30159735679626465, 0.016856903210282326, 0.27930986881256104))
+thickness24 = Vector(
+    (-0.1861875057220459, 0.016856903210282326, 0.27930986881256104))
+thickness25 = Vector(
+    (-0.3421952724456787, 0.016856903210282326, 0.27930986881256104))
+thickness26 = Vector(
+    (-0.3421952724456787, 0.016856903210282326, -0.2793097496032715))
+thickness27 = Vector(
+    (0.6702046394348145, 0.016856903210282326, 0.27930986881256104))
+thickness28 = Vector(
+    (0.28983044624328613, 0.016856903210282326, 0.27930986881256104))
+thickness29 = Vector(
+    (0.24941444396972656, 0.016856903210282326, -0.2793097496032715))
+thickness30 = Vector(
+    (0.28983044624328613, 0.016856903210282326, -0.2793097496032715))
+thickness31 = Vector(
+    (-0.1861875057220459, 0.016856903210282326, -0.2793097496032715))
+thickness32 = Vector(
+    (0.6702046394348145, 0.016856903210282326, -0.2793097496032715))
+thickness33 = Vector(
+    (0.02269768714904785, 0.016856903210282326, -0.2793097496032715))
+thickness34 = Vector(
+    (-0.007831096649169922, 0.016856903210282326, -0.2793097496032715))
+thickness35 = Vector(
+    (-0.007831096649169922, 0.016856903210282326, 0.27930986881256104))
+thickness36 = Vector(
+    (-0.13929295539855957, 0.016856903210282326, 0.27930986881256104))
+thickness37 = Vector(
+    (-0.13929295539855957, 0.016856903210282326, -0.2793097496032715))
+thickness38 = Vector(
+    (0.02269768714904785, 0.016856903210282326, 0.27930986881256104))
+thickness39 = Vector(
+    (0.24941444396972656, 0.016856903210282326, 0.27930986881256104))
 
 
 thickness_shape_verts = (
-    thickness1, thickness5, thickness6,
-    thickness1, thickness5, thickness3,
-    thickness0, thickness2, thickness11,
-    thickness4, thickness2, thickness11,
-    thickness16, thickness17, thickness14,
-    thickness16, thickness15, thickness14,
-    thickness13, thickness18, thickness9,
-    thickness19, thickness18, thickness9,
-    thickness8, thickness10, thickness12,
-    thickness8, thickness7, thickness12,
+    thickness11,
+    thickness0,
+    thickness2,
+    thickness9,
+    thickness18,
+    thickness19,
+    thickness11,
+    thickness2,
+    thickness4,
+    thickness1,
+    thickness5,
+    thickness3,
+    thickness1,
+    thickness6,
+    thickness5,
+    thickness14,
+    thickness16,
+    thickness15,
+    thickness12,
+    thickness10,
+    thickness8,
+    thickness12,
+    thickness8,
+    thickness7,
+    thickness14,
+    thickness17,
+    thickness16,
+    thickness9,
+    thickness13,
+    thickness18,
+    thickness31,
+    thickness22,
+    thickness20,
+    thickness29,
+    thickness39,
+    thickness38,
+    thickness31,
+    thickness24,
+    thickness22,
+    thickness21,
+    thickness23,
+    thickness25,
+    thickness21,
+    thickness25,
+    thickness26,
+    thickness34,
+    thickness35,
+    thickness36,
+    thickness32,
+    thickness28,
+    thickness30,
+    thickness32,
+    thickness27,
+    thickness28,
+    thickness34,
+    thickness36,
+    thickness37,
+    thickness29,
+    thickness38,
+    thickness33,
+    thickness14,
+    thickness37,
+    thickness17,
+    thickness19,
+    thickness29,
+    thickness9,
+    thickness7,
+    thickness32,
+    thickness12,
+    thickness5,
+    thickness23,
+    thickness3,
+    thickness16,
+    thickness35,
+    thickness15,
+    thickness6,
+    thickness25,
+    thickness5,
+    thickness13,
+    thickness38,
+    thickness18,
+    thickness12,
+    thickness30,
+    thickness10,
+    thickness15,
+    thickness34,
+    thickness14,
+    thickness18,
+    thickness39,
+    thickness19,
+    thickness0,
+    thickness22,
+    thickness2,
+    thickness8,
+    thickness27,
+    thickness7,
+    thickness17,
+    thickness36,
+    thickness16,
+    thickness2,
+    thickness24,
+    thickness4,
+    thickness10,
+    thickness28,
+    thickness8,
+    thickness3,
+    thickness21,
+    thickness1,
+    thickness9,
+    thickness33,
+    thickness13,
+    thickness11,
+    thickness20,
+    thickness0,
+    thickness1,
+    thickness26,
+    thickness6,
+    thickness4,
+    thickness31,
+    thickness11,
+    thickness14,
+    thickness34,
+    thickness37,
+    thickness19,
+    thickness39,
+    thickness29,
+    thickness7,
+    thickness27,
+    thickness32,
+    thickness5,
+    thickness25,
+    thickness23,
+    thickness16,
+    thickness36,
+    thickness35,
+    thickness6,
+    thickness26,
+    thickness25,
+    thickness13,
+    thickness33,
+    thickness38,
+    thickness12,
+    thickness32,
+    thickness30,
+    thickness15,
+    thickness35,
+    thickness34,
+    thickness18,
+    thickness38,
+    thickness39,
+    thickness0,
+    thickness20,
+    thickness22,
+    thickness8,
+    thickness28,
+    thickness27,
+    thickness17,
+    thickness37,
+    thickness36,
+    thickness2,
+    thickness22,
+    thickness24,
+    thickness10,
+    thickness30,
+    thickness28,
+    thickness3,
+    thickness23,
+    thickness21,
+    thickness9,
+    thickness29,
+    thickness33,
+    thickness11,
+    thickness31,
+    thickness20,
+    thickness1,
+    thickness21,
+    thickness26,
+    thickness4,
+    thickness24,
+    thickness31,
 )
 
 

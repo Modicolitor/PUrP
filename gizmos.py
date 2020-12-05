@@ -57,10 +57,13 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
+            sensi = 1000 if not event.shift else 10000
+            #sensi = 1000
             self.delta = event.mouse_y - self.init_value
-            self.valueos = self.init_oversize + self.delta/1000
+            self.valueos = self.init_oversize + self.delta/sensi
 
             self.execute(context)
+
         elif event.type == 'LEFTMOUSE':  # Confirm
             applyScalRot(self.obin)
             oversizeToPrim(context, singcoupmode(
@@ -103,7 +106,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -124,7 +127,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
         # applyScalRot(self.obout)
         singcoupmod = singcoupmode(context, None, context.object)
-        #oversizeToPrim(context, singcoupmode, self.obout, self.obin)
+        # oversizeToPrim(context, singcoupmode, self.obout, self.obin)
 
         scalefactor = PUrP.GlobalScale * PUrP.CoupScale
         if "Cube" in self.obout.data.name:
@@ -133,7 +136,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         else:
             vert = self.obout.data.vertices[0].co@self.obout.matrix_world
             # print(vert)
-            #inter = 2 * abs(vert[1])/scalefactor
+            # inter = 2 * abs(vert[1])/scalefactor
             # print(inter)
             PUrP.CoupSize = abs(vert[1])/scalefactor
 
@@ -142,18 +145,19 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
             # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
             # else:
             #    self.delta =  self.init_value
 
             # self.valuex1 = self.init_scale_x1 + self.delta / \
             #    1000  # - self.window_width/2 #(HD Screen 800)
-            #self.valuey1 = self.init_scale_y1 + self.delta/1000
-            #self.valuez1 = self.init_scale_z1 + self.delta/1000
+            # self.valuey1 = self.init_scale_y1 + self.delta/1000
+            # self.valuez1 = self.init_scale_z1 + self.delta/1000
 
-            self.valuex0 = self.init_scale_x0 + self.delta/1000
-            #self.valuey0 = self.init_scale_y0 + self.delta/1000
-            #self.valuez0 = self.init_scale_z0 + self.delta/1000
+            self.valuex0 = self.init_scale_x0 + self.delta/sensi
+            # self.valuey0 = self.init_scale_y0 + self.delta/1000
+            # self.valuez0 = self.init_scale_z0 + self.delta/1000
 
             # print(f"MouspositionX: {self.value}")
             self.execute(context)
@@ -173,9 +177,9 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
-            #self.obin.scale.x = self.init_scale_x1
-            #self.obin.scale.y = self.init_scale_y1
-            #self.obin.scale.z = self.init_scale_z1
+            # self.obin.scale.x = self.init_scale_x1
+            # self.obin.scale.y = self.init_scale_y1
+            # self.obin.scale.z = self.init_scale_z1
             return {'CANCELLED'}
         return {'RUNNING_MODAL'}
 
@@ -192,12 +196,12 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
                 self.obin = child
 
         self.init_scale_x0 = self.obout.scale.x
-        #self.init_scale_y0 = self.obout.scale.y
-        #self.init_scale_z0 = self.obout.scale.z
+        # self.init_scale_y0 = self.obout.scale.y
+        # self.init_scale_z0 = self.obout.scale.z
 
         self.valuex0 = self.obout.scale.x
-        #self.valuey0 = self.obout.scale.y
-        #self.valuez0 = self.obout.scale.z
+        # self.valuey0 = self.obout.scale.y
+        # self.valuez0 = self.obout.scale.z
 
         self.init_value = event.mouse_x
 
@@ -213,7 +217,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -231,9 +235,9 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_scale_z + self.delta/1000
+            self.value = self.init_scale_z + self.delta/sensi
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -275,7 +279,7 @@ class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -292,9 +296,9 @@ class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
     def modal(self, context, event):
         children = context.object.children
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_width + self.delta / 1000
+            self.value = self.init_width + self.delta / sensi
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -331,7 +335,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -346,9 +350,9 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
 
     def modal(self, context, event):
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 10 if not event.shift else 100
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_segments + self.delta / 10
+            self.value = self.init_segments + self.delta / sensi
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -385,7 +389,7 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -421,13 +425,12 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
     def modal(self, context, event):
         ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
             print(
                 f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
-            self.value = self.init_scale + \
-                mathutils.Vector(
-                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+            self.value = self.init_scale + mathutils.Vector(
+                (self.delta / sensi, self.delta / sensi, self.delta / sensi))
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -465,7 +468,7 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
             return True
@@ -487,11 +490,11 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-        #ob = context.object
+        # ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_mouse
-            self.value = 1.0 + self.delta / 1000
+            self.value = 1.0 + self.delta / sensi
 
             self.execute(context)
 
@@ -607,10 +610,11 @@ class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
         return {'FINISHED'}
 
     def modal(self, context, event):
-        #ob = context.object
+        # ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_mouse
-            self.value = 1.0 + self.delta / 1000
+            self.value = 1.0 + self.delta / sensi
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -700,7 +704,7 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
 
         if self.value <= 0:
             ob.modifiers["PUrP_Solidify"].thickness = 0
-            #context.scene.PUrP.Oversize = 0
+            # context.scene.PUrP.Oversize = 0
         else:
             ob.modifiers["PUrP_Solidify"].thickness = self.value * \
                 self.GlobalScale
@@ -710,9 +714,9 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
     def modal(self, context, event):
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta / 1000
+            self.value = self.init_count + self.delta / sensi
             print(
                 f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
             self.execute(context)
@@ -788,7 +792,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpr.alpha_highlight = 1.0
 
         mpr.scale_basis = 0.3
-        #mpr.matrix_offset[2][3] = 1
+        # mpr.matrix_offset[2][3] = 1
 
         self.roll_widget = mpr
 
@@ -853,8 +857,8 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
 
         mps.use_draw_offset_scale = True
         mps.matrix_basis = ob.matrix_world.normalized()
-        #mps.matrix_offset[2][0] = 0.2
-        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_offset[2][0] = 0.2
+        # mps.matrix_offset[2][2] = 0.5
         # mps.matrix_basis[2][3] += 0.8
         # mps.matrix_basis[0][3] += 0.5
         mps.line_width = 10
@@ -875,8 +879,8 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
-        #mps.matrix_offset[2][0] = 0.2
-        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_offset[2][0] = 0.2
+        # mps.matrix_offset[2][2] = 0.5
         # mps.matrix_basis[2][3] += 0.8
         # mps.matrix_basis[0][3] += 0.5
         mcsize.line_width = 3
@@ -942,8 +946,8 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mat = mat_trans @ mat_rot1
         mpthickness.matrix_offset = mat
 
-        #mps.matrix_offset[2][0] = 0.2
-        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_offset[2][0] = 0.2
+        # mps.matrix_offset[2][2] = 0.5
         mpthickness.matrix_offset[2][3] -= 0.5
         # mps.matrix_basis[0][3] += 0.5
         mpthickness.line_width = 3
@@ -1021,7 +1025,7 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
             mph.scale_basis = 0.0
             mpo.scale_basis = 0.0
             mps.scale_basis = 0.0
-            #mcsize.scale_basis = 0.0
+            # mcsize.scale_basis = 0.0
             lowradius.scale_basis = 0.0
             upradius.scale_basis = 0.0
 
@@ -1085,8 +1089,8 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
         mat = mat_trans @ mat_rot1
         mpthickness.matrix_offset = mat
 
-        #mps.matrix_offset[2][0] = 0.2
-        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_offset[2][0] = 0.2
+        # mps.matrix_offset[2][2] = 0.5
         mpthickness.matrix_offset[2][3] -= 0.5
         # mps.matrix_basis[0][3] += 0.5
         mpthickness.line_width = 3
@@ -1145,11 +1149,11 @@ class PP_OT_FlatCoupScaleGizmo(bpy.types.Operator):
     def modal(self, context, event):
         ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
             self.value = self.init_scale + \
                 mathutils.Vector(
-                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+                    (self.delta / sensi, self.delta / sensi, self.delta / sensi))
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1233,15 +1237,15 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
         # mat_rot2 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Y')  # rotate
 
-        #mat_rot = mat_rot1 @ mat_rot2
-        #mat_trans = mathutils.Matrix.Translation(ob.location)
+        # mat_rot = mat_rot1 @ mat_rot2
+        # mat_trans = mathutils.Matrix.Translation(ob.location)
         mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
         mat = mat_trans @ mat_rot1
         mpr.matrix_offset = mat
         mpr.matrix_offset[0][3] = 1.5
-        #mpr.matrix_offset[0][3] = 1
+        # mpr.matrix_offset[0][3] = 1
         mpr.select_bias = 5
-        #mpr.scale_basis = 0.5
+        # mpr.scale_basis = 0.5
         mpr.line_width = 50
         mpr.color = 0.05, 0.2, 0.8
         mpr.alpha = 0.5
@@ -1263,13 +1267,13 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # mat_rot1 = mathutils.Matrix.Rotation(radians(90.0), 4, 'Z')  # rotate
         mat_rot2 = mathutils.Matrix.Rotation(radians(-90.0), 4, 'Y')  # rotate
 
-        #mat_rot = mat_rot1 @ mat_rot2
+        # mat_rot = mat_rot1 @ mat_rot2
         mat_trans = mathutils.Matrix.Translation(mathutils.Vector((0, 0, 0)))
         mat = mat_trans @ mat_rot2
         mpl.matrix_offset = mat
-        #mpl.matrix_basis[0][3] += 0.4
+        # mpl.matrix_basis[0][3] += 0.4
 
-        #mpl.scale_basis = 0.5
+        # mpl.scale_basis = 0.5
         mpl.line_width = 3
         mpl.color = 0.05, 0.2, 0.8
         mpl.alpha = 0.5
@@ -1419,8 +1423,8 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
-        #mps.matrix_offset[2][0] = 0.2
-        #mps.matrix_offset[2][2] = 0.5
+        # mps.matrix_offset[2][0] = 0.2
+        # mps.matrix_offset[2][2] = 0.5
         # mps.matrix_basis[2][3] += 0.8
         # mps.matrix_basis[0][3] += 0.5
         mcsize.line_width = 3
@@ -1439,7 +1443,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
         # if has_stopper(ob):
         mpr = self.Roffset
         mpr.matrix_basis = ob.matrix_world.normalized()
-        #mpr.matrix_offset[0][3] = 1.5
+        # mpr.matrix_offset[0][3] = 1.5
 
         mpl = self.Loffset
         mpl.matrix_basis = ob.matrix_world.normalized()
@@ -1536,9 +1540,9 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         PUrP = context.scene.PUrP
         # * PUrP.GlobalScale
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta * PUrP.GlobalScale / 100
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / sensi
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1612,9 +1616,9 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         PUrP = context.scene.PUrP
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_x - self.init_value
-            self.value = self.init_position + self.delta * PUrP.GlobalScale / 100
+            self.value = self.init_position + self.delta * PUrP.GlobalScale / sensi
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1705,11 +1709,11 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
     def modal(self, context, event):
         PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / 100
+            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / sensi
             # if self.has_stopper:
-            self.valuemiddle = self.middlez + self.delta / 100
+            self.valuemiddle = self.middlez + self.delta / sensi
 
             self.execute(context)
 
@@ -1807,9 +1811,9 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
     def modal(self, context, event):
         PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.lowestz + self.delta * PUrP.GlobalScale / 100
+            self.value = self.lowestz + self.delta * PUrP.GlobalScale / 1000
 
             self.execute(context)
 
@@ -1873,9 +1877,9 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
     def modal(self, context, event):
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta / 100
+            self.value = self.init_count + self.delta / sensi
 
             self.execute(context)
 
@@ -1927,9 +1931,9 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
     def modal(self, context, event):
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta / 100
+            self.value = self.init_count + self.delta / sensi
 
             self.execute(context)
 
@@ -1982,9 +1986,9 @@ class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
     def modal(self, context, event):
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta * self.GlobalScale / 100
+            self.value = self.init_count + self.delta * self.GlobalScale / sensi
 
             self.execute(context)
 
@@ -2041,9 +2045,9 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
     def modal(self, context, event):
         ob = context.object
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.init_count + self.delta / 1000
+            self.value = self.init_count + self.delta / sensi
             print(
                 f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
             self.execute(context)
@@ -2068,7 +2072,7 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
         # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
         self.value = ob.modifiers["PUrP_Solidify"].thickness / self.GlobalScale
 
-        #helpi = [str(ob.modifiers["PUrP_Solidify"].thickness)]
+        # helpi = [str(ob.modifiers["PUrP_Solidify"].thickness)]
 
         # float(helpi[0])
         self.init_count = ob.modifiers["PUrP_Solidify"].thickness / \
@@ -2114,13 +2118,13 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         ob = context.object
 
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
             print(
                 f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
             self.value = self.init_scale + \
                 mathutils.Vector(
-                    (self.delta / 1000, self.delta / 1000, self.delta / 1000))
+                    (self.delta / sensi, self.delta / sensi, self.delta / sensi))
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm

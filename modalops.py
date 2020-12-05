@@ -67,9 +67,9 @@ class PP_OT_PlanarZScaleMenu(bpy.types.Operator):
     def modal(self, context, event):
         PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
-
+            sensi = 100 if not event.type == 'SHIFT' else 1000
             self.delta = event.mouse_y - self.init_value
-            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / 100
+            self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / sensi
             # if self.has_stopper:
             self.valuemiddle = self.middlez + self.delta / 100
 

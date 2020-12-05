@@ -28,10 +28,8 @@ bugs:
 general operator bug:
 
 
-
 [] adding has order on
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
-
 
 
 
@@ -94,6 +92,11 @@ Publishing:
 
 
 resolved bug:
+
+[+] press shift to change smaller increments for gizmot operators
+[+] 3D Gizmos!! 
+
+
 [+] inlays selectable
 [+] refactor order system
 [+] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore (check for PUrP.CObj exists, check if PUrP.CObj is coup)
