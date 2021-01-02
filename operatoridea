@@ -27,13 +27,16 @@ after applying
 bugs:
 general operator bug:
 
-
-[] adding has order on
+[] Defkis right shoulder: fix turns 90 degrees and has bool artefacts, second shoulder ok
+[] exchange should not make a new mainplane, or change it in anyway
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
+[] mf fail connector when mainplane turned/transformed
 
 
 
-[] adding a planar while another planar is selected/active applys rotation to the the active planar (New planar is stil applied to CObj)
+[] apply should always ensure scale of 1, otherwise weird position 
+
+
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   

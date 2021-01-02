@@ -94,7 +94,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             CenterObj_name = CenterObj.name
             CenterObj.PUrPCobj = True
             Centerloc = CenterObj.location
-
+        ensurenoscaling(context, CenterObj)
         # make slice plane when not planar
         if PUrP.SingleCouplingModes != "4":
             bpy.ops.mesh.primitive_plane_add(
@@ -1053,8 +1053,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
                 # mod.show_viewport = True
-                bpy.ops.object.modifier_apply(
-                    apply_as='DATA', modifier=mod.name)
+                bpy.ops.object.modifier_apply(modifier=mod.name)
 
             elif str(connector.name) + '_diff' == mod.name:
                 print(
@@ -1062,8 +1061,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
                 # mod.show_viewport = True
-                bpy.ops.object.modifier_apply(
-                    apply_as='DATA', modifier=mod.name)
+                bpy.ops.object.modifier_apply(modifier=mod.name)
             elif str(connector.name) + '_union' == mod.name:
                 print(
                     f'I delete now modifier {mod.name} from Object {daughter.name}')
@@ -1078,8 +1076,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                 context.view_layer.objects.active = daughter
                 print(f"active: {active}")
                 mod.show_viewport = True
-                bpy.ops.object.modifier_apply(
-                    apply_as='DATA', modifier=mod.name)
+                bpy.ops.object.modifier_apply(modifier=mod.name)
 
             elif str(connector.name) + '_union' == mod.name:
                 context.view_layer.objects.active = daughter
@@ -1087,8 +1084,7 @@ def applyRemoveCouplMods(daughter, connector, side):
                 print(
                     f"I apply now modifier: {mod.name} to Object {daughter.name}")
                 mod.show_viewport = True
-                bpy.ops.object.modifier_apply(
-                    apply_as='DATA', modifier=mod.name)
+                bpy.ops.object.modifier_apply(modifier=mod.name)
             elif str(connector.name) + '_diff' == mod.name:
                 print(
                     f'I delete now modifier {mod.name} from Object {daughter.name}')
@@ -1097,6 +1093,14 @@ def applyRemoveCouplMods(daughter, connector, side):
         print("Somethings Wrong with side determin")
     # if context.scene.PUrP.PUrP_name not in daughter.name:
     #    daughter.name = str(context.scene.PUrP.PUrP_name) + str(daughter.name)
+
+
+def ensurenoscaling(context, Cobj):
+    deselectall(context)
+    Cobj.select_set(True)
+    if Cobj.scale[0] != 1 or Cobj.scale[1] != 1 or Cobj.scale[2] != 1:
+        bpy.ops.object.transform_apply(
+            location=False, rotation=False, scale=True)
 
 
 def in_collection(context, ob):
@@ -1174,8 +1178,13 @@ def removeCoupling(context, Coupl):
                 for mod in child.modifiers:
                     print(f"fix stick active {active} mod {mod.name}")
                     context.view_layer.objects.active = child
-                    bpy.ops.object.modifier_apply(
-                        apply_as='DATA', modifier=mod.name)
+                    #ensuremodvis(context, mod)
+                    print(mod.name)
+                    try:  # not used bevel cause runtime error when applying in 2.91, try as work arround
+                        bpy.ops.object.modifier_apply(modifier=mod.name)
+                    except:
+                        bpy.ops.object.modifier_remove(modifier=mod.name)
+
                 child.name = Coupl.parent.name
                 child.display_type = 'SOLID'
                 # child.location = mathutils.Vector((0,0,0))
@@ -1245,7 +1254,7 @@ def centerObjDecider(context, CenterObj):
                             Cobjmodslist.append(ele)
 
                     for Cmod in Cobjmodslist:  # look through addon own modifier liste and
-                        print(f"centerObjdecider Cmod name {Cmod.name}")
+                        #print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
 
                             if bvhOverlap(context, Objects[mod], Cobj):
@@ -1355,7 +1364,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
 
     # apply boolean to seperate Centralobj parts
     context.view_layer.objects.active = CenterObj
-    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=obj.name)
+    bpy.ops.object.modifier_apply(modifier=obj.name)
 
     # seperate by loose parts
 
@@ -1466,7 +1475,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
         if delete:
             removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
-        print(f"coup parent after applysingle is {coup.parent}")
+        #print(f"coup parent after applysingle is {coup.parent}")
 
         return Daughters
 
@@ -2609,7 +2618,16 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
         return {'FINISHED'}
 
 
+def ensuremodvis(context, mod):
+
+    if not mod.show_render:
+        mod.show_render = True
+    if not mod.show_viewport:
+        mod.show_viewport = True
+
 # apply multiple planar to  active object  ---- maybe alternative with the normal one
+
+
 class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
     '''Apply multiple planar connectors to the active Object. First select all planar connectors and then the CenterObj last. Helpful when CenterObj will be cut in a lot of pieces'''
     bl_idname = "object.applymultipleplanartoobject"
@@ -2765,20 +2783,20 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                             context.view_layer.objects.active = daughter
                             ensure_mod(context, diff, daughter, "stick_diff")
                             bpy.ops.object.modifier_apply(
-                                apply_as='DATA', modifier=coup.name + "_stick_diff")
+                                modifier=coup.name + "_stick_diff")
                         print(f"Daughters set {Cob.name}")
                         # applySingleCoup(context, coup, Cob, PUrP.KeepCoup)
                     else:
                         context.view_layer.objects.active = Cob
                         ensure_mod(context, diff, Cob, "stick_diff")
                         bpy.ops.object.modifier_apply(
-                            apply_as='DATA', modifier=coup.name + "_stick_diff")
+                            modifier=coup.name + "_stick_diff")
                 else:
                     # without overlap just add the inlay mod and apply
                     context.view_layer.objects.active = Cob
                     ensure_mod(context, diff, Cob, "stick_diff")
                     bpy.ops.object.modifier_apply(
-                        apply_as='DATA', modifier=coup.name + "_stick_diff")
+                        modifier=coup.name + "_stick_diff")
 
                 # letzte Runde, delete or dublicate
                 # last in line
@@ -2827,7 +2845,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         # print(f"{union.fail}")
                         context.view_layer.objects.active = Cob
                         bpy.ops.object.modifier_apply(
-                            apply_as='DATA', modifier=coup.name + "_union")
+                            modifier=coup.name + "_union")
 
                         # union + das Cobjs
                         # mit mainplane mach das ganze applyteil inkl. seperate by loose parts
@@ -2840,15 +2858,13 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                     if not PUrP.IgnoreMainCut:
                         ensure_mod(context, coup, Cob, "")
 
-                        bpy.ops.object.modifier_apply(
-                            apply_as='DATA', modifier=coup.name)
+                        bpy.ops.object.modifier_apply(modifier=coup.name)
 
                     ensure_mod(context, diff, Cob, "diff")
                     Cob.select_set(True)
                     # apply modifier
 
-                    bpy.ops.object.modifier_apply(
-                        apply_as='DATA', modifier=coup.name + "_diff")
+                    bpy.ops.object.modifier_apply(modifier=coup.name + "_diff")
 
                     # the mainplane for MF when not the base Cob
 
@@ -3294,7 +3310,7 @@ def change_parent(context, obj, parent):
 
 def cut_n_separate(context, coup, Cobj):
     context.view_layer.objects.active = Cobj
-    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=coup.name)
+    bpy.ops.object.modifier_apply(modifier=coup.name)
 
     # seperate by loose parts
     bpy.ops.object.editmode_toggle()
