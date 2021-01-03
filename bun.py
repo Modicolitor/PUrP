@@ -1300,11 +1300,13 @@ def SideOfPlane(context, coup, CenterObj):
         location=True, rotation=True, scale=False)
 
     # cube verts gerade unten, ungerade oben
-    test = 0
+    #test = 0
+    test = len(CenterObj.data.vertices)-1
     DirecDistance = 0
     while DirecDistance == 0:
 
-        CouplingNormal = coup_tmp.data.vertices[0].normal
+        #CouplingNormal = coup_tmp.data.vertices[0].normal
+        CouplingNormal = mathutils.Vector((0, 0, 1))
         print(f"CouplingNormal {CouplingNormal}")
 
         direction = CouplingNormal.dot(
@@ -1317,6 +1319,7 @@ def SideOfPlane(context, coup, CenterObj):
 
         DirecDistance = direction - planedistanceorigin
         # print(f"difference {difference}")
+        test -= 1
     bpy.data.objects.remove(coup_tmp)
 
     return DirecDistance
