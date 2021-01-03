@@ -65,13 +65,13 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
-            applyScalRot(self.obin)
+            # applyScalRot(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             PUrP.Oversize = self.init_oversize
-            applyScalRot(self.obin)
+            # applyScalRot(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
             return {'CANCELLED'}
@@ -162,8 +162,8 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
-            applyScalRot(self.obout)
-            applyScalRot(self.obin)
+            # applyScalRot(self.obout)
+            # applyScalRot(self.obin)
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
@@ -172,8 +172,8 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             self.obout.scale.x = self.init_scale_x0
             self.obout.scale.y = self.init_scale_x0
             self.obout.scale.z = self.init_scale_x0
-            applyScalRot(self.obout)
-            applyScalRot(self.obin)
+            # applyScalRot(self.obout)
+            # applyScalRot(self.obin)
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
@@ -384,7 +384,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
 
 
 class PP_OT_CoupScaleGizmo(bpy.types.Operator):
-    '''Change the beveloffset of the coupling'''
+    '''Change the Size of the Connector'''
     bl_idname = "purp.coupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -404,8 +404,8 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         # bpy.ops.object.transform_apply(
         #    location=False, rotation=False, scale=True)
 
-        applyScalRot(self.obout)
-        applyScalRot(self.obin)
+        # applyScalRot(self.obout)
+        # applyScalRot(self.obin)
 
         oversizeToPrim(context, singcoupmode(
             context, None, context.object), self.obout, self.obin)

@@ -27,14 +27,8 @@ after applying
 bugs:
 general operator bug:
 
-[] Defkis right shoulder: fix turns 90 degrees and has bool artefacts, second shoulder ok
-[] exchange should not make a new mainplane, or change it in anyway
+[]  (Defkis right shoulder: fix turns 90 degrees and has bool artefacts, second shoulder ok)
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
-[] mf fail connector when mainplane turned/transformed
-
-
-
-[] apply should always ensure scale of 1, otherwise weird position 
 
 
 
@@ -99,7 +93,9 @@ resolved bug:
 [+] press shift to change smaller increments for gizmot operators
 [+] 3D Gizmos!! 
 
-
+[+] mf fail connector when mainplane turned/transformed --> optimzed side of plane to be independed of connector
+[+] add should always ensure scale of 1, otherwise weird position 
+[-] exchange should not make a new mainplane, or change it in anyway looks like it doesn't
 [+] inlays selectable
 [+] refactor order system
 [+] adding shouldn't be allowed when PUrP.CObj doesn't exist anymore (check for PUrP.CObj exists, check if PUrP.CObj is coup)

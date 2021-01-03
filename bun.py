@@ -316,7 +316,8 @@ def oversizeToPrim(context, mode, ob0, ob1):
 def applyScalRot(obj):
     mat = obj.matrix_world
     # translation/ location vector
-    trans = mathutils.Matrix.Translation(mathutils.Vector(
+    Vector = mathutils.Vector
+    trans = mathutils.Matrix.Translation(Vector(
         (obj.matrix_world[0][3], obj.matrix_world[1][3], obj.matrix_world[2][3])))
 
     # ob data
@@ -325,6 +326,9 @@ def applyScalRot(obj):
         v.co = v.co@mat
     mat.identity()
     mat @= trans
+
+    #obj.rotation_euler = Vector((0, 0, 0))
+    #obj.rotation_euler = obj.parent.rotation_euler
 
 
 def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
