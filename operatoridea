@@ -27,9 +27,10 @@ after applying
 bugs:
 general operator bug:
 
-[]  (Defkis right shoulder: fix turns 90 degrees and has bool artefacts, second shoulder ok)
+[]  when user scales mainplaine and then applys scale via 
 [] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
-
+[] deleted object stayed in Centerobj during add and not the selected
+[] add planar unmapped made problems (also centerobj was deleted)
 
 
 [] I can't delete planar after apply and kept (message: "obj before crash")

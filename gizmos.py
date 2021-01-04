@@ -11,7 +11,7 @@ from .gizmotshape import PUrP_CylinderShapeWidget
 
 
 from .bun import oversizeToPrim
-from .bun import applyScalRot
+from .bun import applyScalRot, applyScale
 from .bun import singcoupmode
 from .bun import planaranalysizerGlobal
 from .bun import planaranalysizerLocal
@@ -44,13 +44,13 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
         if self.valueos > 0:
             PUrP.Oversize = self.valueos
-            # applyScalRot(self.obin)
+            applyScale(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
 
         else:
             PUrP.Oversize = 0
-            # applyScalRot(self.obin)
+            applyScale(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
         return {'FINISHED'}
@@ -65,13 +65,13 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
-            # applyScalRot(self.obin)
+            applyScale(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             PUrP.Oversize = self.init_oversize
-            # applyScalRot(self.obin)
+            applyScale(self.obin)
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
             return {'CANCELLED'}
@@ -125,7 +125,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         self.obin.scale.y = self.valuex0
         self.obin.scale.z = self.valuex0
 
-        # applyScalRot(self.obout)
+        applyScale(self.obout)
         singcoupmod = singcoupmode(context, None, context.object)
         # oversizeToPrim(context, singcoupmode, self.obout, self.obin)
 
@@ -162,8 +162,8 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
-            # applyScalRot(self.obout)
-            # applyScalRot(self.obin)
+            applyScale(self.obout)
+            applyScale(self.obin)
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
@@ -172,8 +172,8 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             self.obout.scale.x = self.init_scale_x0
             self.obout.scale.y = self.init_scale_x0
             self.obout.scale.z = self.init_scale_x0
-            # applyScalRot(self.obout)
-            # applyScalRot(self.obin)
+            applyScale(self.obout)
+            applyScale(self.obin)
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
@@ -241,8 +241,8 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
-            applyScalRot(self.obout)
-            applyScalRot(self.obin)
+            applyScale(self.obout)
+            applyScale(self.obin)
 
             oversizeToPrim(context, singcoupmode(
                 context, None, context.object), self.obout, self.obin)
@@ -384,7 +384,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
 
 
 class PP_OT_CoupScaleGizmo(bpy.types.Operator):
-    '''Change the Size of the Connector'''
+    '''Change the Size of the Connector blubb !!!!'''
     bl_idname = "purp.coupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -404,19 +404,19 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         # bpy.ops.object.transform_apply(
         #    location=False, rotation=False, scale=True)
 
-        # applyScalRot(self.obout)
-        # applyScalRot(self.obin)
+        applyScale(self.obout)
+        applyScale(self.obin)
 
         oversizeToPrim(context, singcoupmode(
             context, None, context.object), self.obout, self.obin)
         print(f" obname {ob.name}")
         if "Planar" in ob.name:
-            print(1)
+            # print(1)
             coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
             PUrP.CoupScale = abs(ob.data.vertices[3].co.x) / coupfaktor
 
         else:
-            print(2)
+            # print(2)
             PUrP.CoupScale = ob.data.vertices[1].co.x * \
                 self.value[0] / (3 * PUrP.GlobalScale)
         # print(self.value)
@@ -436,6 +436,11 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         elif event.type == 'LEFTMOUSE':  # Confirm
             bpy.ops.object.transform_apply(
                 location=False, rotation=False, scale=True)
+            applyScale(self.obout)
+            applyScale(self.obin)
+
+            oversizeToPrim(context, singcoupmode(
+                context, None, context.object), self.obout, self.obin)
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             ob.scale = self.init_scale
@@ -1135,8 +1140,8 @@ class PP_OT_FlatCoupScaleGizmo(bpy.types.Operator):
         # bpy.ops.object.transform_apply(
         #    location=False, rotation=False, scale=True)
 
-        # applyScalRot(self.obout)
-        # applyScalRot(self.obin)
+        # applyScale(self.obout)
+        # applyScale(self.obin)
 
         # oversizeToPrim(context, singcoupmode(
         #    context, None, context.object), self.obout, self.obin)
@@ -2136,10 +2141,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
             PUrP.CoupScale = abs(vx3) / coupfaktor
             PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerLocal(
                 context, ob)
-            # applyScalRot(self.obout)
-            # applyScalRot(self.obin)
-            # oversizeToPrim(context, singcoupmode(
-            #    context, None, context.object), self.obout, self.obin)
+
             return {'FINISHED'}
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancels
             ob.scale = self.init_scale
@@ -2152,7 +2154,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         ob = context.object
         self.init_scale = ob.scale.copy()
         self.init_value = event.mouse_x
-        # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+
         self.value = ob.scale
         self.execute(context)
         context.window_manager.modal_handler_add(self)

@@ -331,6 +331,20 @@ def applyScalRot(obj):
     #obj.rotation_euler = obj.parent.rotation_euler
 
 
+def applyScale(obj):
+    verts = obj.data.vertices
+    scale = obj.scale
+
+    for vert in verts:
+        vert.co[0] *= scale[0]
+        vert.co[1] *= scale[1]
+        vert.co[2] *= scale[2]
+
+    obj.scale[0] = 1
+    obj.scale[1] = 1
+    obj.scale[2] = 1
+
+
 def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     context = bpy.context
     PUrP = bpy.context.scene.PUrP
@@ -1646,7 +1660,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                 print(f'selected objects{context.selected_objects}')
                 bpy.ops.object.delete(use_global=False)
 
-            context.view_layer.objects.active = context.scene.PUrP.CenterObj
+            #context.view_layer.objects.active = context.scene.PUrP.CenterObj
             # order part
             PUrP = context.scene.PUrP
             if PUrP.OrderBool:
