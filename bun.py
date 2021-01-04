@@ -878,9 +878,12 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                             {'WARNING'}, "Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
 
                     # generate new planar
-                    coupModeDivision(context, CenterObj,
-                                     oldname, is_unmap, viewportvis)
+                    newmain = coupModeDivision(context, CenterObj,
+                                               oldname, is_unmap, viewportvis)
                     context.object.matrix_world = trans
+
+                    if is_unmap:
+                        unmapped_signal(context, newmain)
 
                 else:  # when it was SingleCoupling, the mainplane is kept
 
@@ -930,7 +933,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     context.view_layer.objects.active = obj
                     bpy.ops.object.transform_apply(
                         location=False, rotation=False, scale=True)
-
                     if is_unmap:
                         unmapped_signal(context, obj)
 
@@ -946,6 +948,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     set_BoolSolver(context, mod)
                 '''
             PUrP = context.scene.PUrP
+
             if PUrP.OrderBool:
                 update_order(context, CenterObj)
 
