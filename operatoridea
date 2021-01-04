@@ -27,10 +27,10 @@ after applying
 bugs:
 general operator bug:
 
-[]  when user scales mainplaine and then applys scale via 
-[] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
+
+
 [] deleted object stayed in Centerobj during add and not the selected
-[] add planar unmapped made problems (also centerobj was deleted)
+[] exchanging unmapped planar remaps to Cobj  (not the problem of single)
 
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
@@ -90,7 +90,9 @@ Publishing:
 
 
 resolved bug:
-
+[+] add planar unmapped made problems (also centerobj was deleted)
+[+] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
+[+]  when user scales mainplaine and then applys scale via --> introduced simple apply(only)Scale funtion
 [+] press shift to change smaller increments for gizmot operators
 [+] 3D Gizmos!! 
 

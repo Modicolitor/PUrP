@@ -94,7 +94,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             CenterObj_name = CenterObj.name
             CenterObj.PUrPCobj = True
             Centerloc = CenterObj.location
-        ensurenoscaling(context, CenterObj)
+            ensurenoscaling(context, CenterObj)
         # make slice plane when not planar
         if PUrP.SingleCouplingModes != "4":
             bpy.ops.mesh.primitive_plane_add(
@@ -129,8 +129,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             newname_mainplane = "Null"  # for planar
 
-        coupModeDivision(context, CenterObj, newname_mainplane,
-                         add_unmap, PUrP.ViewPortVisAdd)
+        newMain = coupModeDivision(context, CenterObj, newname_mainplane,
+                                   add_unmap, PUrP.ViewPortVisAdd)
+
         if not add_unmap:
             CObCo = CenterObj.location
             CurCo = cursorloc
@@ -151,7 +152,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             if PUrP.OrderBool:
                 update_order(context, CenterObj)
         else:
-            unmapped_signal(context, data.objects[newname_mainplane])
+            unmapped_signal(context, newMain)
 
         return{"FINISHED"}
 
@@ -209,7 +210,7 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped, visibil
         newMain = data.objects[newname_mainplane]
 
     elif PUrP.SingleCouplingModes == "4":
-        newMain = genPlanar(context, CenterObj, visibility)
+        newMain = genPlanar(context, CenterObj, visibility, is_unmapped)
     # Adjustment for globalscale
     # newMain.scale = mathutils.Vector((GlobalScale, GlobalScale, GlobalScale))
 
@@ -219,6 +220,7 @@ def coupModeDivision(context, CenterObj, newname_mainplane, is_unmapped, visibil
     context.view_layer.objects.active = newMain
     newMain.select_set(True)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    return newMain
 
 
 def singcoupmode(context, Number, coup):
@@ -471,7 +473,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     return context.object
 
 
-def genPlanar(context, CenterObj, visibility):
+def genPlanar(context, CenterObj, visibility, is_unmapped):
     # context = bpy.context
     PUrP = bpy.context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
@@ -539,8 +541,8 @@ def genPlanar(context, CenterObj, visibility):
     context.object.name = str(newname) + str(nameadd)
 
     print(f'active {context.object.name}, CenterObj {CenterObj.name}')
-
-    context.object.parent = CenterObj
+    if not is_unmapped:
+        context.object.parent = CenterObj
     context.object.display_type = 'WIRE'
     context.object.show_in_front = True
 
@@ -733,12 +735,13 @@ def genPlanar(context, CenterObj, visibility):
     mod.use_rim = True
 
     # boolean _diff at parent object
-    mod = obj.parent.modifiers.new(name=obj.name, type="BOOLEAN")
-    mod.show_viewport = visibility
-    mod.operation = 'DIFFERENCE'
-    mod.object = obj
-    set_BoolSolver(context, mod)
-    print(f"Active after planar generation {context.object}, obj is {obj}")
+    if not is_unmapped:
+        mod = obj.parent.modifiers.new(name=obj.name, type="BOOLEAN")
+        mod.show_viewport = visibility
+        mod.operation = 'DIFFERENCE'
+        mod.object = obj
+        set_BoolSolver(context, mod)
+    #print(f"Active after planar generation {context.object}, obj is {obj}")
 
     return obj
 
@@ -1114,11 +1117,10 @@ def applyRemoveCouplMods(daughter, connector, side):
 
 
 def ensurenoscaling(context, Cobj):
-    deselectall(context)
+    # deselectall(context)
     Cobj.select_set(True)
     if Cobj.scale[0] != 1 or Cobj.scale[1] != 1 or Cobj.scale[2] != 1:
-        bpy.ops.object.transform_apply(
-            location=False, rotation=False, scale=True)
+        applyScale(Cobj)
 
 
 def in_collection(context, ob):
