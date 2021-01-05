@@ -1,3 +1,4 @@
+import bmesh
 import bpy
 import mathutils
 from math import radians, sqrt
@@ -794,6 +795,56 @@ def newmainPlane(context, CenterObj):
     mod.operation = 'DIFFERENCE'
     '''
     return newname_mainplane
+
+
+def newmainJoint(context, CenterObj):
+
+    bpy.ops.mesh.primitive_circle_add(
+        radius=1, fill_type='TRIFAN', enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+
+    # planar side offset
+    me = bpy.context.object.data
+
+    # Get a BMesh representation
+    bm = bmesh.new()   # create an empty BMesh
+    bm.from_mesh(me)   # fill it in from a Mesh
+
+    bm.verts.ensure_lookup_table()
+    # bm.edges.ensure_lookup_table()
+
+    edges_Up = [ele for n, ele in enumerate(bm.edges[:])
+                if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and n < ((len(bm.edges)-1)/2)]
+    edges_down = [ele for ele in bm.edges[:]
+                  if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and ele not in edges_Up]
+
+    ret = bmesh.ops.extrude_edge_only(bm, edges=edges_Up)
+    geom_extrude_mid = ret['geom']
+    verts_extrude_a = [ele for ele in geom_extrude_mid
+                       if isinstance(ele, bmesh.types.BMVert)]
+    edges_extrude_a = [ele for ele in geom_extrude_mid
+                       if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+
+    bmesh.ops.translate(
+        bm,
+        verts=verts_extrude_a,
+        vec=(0.0, 0.0, 1))
+
+    ret = bmesh.ops.extrude_edge_only(bm, edges=edges_down)
+    geom_extrude_mid = ret['geom']
+    verts_extrude_b = [ele for ele in geom_extrude_mid
+                       if isinstance(ele, bmesh.types.BMVert)]
+    edges_extrude_b = [ele for ele in geom_extrude_mid
+                       if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+
+    bmesh.ops.translate(
+        bm,
+        verts=verts_extrude_b,
+        vec=(0.0, 0.0, -1))
+
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+
+    bm.to_mesh(me)
+    bm.free()
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):

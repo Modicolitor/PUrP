@@ -28,9 +28,8 @@ bugs:
 general operator bug:
 
 
-
+[] order up/down poll
 [] deleted object stayed in Centerobj during add and not the selected
-[] exchanging unmapped planar remaps to Cobj  (not the problem of single)
 
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
@@ -90,6 +89,8 @@ Publishing:
 
 
 resolved bug:
+[+] exchanging unmapped planar remaps to Cobj  (not the problem of single)
+[+] unmapped signal and exchange problems
 [+] add planar unmapped made problems (also centerobj was deleted)
 [+] (while cleaning) if i delete obj before deleting the coup, i get an error while deleting the coup
 [+]  when user scales mainplaine and then applys scale via --> introduced simple apply(only)Scale funtion
