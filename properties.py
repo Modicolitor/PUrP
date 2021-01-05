@@ -8,9 +8,9 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     PUrP_name = bpy.props.StringProperty(
         name="PUrPname", default="PUrP_")
     CutThickness = bpy.props.FloatProperty(
-        name="Size", default=0.04, min=0.0)
+        name="Maintcut Thickness", default=0.04, min=0.0)
     CoupSize = bpy.props.FloatProperty(
-        name="Size", default=1.0, min=0.0)
+        name="Inlay Size", default=1.0, min=0.0)
     Oversize = bpy.props.FloatProperty(
         name="DynamicOversize", default=0.04)
     zScale = bpy.props.FloatProperty(

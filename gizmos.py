@@ -384,7 +384,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
 
 
 class PP_OT_CoupScaleGizmo(bpy.types.Operator):
-    '''Change the Size of the Connector blubb !!!!'''
+    '''Change the Size of the Connector'''
     bl_idname = "purp.coupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -415,9 +415,12 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
             coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
             PUrP.CoupScale = abs(ob.data.vertices[3].co.x) / coupfaktor
 
-        else:
+        elif "Plane" in ob.data.name:
             # print(2)
             PUrP.CoupScale = ob.data.vertices[1].co.x * \
+                self.value[0] / (3 * PUrP.GlobalScale)
+        elif "Joint" in ob.data.name:
+            PUrP.CoupScale = ob.data.vertices[1].co.y * \
                 self.value[0] / (3 * PUrP.GlobalScale)
         # print(self.value)
         return {'FINISHED'}

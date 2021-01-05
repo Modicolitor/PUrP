@@ -763,7 +763,7 @@ def newmainPlane(context, CenterObj, unmapped):
     CutThickness = PUrP.CutThickness
 
     bpy.ops.mesh.primitive_plane_add(
-        size=6, enter_editmode=False, location=(0, 0, 0))
+        size=2, enter_editmode=False, location=(0, 0, 0))
     context.object.name = str(
         PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
     newname_mainplane = context.object.name
@@ -877,10 +877,12 @@ def ReplaceOrNotMain(context, coup):
     PUrP = context.scene.PUrP
     if 'Plane' in name and PUrP.SingleMainTypes == '1':
         return False
+
     elif 'Joint' in name and PUrP.SingleMainTypes == '2':
-        return False
-    else:
-        return True
+        if amount_jointverts(context, coup) == PUrP.MaincutVert:
+            return False
+
+    return True
 
 
 def is_joint(context, coup):
@@ -893,8 +895,8 @@ def amount_jointverts(context, coup):
 
     if is_joint(context, coup):
         allverts = len(coup.data.vertices)
-        # add two verts which are not extrakted and substract the center vert
-        return (allverts+1)/2
+        #  substract the center vert and remove the half from the extrusion
+        return (allverts)/2
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
@@ -2107,7 +2109,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 PUrP.SingleMainTypes = '1'
             elif is_joint(context, obj):
                 PUrP.SingleMainTypes = '2'
-                PUrP.MaincutVert = amount_jointverts(context, coup)
+                PUrP.MaincutVert = amount_jointverts(context, obj)
 
             if PUrP.ExactOptBool:
                 if is_unmapped(context, obj):
@@ -2129,8 +2131,13 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
             PUrP.CutThickness = obj.modifiers['PUrP_Solidify'].thickness / \
                 PUrP.GlobalScale
-            PUrP.CoupScale = obj.data.vertices[1].co.x / (3 * PUrP.GlobalScale)
-            yv0 = self.obout.data.vertices[0].co.y
+
+            if is_joint(context, obj):
+                PUrP.CoupScale = obj.data.vertices[1].co.y / \
+                    (3 * PUrP.GlobalScale)
+            else:
+                PUrP.CoupScale = obj.data.vertices[1].co.x / \
+                    (3 * PUrP.GlobalScale)
 
             # more code because of order
             if len(children) == 0 or len(children) == 1:
