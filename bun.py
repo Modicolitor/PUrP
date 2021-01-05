@@ -98,22 +98,13 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             ensurenoscaling(context, CenterObj)
         # make slice plane when not planar
         if PUrP.SingleCouplingModes != "4":
-            bpy.ops.mesh.primitive_plane_add(
-                size=6, enter_editmode=False, location=(0, 0, 0))
-            context.object.name = str(
-                PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
-            newname_mainplane = context.object.name
-            context.object.scale *= PUrP.GlobalScale * PUrP.CoupScale
-            bpy.ops.object.transform_apply(
-                location=False, rotation=False, scale=True)
 
-            # bpy.ops.object.modifier_add(type='SOLIDIFY')
-            mod = context.object.modifiers.new(
-                name="PUrP_Solidify", type="SOLIDIFY")
-            mod.thickness = CutThickness * GlobalScale
-            mod.offset = 1.0
-            context.object.display_type = 'WIRE'
-            # context.object.show_in_front = True
+            newmain = genSinglemain(
+                context, CenterObj, PUrP.SingleMainTypes, add_unmap)
+            newname_mainplane = newmain.name
+            #context.object.scale *= PUrP.GlobalScale * PUrP.CoupScale
+            # bpy.ops.object.transform_apply(
+            #    location=False, rotation=False, scale=True)
 
             if not add_unmap:
                 context.object.parent = data.objects[CenterObj_name]
@@ -123,14 +114,14 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
                 mod.show_viewport = False
                 if PUrP.ViewPortVisAdd:
                     mod.show_viewport = True
-                mod.object = data.objects[newname_mainplane]
+                mod.object = newmain
                 mod.operation = 'DIFFERENCE'
                 set_BoolSolver(context, mod)
 
         else:
             newname_mainplane = "Null"  # for planar
 
-        newMain = coupModeDivision(context, CenterObj, newname_mainplane,
+        newMain = coupModeDivision(context, CenterObj, newmain.name,
                                    add_unmap, PUrP.ViewPortVisAdd)
 
         if not add_unmap:
@@ -140,7 +131,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             cursorlocrelativ = cursorloc
         if PUrP.SingleCouplingModes != "4":
-            data.objects[newname_mainplane].location = cursorlocrelativ
+            newmain.location = cursorlocrelativ
 
         elif PUrP.SingleCouplingModes == "4":
             context.object.location = cursorlocrelativ
@@ -765,7 +756,7 @@ def appendCoupling(filename, objectname):
         bpy.context.view_layer.objects.active = obj
 
 
-def newmainPlane(context, CenterObj):
+def newmainPlane(context, CenterObj, unmapped):
     data = bpy.data
     PUrP = context.scene.PUrP
     PUrP_name = PUrP.PUrP_name
@@ -784,23 +775,20 @@ def newmainPlane(context, CenterObj):
     mod.offset = 1.0
     context.object.display_type = 'WIRE'
     # context.object.show_in_front = True
+    if not unmapped:
+        context.object.parent = CenterObj
 
-    context.object.parent = CenterObj
-
-    # set boolean for the slice plane
-    '''
-    mod = data.objects[CenterObj.name].modifiers.new(
-        name=context.object.name, type="BOOLEAN")
-    mod.object = data.objects[newname_mainplane]
-    mod.operation = 'DIFFERENCE'
-    '''
-    return newname_mainplane
+    return context.object
 
 
-def newmainJoint(context, CenterObj):
+def newmainJoint(context, CenterObj, unmapped):
 
-    bpy.ops.mesh.primitive_circle_add(
-        radius=1, fill_type='TRIFAN', enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+    PUrP = context.scene.PUrP
+    PUrP_name = PUrP.PUrP_name
+    CutThickness = PUrP.CutThickness
+
+    bpy.ops.mesh.primitive_circle_add(vertices=PUrP.MaincutVert, radius=1, fill_type='TRIFAN',
+                                      enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
     # planar side offset
     me = bpy.context.object.data
@@ -812,17 +800,18 @@ def newmainJoint(context, CenterObj):
     bm.verts.ensure_lookup_table()
     # bm.edges.ensure_lookup_table()
 
-    edges_Up = [ele for n, ele in enumerate(bm.edges[:])
-                if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and n < ((len(bm.edges)-1)/2)]
-    edges_down = [ele for ele in bm.edges[:]
-                  if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and ele not in edges_Up]
+    # in der mitte 0 dann
+    edges_up = [ele for n, ele in enumerate(bm.edges[:])
+                if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and bm.verts[1] not in ele.verts and n < ((len(bm.edges)-1)/2)-1]
+    edges_down = [ele for n, ele in enumerate(bm.edges[:])
+                  if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary and bm.verts[0] not in ele.verts and n > ((len(bm.edges)-1)/2)+1]
 
-    ret = bmesh.ops.extrude_edge_only(bm, edges=edges_Up)
+    ret = bmesh.ops.extrude_edge_only(bm, edges=edges_up)
     geom_extrude_mid = ret['geom']
     verts_extrude_a = [ele for ele in geom_extrude_mid
                        if isinstance(ele, bmesh.types.BMVert)]
-    edges_extrude_a = [ele for ele in geom_extrude_mid
-                       if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+    # edges_extrude_a = [ele for ele in geom_extrude_mid
+    #                   if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
 
     bmesh.ops.translate(
         bm,
@@ -833,8 +822,8 @@ def newmainJoint(context, CenterObj):
     geom_extrude_mid = ret['geom']
     verts_extrude_b = [ele for ele in geom_extrude_mid
                        if isinstance(ele, bmesh.types.BMVert)]
-    edges_extrude_b = [ele for ele in geom_extrude_mid
-                       if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
+    # edges_extrude_b = [ele for ele in geom_extrude_mid
+    #                  if isinstance(ele, bmesh.types.BMEdge) and ele.is_boundary]
 
     bmesh.ops.translate(
         bm,
@@ -845,6 +834,67 @@ def newmainJoint(context, CenterObj):
 
     bm.to_mesh(me)
     bm.free()
+
+    context.object.data.name = "Joint"
+    context.object.name = str(
+        PUrP_name) + "SingleConnector_" + str(random.randint(1, 999))
+    newname_mainplane = context.object.name
+
+    # bpy.ops.object.modifier_add(type='SOLIDIFY')
+    mod = context.object.modifiers.new(
+        name="PUrP_Solidify", type="SOLIDIFY")
+    mod.thickness = CutThickness * PUrP.GlobalScale
+    mod.offset = 1.0
+    mod.solidify_mode = 'NON_MANIFOLD'
+    mod.nonmanifold_thickness_mode = 'EVEN'
+
+    context.object.display_type = 'WIRE'
+
+    # context.object.show_in_front = True
+    if not unmapped:
+        context.object.parent = CenterObj
+
+    return context.object
+
+
+def genSinglemain(context, CenterObj, type, unmapped):
+    if type == '1':
+        newmain = newmainPlane(context, CenterObj, unmapped)
+    elif type == '2':
+        newmain = newmainJoint(context, CenterObj, unmapped)
+    else:
+        print("Maincut type must be '1' oder '2'")
+    PUrP = context.scene.PUrP
+    scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+    for vert in newmain.data.vertices:
+        vert.co *= 3 * scalefactor
+    applyScale(newmain)
+    return newmain
+
+
+def ReplaceOrNotMain(context, coup):
+    name = coup.data.name
+    PUrP = context.scene.PUrP
+    if 'Plane' in name and PUrP.SingleMainTypes == '1':
+        return False
+    elif 'Joint' in name and PUrP.SingleMainTypes == '2':
+        return False
+    else:
+        return True
+
+
+def is_joint(context, coup):
+    if 'Joint' in coup.data.name:
+        return True
+    return False
+
+
+def amount_jointverts(context, coup):
+
+    if is_joint(context, coup):
+        allverts = len(coup.data.vertices)
+        # add two verts which are not extrakted and substract the center vert
+        return (allverts+1)/2
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
@@ -938,7 +988,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
                 else:  # when it was SingleCoupling, the mainplane is kept
 
-                    if "Plane" not in obj.data.name:
+                    if ReplaceOrNotMain(context, obj):
                         # print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
@@ -951,8 +1001,12 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         # delete the old planar coupling
                         bpy.ops.object.delete(use_global=False)
                         # name for
-                        newname = newmainPlane(
-                            context, data.objects[parentname])
+
+                        newob = genSinglemain(
+                            context, CenterObj, PUrP.SingleMainTypes, is_unmap)
+
+                        #newname = newmainPlane(context, data.objects[parentname])
+                        newname = newob.name
                         data.objects[newname].matrix_world = trans
                         obj = context.object
 
@@ -970,49 +1024,32 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     coupModeDivision(context, CenterObj,
                                      obj.name, is_unmap, viewportvis)
                     # print(f"obj at rescale {obj}")
-                    scalefactor = PUrP.GlobalScale * PUrP.CoupScale
-                    obj.data.vertices[0].co = mathutils.Vector(
-                        (- 3 * scalefactor, - 3 * scalefactor, 0))
-                    obj.data.vertices[1].co = mathutils.Vector(
-                        (3 * scalefactor, - 3 * scalefactor, 0))
-                    obj.data.vertices[2].co = mathutils.Vector(
-                        (- 3 * scalefactor, 3 * scalefactor, 0))
-                    obj.data.vertices[3].co = mathutils.Vector(
-                        (3 * scalefactor, 3 * scalefactor, 0))
 
-                    obj.select_set(True)
-                    context.view_layer.objects.active = obj
-                    bpy.ops.object.transform_apply(
-                        location=False, rotation=False, scale=True)
+                    #scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+                    # for vert in obj.data.vertices:
+                    #    vert.co *= 3 * scalefactor
+                    # obj.data.vertices[0].co = mathutils.Vector(
+                    #    (- 3 * scalefactor, - 3 * scalefactor, 0))
+                    # obj.data.vertices[1].co = mathutils.Vector(
+                    #    (3 * scalefactor, - 3 * scalefactor, 0))
+                    # obj.data.vertices[2].co = mathutils.Vector(
+                    #    (- 3 * scalefactor, 3 * scalefactor, 0))
+                    # obj.data.vertices[3].co = mathutils.Vector(
+                    #    (3 * scalefactor, 3 * scalefactor, 0))   ####why not simply scaled  scaled
+
+                    # obj.select_set(True)
+                    #context.view_layer.objects.active = obj
+                    # bpy.ops.object.transform_apply(
+                    #    location=False, rotation=False, scale=True)
                     if is_unmap:
                         unmapped_signal(context, obj)
 
             #hideselectinlay(context, obj)
-            '''
-                if not is_unmap:
-                    mod = CenterObj.modifiers.new(
-                        name=obj.name, type="BOOLEAN")
-                    print(f"viewportvis applied {viewportvis}")
-                    mod.show_viewport = viewportvis
-                    mod.object = obj
-                    mod.operation = 'DIFFERENCE'
-                    set_BoolSolver(context, mod)
-                '''
-            PUrP = context.scene.PUrP
 
             if PUrP.OrderBool:
                 update_order(context, CenterObj)
 
         return {'FINISHED'}
-
-# returns a list of
-
-
-# def hideselectinlay(context, obj):
-#   children =  obj.children[:]
-#   for child in obj.children:
-#        if is_inlay(context, child):
-#            child.hide_select = True
 
 
 def otherparents(context, coup):
@@ -2065,6 +2102,13 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
         if is_single(context, obj):
             children = obj.children
+
+            if 'Plane' in obj.data.name:
+                PUrP.SingleMainTypes = '1'
+            elif is_joint(context, obj):
+                PUrP.SingleMainTypes = '2'
+                PUrP.MaincutVert = amount_jointverts(context, coup)
+
             if PUrP.ExactOptBool:
                 if is_unmapped(context, obj):
                     PUrP.BoolModSettings = '1'

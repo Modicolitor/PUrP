@@ -30,7 +30,9 @@ general operator bug:
 
 [] order up/down poll
 [] deleted object stayed in Centerobj during add and not the selected
-
+[] gizmot putting Coupscale to zero
+[] analyse for joint and flat singlemain types
+[] exchange increases size with each ex
 
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   

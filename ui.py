@@ -44,14 +44,18 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.prop(PUrP, "SingleCouplingModes",
                         expand=True, text='Connector Modes')
             if context.scene.PUrP.SingleCouplingModes != '4':
+                subcol.prop(PUrP, "SingleMainTypes", text='Maincut Type')
                 subcol.prop(PUrP, "SingleCouplingTypes", text='Connector Type')
+
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text='Connector Type')
             if context.scene.PUrP.ExactOptBool:
                 subcol.prop(PUrP, "BoolModSettings", text='Solver')
             subcol.prop(PUrP, "GlobalScale", text='Global Scale')
             subcol.prop(PUrP, "CoupScale", text='Connector Scale')
-
+            if context.scene.PUrP.SingleMainTypes == '2':
+                subcol.prop(context.scene.PUrP, "MaincutVert",
+                            text='Maincut Verts')
             if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":  # cylinder cone
                 subcol.prop(context.scene.PUrP, "CylVert", text='Vertices')
                 subcol.prop(context.scene.PUrP, "aRadius", text='Radius')

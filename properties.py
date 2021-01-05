@@ -64,6 +64,13 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     OrderBool = bpy.props.BoolProperty(
         name="Is Order on or off", default=False)
 
+    MaincutVert = bpy.props.IntProperty(
+        name='Vertexcount',
+        description='Set the resolution of the main cut joint',
+        default=16,
+        min=0,
+    )
+
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',
         description='Set the resolution of the cylic objects',
@@ -78,6 +85,15 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         items=[('1', 'Cube', ''),
                ('2', 'Cylinder', ''),
                ('3', 'Cone', ''),
+               ]
+    )
+
+    SingleMainTypes = bpy.props.EnumProperty(
+        name='',  # SingleCoupltypes
+        description='List of forms avaiable in single connector mode',
+        default='1',
+        items=[('1', 'Flat', ''),
+               ('2', 'Joint', ''),
                ]
     )
 
