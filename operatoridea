@@ -1,4 +1,4 @@
-
+Not for Blender users under 3 years because small plastic pieces could be swallowed or breathed in.
 
 #################feature ideen 
 
@@ -14,18 +14,16 @@ after applying
 
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
-
-
-[] global scale value (ist couple size die cubes in single oder die fläche)
-
-
-
 [] can a planar cut, comunicate to the following planar that it should cut through all, or does it makes problem in combination with Apply all/parent aply zuordnung ...???????????
 
 ###############################################################
 
 bugs:
 general operator bug:
+[] single zscale gizmos gives back wrong value back (Defkis)
+[] scale inlay gizmot goes crazy big 
+[] inlay size not reproducing
+[] joint replaced too often
 
 
 [] order up/down poll
@@ -34,12 +32,17 @@ general operator bug:
 [] analyse for joint and flat singlemain types
 [] exchange increases size with each ex
 
+
+
 [] I can't delete planar after apply and kept (message: "obj before crash")
 [] Panel for active object: Linedistance, Line, Modal operators for properties?   
 [-] Linedistance must be absolut, otherwise scale changes it
 [] error in "corect name" (ob == none ) when unmapping duplicated planar
 [] Logo2 problem mit normal puzzle apply all, also multi planar to object fails second completly, also the kept coups are moved
 [] 
+
+[] Tour durch das Addon im Addon
+
 
 [ ] single to Multiple: unmapp still moves coupling 
                         mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)

@@ -101,7 +101,7 @@ class PP_OT_OversizeGizmo(bpy.types.Operator):
 
 
 class PP_OT_CouplSizeGizmo(bpy.types.Operator):
-    '''Change the scale of the coupling'''
+    '''Change the scale of the Inlay'''
     bl_idname = "object.couplesize"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -125,11 +125,12 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
         self.obin.scale.y = self.valuex0
         self.obin.scale.z = self.valuex0
 
-        applyScale(self.obout)
+        # applyScale(self.obout)
         singcoupmod = singcoupmode(context, None, context.object)
         # oversizeToPrim(context, singcoupmode, self.obout, self.obin)
 
         scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+
         if "Cube" in self.obout.data.name:
             vert = self.obout.data.vertices[0].co@self.obout.matrix_world
             PUrP.CoupSize = 2 * abs(vert[1])/scalefactor
@@ -147,19 +148,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
             # if context.object.children[0].scale.x <= context.object.children[1].scale.x:  ####not bigger than the outer object
             sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
-            # else:
-            #    self.delta =  self.init_value
-
-            # self.valuex1 = self.init_scale_x1 + self.delta / \
-            #    1000  # - self.window_width/2 #(HD Screen 800)
-            # self.valuey1 = self.init_scale_y1 + self.delta/1000
-            # self.valuez1 = self.init_scale_z1 + self.delta/1000
-
             self.valuex0 = self.init_scale_x0 + self.delta/sensi
-            # self.valuey0 = self.init_scale_y0 + self.delta/1000
-            # self.valuez0 = self.init_scale_z0 + self.delta/1000
-
-            # print(f"MouspositionX: {self.value}")
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             applyScale(self.obout)
@@ -212,7 +201,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
 
 class PP_OT_zScaleGizmo(bpy.types.Operator):
-    '''Change the z-scale of the coupling'''
+    '''Change the z-scale of the connector'''
     bl_idname = "object.zscale"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -229,8 +218,21 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
         self.obout.scale.z = self.value
         self.obin.scale.z = self.value
 
+        # applyScale(self.obout)
+        # applyScale(self.obin)
+
         PUrP = context.scene.PUrP
-        PUrP.zScale = self.value / PUrP.CoupSize
+        scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
+        upverts, b, aRadius, bRadius = coneanalysizer(
+            context, self.obout)
+        up0 = upverts[0].co@self.obout.matrix_world
+        up0z = up0[2]
+        if is_stick(context, context.object):
+            PUrP.zScale = 2*up0z / \
+                scalefactor  # self.value / PUrP.CoupSize
+        else:
+            print(up0z)
+            PUrP.zScale = up0z/(scalefactor)
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -271,6 +273,14 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
 
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
+
+
+def is_stick(context, coup):
+    back = False
+    for child in coup.children:
+        if "fix" in child.name:
+            back = True
+    return back
 
 
 class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
@@ -493,7 +503,7 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         oversizeToPrim(context, singcoupmode(
             context, None, context.object), self.obout, self.obin)
 
-        a, b, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+        a, b, PUrP.aRadius, PUrP.bRadius = coneanalysizer(
             context, self.obout)
         return {'FINISHED'}
 
@@ -534,10 +544,10 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
 
         PUrP = context.scene.PUrP
 
-        self.upperverts, self.lowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+        self.upperverts, self.lowerverts, PUrP.aRadius, PUrP.bRadius = coneanalysizer(
             context, self.obout)
 
-        self.INupperverts, self.INlowerverts, PUrP.aRadius, PUrP.bRadius = self.coneanalysizer(
+        self.INupperverts, self.INlowerverts, PUrP.aRadius, PUrP.bRadius = coneanalysizer(
             context, self.obin)
 
         if "Cylinder" in self.obout.data.name:
@@ -565,29 +575,30 @@ class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
-    def coneanalysizer(self, context, ob):
-        # Cyclvert, and the radius are extrakted; Coupling types
-        PUrP = context.scene.PUrP
 
-        upperverts = []
-        lowerverts = []
-        for vert in ob.data.vertices:
-            if vert.co.z > 0:
-                upperverts.append(vert)
-            elif vert.co.z <= 0:
-                lowerverts.append(vert)
-        # upperverts information
-        if len(upperverts) == 1:  # hard tip
-            bRadius = 0.0
-        else:  # soft tip
-            bRadius = abs(ob.data.vertices[1].co.y)
-            bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
-        # lower radius
+def coneanalysizer(context, ob):
+    # Cyclvert, and the radius are extrakted; Coupling types
+    PUrP = context.scene.PUrP
 
-        aRadius = abs(ob.data.vertices[0].co.y)
-        aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
+    upperverts = []
+    lowerverts = []
+    for vert in ob.data.vertices:
+        if vert.co.z > 0:
+            upperverts.append(vert)
+        elif vert.co.z <= 0:
+            lowerverts.append(vert)
+    # upperverts information
+    if len(upperverts) == 1:  # hard tip
+        bRadius = 0.0
+    else:  # soft tip
+        bRadius = abs(ob.data.vertices[1].co.y)
+        bRadius = bRadius / (PUrP.GlobalScale * PUrP.CoupScale)
+    # lower radius
 
-        return upperverts, lowerverts, aRadius, bRadius
+    aRadius = abs(ob.data.vertices[0].co.y)
+    aRadius = aRadius/(PUrP.GlobalScale * PUrP.CoupScale)
+
+    return upperverts, lowerverts, aRadius, bRadius
 
 
 class PP_OT_UpperRadiusGizmo(bpy.types.Operator):

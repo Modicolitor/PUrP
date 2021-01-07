@@ -265,7 +265,7 @@ def oversizeToPrim(context, mode, ob0, ob1):
             P2Dim = mathutils.Vector((Pur[0], Pur[1]))
 
             P2Norm = P2Dim.normalized()
-            print(f"P2Dim {P2Dim} Pur {P2Norm}")
+            #print(f"P2Dim {P2Dim} Pur {P2Norm}")
 
             v.co.x = Pur[0] - shift * P2Norm[0]
             v.co.y = Pur[1] - shift * P2Norm[1]
@@ -414,15 +414,15 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     if PUrP.SingleCouplingModes == "2":  # Male - female
         for edge in context.object.data.edges:
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
-                print(f"setting weight for edge {edge}")
+                #print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
     elif PUrP.SingleCouplingModes == "1":  # stick --> upper and lower edge bevelt
         for edge in context.object.data.edges:
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
-                print(f"setting weight for edge {edge}")
+                #print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
             if context.object.data.vertices[edge.vertices[0]].co.z == downverz and context.object.data.vertices[edge.vertices[1]].co.z == downverz:
-                print(f"setting weight for edge {edge}")
+                #print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
 
     scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
@@ -881,7 +881,7 @@ def ReplaceOrNotMain(context, coup):
     elif 'Joint' in name and PUrP.SingleMainTypes == '2':
         if amount_jointverts(context, coup) == PUrP.MaincutVert:
             return False
-
+    print("Exchanged MainCut")
     return True
 
 
