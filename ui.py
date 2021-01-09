@@ -108,7 +108,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
 
         else:
             col.operator("purp.init", icon="SHADERFX")
-            col.operator("purp.tutorialwindow", icon="SHADERFX")
+            col.operator("purp.window_draw_operator", icon="SHADERFX")
 
 
 class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
