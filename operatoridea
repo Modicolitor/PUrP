@@ -9,56 +9,17 @@ Not for Blender users under 3 years because small plastic pieces could be swallo
 after applying
 [] remove parents relation ships 
 [] generate line of objects (maybe rotatet to the flat parts)
-
 [] label in UI when non scale not zero 
-
 [] Planar connector anwinkeln für leichteren druck und wrench effekt 
 
-[] can a planar cut, comunicate to the following planar that it should cut through all, or does it makes problem in combination with Apply all/parent aply zuordnung ...???????????
+
 
 ###############################################################
 
 bugs:
 general operator bug:
-[] single zscale gizmos gives back wrong value back (Defkis)
-[] scale inlay gizmot goes crazy big 
-[] inlay size not reproducing
-[] joint replaced too often
-
-
-[] order up/down poll
-[] deleted object stayed in Centerobj during add and not the selected
-[] gizmot putting Coupscale to zero
-[] analyse for joint and flat singlemain types
-[] exchange increases size with each ex
-
-
-
-[] I can't delete planar after apply and kept (message: "obj before crash")
-[] Panel for active object: Linedistance, Line, Modal operators for properties?   
-[-] Linedistance must be absolut, otherwise scale changes it
-[] error in "corect name" (ob == none ) when unmapping duplicated planar
-[] Logo2 problem mit normal puzzle apply all, also multi planar to object fails second completly, also the kept coups are moved
-[] 
 
 [] Tour durch das Addon im Addon
-
-
-[ ] single to Multiple: unmapp still moves coupling 
-                        mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)
-
-[] duplicated planar end up beeing applied in copies too <-- rename function and remap
-[?] depsgraph bvh problem  line 52 bvh, because of noneteype during multiplanar apply
- 
-
-
-[?] apply all Problems 
-  
-   [?] utf8 byte error hard to reproduce
-    [?] apply all --> error cObj in print not found  
-    
-[] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
-
 
 
 
@@ -94,6 +55,26 @@ Publishing:
 
 
 resolved bug:
+[ +] single to Multiple: unmapp still moves coupling 
+                        mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)
+
+[+] duplicated planar end up beeing applied in copies too <-- rename function and remap
+[~] planar to MulitiObject remove mods from accidental selected SingleCoup inlay -> try and make all of these operator wetterfest
+[-] Panel for active object: Linedistance, Line, Modal operators for properties?   
+[-] Linedistance must be absolut, otherwise scale changes it
+[+] error in "corect name" (ob == none ) when unmapping duplicated planar
+[+] Logo2 problem mit normal puzzle apply all, also multi planar to object fails second completly, also the kept coups are moved
+
+[+] I can't delete planar after apply and kept (message: "obj before crash")
+[+] order up/down poll
+[+] deleted object stayed in Centerobj during add and not the selected
+[+] gizmot putting Coupscale to zero
+[+] analyse for joint and flat singlemain types
+[+] exchange increases size with each ex
+[+] single zscale gizmos gives back wrong value back (Defkis)
+[+] scale inlay gizmot goes crazy big 
+[+] inlay size not reproducing
+[+] joint replaced too often
 [+] exchanging unmapped planar remaps to Cobj  (not the problem of single)
 [+] unmapped signal and exchange problems
 [+] add planar unmapped made problems (also centerobj was deleted)

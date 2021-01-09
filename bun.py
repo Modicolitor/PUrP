@@ -56,7 +56,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
 
         deselectall(context)
 
-        # handling CenterObj
+        # handling CenterObj ###############
+        # try to test if the object is not deleted
+
         if not add_unmap:
             if active != None:
                 if active.type == "MESH":
@@ -121,7 +123,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             newname_mainplane = "Null"  # for planar
 
-        newMain = coupModeDivision(context, CenterObj, newmain.name,
+        newMain = coupModeDivision(context, CenterObj, newname_mainplane,
                                    add_unmap, PUrP.ViewPortVisAdd)
 
         if not add_unmap:
@@ -1725,6 +1727,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
         selected = context.selected_objects[:]
 
         coups = []
+
         for obj in selected:
             # print("obj in delete schleife {obj}")
             if is_coup(context, obj):
@@ -1752,14 +1755,17 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                         obj.parent.modifiers.remove(mod)
 
                 obj.select_set(True)
-                print(f'selected objects{context.selected_objects}')
-                bpy.ops.object.delete(use_global=False)
-
+                #print(f'selected objects{context.selected_objects}')
+                bpy.ops.object.delete(use_global=True)
+            else:
+                obj.select_set(True)
+                bpy.ops.object.delete(use_global=True)
             # context.view_layer.objects.active = context.scene.PUrP.CenterObj
             # order part
             PUrP = context.scene.PUrP
-            if PUrP.OrderBool:
-                update_order(context, CenterObj)
+
+        if PUrP.OrderBool:
+            update_order(context, PUrP.CenterObj)
 
         return{"FINISHED"}
 
@@ -2400,7 +2406,11 @@ def update_order(context, CenterObj):
     data = bpy.data
     active = context.object
     PUrP = context.scene.PUrP
-    initialActivename = active.name[:]
+    try:
+        initialActivename = active.name[:]
+    except:
+        initialActivename = PUrP.CenterObj.name
+
     # garbage run
     removePUrPOrder()
     # new numbers
@@ -2955,6 +2965,8 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         newfix.parent = None
                         newfix.display_type = 'SOLID'
                         newfix.show_in_front = True
+                        newfix.hide_select = False
+                        print(f"new fix is set to {newfix.hide_select}")
 
                         if not is_unmapped:
                             unmap_coup(context, coup)
@@ -2969,6 +2981,8 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                         fix.matrix_world = mw
                         fix.display_type = 'SOLID'
                         fix.show_in_front = True
+                        fix.hide_select = False
+                        fix.name = Cob.name + "_stick"
 
                         # remove mainplane when not keep
                         print("remove coup {coup.name}")
@@ -3512,7 +3526,7 @@ def ensure_mod(context, ele, CObj, nameadd):
         mod.operation = "DIFFERENCE"
     elif "union" in nameadd:
         mod.operation = "UNION"
-    elif "" == namead:
+    elif "" == nameadd:
         mod.operation = "DIFFERENCE"
 
     mod.object = data.objects[modname]
