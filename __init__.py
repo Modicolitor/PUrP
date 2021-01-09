@@ -8,6 +8,8 @@
 # You should have received a copy of the GNU General Public License along with Power Sequencer. If
 # not, see <https://www.gnu.org/licenses/>.
 
+from .tutwindow import BE_OT_Draw_Operator
+
 
 from .bun import PP_OT_ApplyAllCouplings
 
@@ -29,8 +31,12 @@ from .bun import PP_OT_ApplySingleToObjects
 from .bun import PP_OT_TestCorrectnameOperator
 from .bun import PP_OT_UnmapCoup
 from .bun import PP_OT_ConnectorHide
+
 from .bun import PP_OT_AllConnectorHide
 from .bvh_overlap import PP_OT_OverlapcheckOperator
+
+from .bun import PP_OT_TutorialButton
+#from window_lib.drag_panel_op import DP_OT_draw_operator
 
 #from .gizmos import PP_OT_PlanarRoffsetGizmo
 from .gizmos import PP_OT_BevelSegmentGizmo
@@ -165,7 +171,9 @@ classes = (PP_PT_PuzzlePrintAddMenu,
            PP_OT_ConnectorHide,
            PP_OT_AllConnectorHide,
            PP_OT_PlanarZScaleMenu,
-           PUrPropertyGroup
+           PUrPropertyGroup,
+           BE_OT_Draw_Operator,
+           PP_OT_TutorialButton,
            )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)

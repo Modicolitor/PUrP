@@ -107,7 +107,8 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             #    "purp.zscalemenu", "ZScale", text="Zscale")
 
         else:
-            col.operator("pup.init", icon="SHADERFX")
+            col.operator("purp.init", icon="SHADERFX")
+            col.operator("purp.tutorialwindow", icon="SHADERFX")
 
 
 class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):

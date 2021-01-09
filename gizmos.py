@@ -1610,10 +1610,12 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
-            return True
-        else:
-            return False
+        ob = context.object
+        if ob != None:
+            if ("PUrP" in context.object.name) and ("diff" and "fix" and "union" not in context.object.name):
+                return True
+            else:
+                return False
 
     def execute(self, context):
         ob = context.object

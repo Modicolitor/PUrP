@@ -102,7 +102,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
             newmain = genSinglemain(
                 context, CenterObj, PUrP.SingleMainTypes, add_unmap)
             newname_mainplane = newmain.name
-            #context.object.scale *= PUrP.GlobalScale * PUrP.CoupScale
+            # context.object.scale *= PUrP.GlobalScale * PUrP.CoupScale
             # bpy.ops.object.transform_apply(
             #    location=False, rotation=False, scale=True)
 
@@ -265,7 +265,7 @@ def oversizeToPrim(context, mode, ob0, ob1):
             P2Dim = mathutils.Vector((Pur[0], Pur[1]))
 
             P2Norm = P2Dim.normalized()
-            #print(f"P2Dim {P2Dim} Pur {P2Norm}")
+            # print(f"P2Dim {P2Dim} Pur {P2Norm}")
 
             v.co.x = Pur[0] - shift * P2Norm[0]
             v.co.y = Pur[1] - shift * P2Norm[1]
@@ -321,8 +321,8 @@ def applyScalRot(obj):
     mat.identity()
     mat @= trans
 
-    #obj.rotation_euler = Vector((0, 0, 0))
-    #obj.rotation_euler = obj.parent.rotation_euler
+    # obj.rotation_euler = Vector((0, 0, 0))
+    # obj.rotation_euler = obj.parent.rotation_euler
 
 
 def applyScale(obj):
@@ -414,15 +414,15 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     if PUrP.SingleCouplingModes == "2":  # Male - female
         for edge in context.object.data.edges:
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
-                #print(f"setting weight for edge {edge}")
+                # print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
     elif PUrP.SingleCouplingModes == "1":  # stick --> upper and lower edge bevelt
         for edge in context.object.data.edges:
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
-                #print(f"setting weight for edge {edge}")
+                # print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
             if context.object.data.vertices[edge.vertices[0]].co.z == downverz and context.object.data.vertices[edge.vertices[1]].co.z == downverz:
-                #print(f"setting weight for edge {edge}")
+                # print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
 
     scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
@@ -733,7 +733,7 @@ def genPlanar(context, CenterObj, visibility, is_unmapped):
         mod.operation = 'DIFFERENCE'
         mod.object = obj
         set_BoolSolver(context, mod)
-    #print(f"Active after planar generation {context.object}, obj is {obj}")
+    # print(f"Active after planar generation {context.object}, obj is {obj}")
 
     return obj
 
@@ -878,7 +878,7 @@ def ReplaceOrNotMain(context, coup):
     if 'Plane' in name and PUrP.SingleMainTypes == '1':
         return False
 
-    elif 'Joint' in name and PUrP.SingleMainTypes == '2':
+    elif is_joint(context, coup) and PUrP.SingleMainTypes == '2':
         if amount_jointverts(context, coup) == PUrP.MaincutVert:
             return False
     print("Exchanged MainCut")
@@ -896,7 +896,7 @@ def amount_jointverts(context, coup):
     if is_joint(context, coup):
         allverts = len(coup.data.vertices)
         #  substract the center vert and remove the half from the extrusion
-        return (allverts)/2
+        return int((allverts)/2)
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
@@ -905,7 +905,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
     bl_label = "ExChangeCoupling"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.view_layer.objects.active != None) and context.mode == 'OBJECT':
             if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
@@ -1007,7 +1007,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         newob = genSinglemain(
                             context, CenterObj, PUrP.SingleMainTypes, is_unmap)
 
-                        #newname = newmainPlane(context, data.objects[parentname])
+                        # newname = newmainPlane(context, data.objects[parentname])
                         newname = newob.name
                         data.objects[newname].matrix_world = trans
                         obj = context.object
@@ -1027,7 +1027,7 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                                      obj.name, is_unmap, viewportvis)
                     # print(f"obj at rescale {obj}")
 
-                    #scalefactor = PUrP.GlobalScale * PUrP.CoupScale
+                    # scalefactor = PUrP.GlobalScale * PUrP.CoupScale
                     # for vert in obj.data.vertices:
                     #    vert.co *= 3 * scalefactor
                     # obj.data.vertices[0].co = mathutils.Vector(
@@ -1040,13 +1040,13 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     #    (3 * scalefactor, 3 * scalefactor, 0))   ####why not simply scaled  scaled
 
                     # obj.select_set(True)
-                    #context.view_layer.objects.active = obj
+                    # context.view_layer.objects.active = obj
                     # bpy.ops.object.transform_apply(
                     #    location=False, rotation=False, scale=True)
                     if is_unmap:
                         unmapped_signal(context, obj)
 
-            #hideselectinlay(context, obj)
+            # hideselectinlay(context, obj)
 
             if PUrP.OrderBool:
                 update_order(context, CenterObj)
@@ -1291,7 +1291,7 @@ def removeCoupling(context, Coupl):
                 for mod in child.modifiers:
                     print(f"fix stick active {active} mod {mod.name}")
                     context.view_layer.objects.active = child
-                    #ensuremodvis(context, mod)
+                    # ensuremodvis(context, mod)
                     print(mod.name)
                     try:  # not used bevel cause runtime error when applying in 2.91, try as work arround
                         bpy.ops.object.modifier_apply(modifier=mod.name)
@@ -1367,7 +1367,7 @@ def centerObjDecider(context, CenterObj):
                             Cobjmodslist.append(ele)
 
                     for Cmod in Cobjmodslist:  # look through addon own modifier liste and
-                        #print(f"centerObjdecider Cmod name {Cmod.name}")
+                        # print(f"centerObjdecider Cmod name {Cmod.name}")
                         if Cmod.name == mod:
 
                             if bvhOverlap(context, Objects[mod], Cobj):
@@ -1413,12 +1413,12 @@ def SideOfPlane(context, coup, CenterObj):
         location=True, rotation=True, scale=False)
 
     # cube verts gerade unten, ungerade oben
-    #test = 0
+    # test = 0
     test = len(CenterObj.data.vertices)-1
     DirecDistance = 0
     while DirecDistance == 0:
 
-        #CouplingNormal = coup_tmp.data.vertices[0].normal
+        # CouplingNormal = coup_tmp.data.vertices[0].normal
         CouplingNormal = mathutils.Vector((0, 0, 1))
         print(f"CouplingNormal {CouplingNormal}")
 
@@ -1591,7 +1591,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
         if delete:
             removeCoupling(context, obj)
         Daughters = (DaughterOne, DaughterTwo)
-        #print(f"coup parent after applysingle is {coup.parent}")
+        # print(f"coup parent after applysingle is {coup.parent}")
 
         return Daughters
 
@@ -1755,7 +1755,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                 print(f'selected objects{context.selected_objects}')
                 bpy.ops.object.delete(use_global=False)
 
-            #context.view_layer.objects.active = context.scene.PUrP.CenterObj
+            # context.view_layer.objects.active = context.scene.PUrP.CenterObj
             # order part
             PUrP = context.scene.PUrP
             if PUrP.OrderBool:
@@ -1967,7 +1967,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
             moveModdown(Coup, CenterObj)
 
-        #data = bpy.data
+        # data = bpy.data
 
         if PUrP.OrderBool:
             update_order(context, CenterObj)
@@ -1981,7 +1981,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
 class PP_OT_Ini(bpy.types.Operator):
     bl_label = "Initialize PuzzleUrPrint"
-    bl_idname = "pup.init"
+    bl_idname = "purp.init"
     bl_options = {'REGISTER', "UNDO"}
 
     @ classmethod
@@ -2033,6 +2033,26 @@ class PP_OT_Ini(bpy.types.Operator):
         # CylVert
 
         return{"FINISHED"}
+
+
+class PP_OT_TutorialButton(bpy.types.Operator):
+    bl_idname = "purp.tutorial"
+    bl_label = "Start Tutorial"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @ classmethod
+    def poll(cls, context):
+
+        return True
+
+    def execute(self, context):
+
+        bpy.ops.purp.init()
+        bpy.ops.purp.tutorialwindow()
+        # bpy.ops.purp.tutorialwindow()
+        PUrP = context.scene.PUrP
+
+        return {'FINISHED'}
 
 
 class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
@@ -2408,7 +2428,7 @@ def update_order(context, CenterObj):
         bpy.ops.object.transform_apply(
             location=False, rotation=False, scale=True)
 
-        #context.view_layer.objects.active = CenterObj
+        # context.view_layer.objects.active = CenterObj
 
     context.view_layer.objects.active = data.objects[initialActivename]
     context.view_layer.objects.active.select_set(True)
@@ -2441,7 +2461,7 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
     bl_label = "PP_OT_ReMapCoups"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -2598,7 +2618,7 @@ class PP_OT_UnmapCoup(bpy.types.Operator):
     bl_label = "PP_OT_UnmapCoup"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -2691,7 +2711,7 @@ class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
     bl_label = "PP_OT_ApplyPlanarMultiObj"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -2762,7 +2782,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
     bl_label = "PP_OT_ApplyMultiplePlanarToObject"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -2818,7 +2838,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
     bl_label = "Apply Selected Single Connectors to active object"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if (context.object != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -3048,7 +3068,7 @@ class PP_OT_ConnectorHide(bpy.types.Operator):
     bl_label = "Toggle Connector Visibility of Selected"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
 
         if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
@@ -3070,7 +3090,7 @@ class PP_OT_AllConnectorHide(bpy.types.Operator):
     bl_label = "Toggle Connector Visibility of All"
     bl_options = {'REGISTER', "UNDO"}
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
             return True
