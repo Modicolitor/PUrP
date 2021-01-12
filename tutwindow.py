@@ -230,6 +230,21 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         context.object.body = text
         return context.object
 
+    def add_primitive(self, context, x, y, z, Key):
+        if key == "Cube":
+            print('CUbe')
+            bpy.ops.mesh.primitive_cube_add(
+                size=1, enter_editmode=False, align='WORLD', location=(x, y, z), scale=(1, 1, 1))
+        elif key == "Cylinder":
+            bpy.ops.mesh.primitive_cylinder_add(
+                radius=1, depth=2, enter_editmode=False, align='WORLD', location=(x, y, z), scale=(1, 1, 1))
+        elif key == "Sphere":
+            bpy.ops.mesh.primitive_ico_sphere_add(
+                radius=1, enter_editmode=False, align='WORLD', location=(x, y, z), scale=(1, 1, 1))
+        else:
+            print("Key not in the list")
+        return context.object
+
     def cleanscene(self, context):
         deselectall(context)
         objs = bpy.data.scenes['PUrPTutorial'].objects
