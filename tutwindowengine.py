@@ -681,6 +681,7 @@ class BL_UI_OT_draw_operator(Operator):
             return {'RUNNING_MODAL'}
 
         if event.type in {"ESC"}:
+            bpy.data.scenes.remove(self.tutorialscene)
             self.finish()
 
         return {"PASS_THROUGH"}

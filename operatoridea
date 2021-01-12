@@ -21,7 +21,13 @@ general operator bug:
 
 [] Tour durch das Addon im Addon
 
-
+[] remove active connector
+[] when check box Add unmapped and exchange makes unmapped signal but its still mapped.
+[] upper radius cone gizmos weird, radius top 0 produces self overlap
+[] planar ui shows radius settings, inlay verts, --> remove please
+[] oversize more digits
+[] Buildvolume should not have a gizmo
+[] after apply one planar, the second planar ist not deleted, wrong mapping before?
 
 Known Issues
 [] planar coupscale gizmot, only updates values after applying (low level problem)

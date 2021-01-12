@@ -45,7 +45,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                         expand=True, text='Connector Modes')
             if context.scene.PUrP.SingleCouplingModes != '4':
                 subcol.prop(PUrP, "SingleMainTypes", text='Maincut Type')
-                subcol.prop(PUrP, "SingleCouplingTypes", text='Connector Type')
+                subcol.prop(PUrP, "SingleCouplingTypes", text='Inlay Type')
 
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text='Connector Type')
@@ -53,6 +53,15 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                 subcol.prop(PUrP, "BoolModSettings", text='Solver')
             subcol.prop(PUrP, "GlobalScale", text='Global Scale')
             subcol.prop(PUrP, "CoupScale", text='Connector Scale')
+
+            # for stick, mf, planecut
+            if context.scene.PUrP.SingleCouplingModes == '1' or context.scene.PUrP.SingleCouplingModes == '2' or context.scene.PUrP.SingleCouplingModes == '3':
+                subcol.prop(PUrP, "CoupSize", text='Inlay Size')
+                subcol.prop(PUrP, "zScale", text='z-Scale')
+                subcol.prop(PUrP, "Oversize", text='Oversize')
+                subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
+                subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
+                subcol.prop(PUrP, "BevelSegments", text='Bevel Segments')
             if context.scene.PUrP.SingleMainTypes == '2':
                 subcol.prop(context.scene.PUrP, "MaincutVert",
                             text='Maincut Verts')
@@ -61,22 +70,12 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                             text='Inlay Vertices')
                 subcol.prop(context.scene.PUrP, "aRadius", text='Radius')
                 # subcol.prop(PUrP, "aRadius", text='Radius 1')
-                if PUrP.SingleCouplingTypes == "3":
-                    subcol.prop(PUrP, "bRadius", text='Radius Top')
-
-            # for stick, mf, planecut
-            if context.scene.PUrP.SingleCouplingModes == '1' or context.scene.PUrP.SingleCouplingModes == '2' or context.scene.PUrP.SingleCouplingModes == '3':
-
-                subcol.prop(PUrP, "Oversize", text='Oversize')
-                subcol.prop(PUrP, "CoupSize", text='Inlay Size')
-                subcol.prop(PUrP, "zScale", text='z-Scale')
-                subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
-                subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
-                subcol.prop(PUrP, "BevelSegments", text='Bevel Segments')
+            if PUrP.SingleCouplingTypes == "3":
+                subcol.prop(PUrP, "bRadius", text='Radius Top')
 
             if context.scene.PUrP.SingleCouplingModes == '4':
                 subcol.prop(PUrP, "Oversize", text='Oversize')
-                #subcol.prop(PUrP, "CoupSize", text='Coup Scale')
+                # subcol.prop(PUrP, "CoupSize", text='Coup Scale')
                 subcol.prop(PUrP, "zScale", text='z-Scale')
                 subcol.prop(PUrP, "LineLength", text='LineLength')
                 subcol.prop(PUrP, "LineCount", text='Linecount')
@@ -141,8 +140,8 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
             subcol.operator("object.applysingletoobjects", text='Single Connector To Multiple Objects',
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
-            subcol.operator("object.pp_ot_overlapcheck",
-                            text='Check Overlap', icon="HIDE_OFF")
+            # subcol.operator("object.pp_ot_overlapcheck",
+            # text = 'Check Overlap', icon = "HIDE_OFF")
             # subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
             #                icon="MOD_INSTANCE")
 
@@ -178,9 +177,10 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
             subcol.label(text="Order")
             subcol.operator("pup.couplingorder",
                             text='Toggle Order', icon="LINENUMBERS_ON")
-            subcol.operator("pup.modup", text='Up in Order ', icon="TRIA_UP")
+            subcol.operator("pup.modup", text='Up in Order ',
+                            icon="TRIA_UP")
             subcol.operator(
-                "pup.moddown", text='Down in Connectororder', icon="TRIA_DOWN")
+                "pup.moddown", text='Down in Order', icon="TRIA_DOWN")
 
             subcol = col.box()
             subcol.label(text="Connector Visibility Toggles")
