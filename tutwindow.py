@@ -277,11 +277,26 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                 ob.select_set(True)
                 bpy.ops.apl.coup()
 
+    def set_view(self, context, loc, rot, distance):
+
+        for area in bpy.context.screen.areas:
+            for space in area.spaces:
+                if space.type == 'VIEW_3D':
+                    s = space
+
+        s.lens = 50
+        r = s.region_3d
+        # print(r.view_location)
+        # print(r.view_rotation)
+        r.view_location = loc
+        r.view_rotation = rot
+        r.view_distance = distance
+
     def focus(self, context, objs):
         deselectall(context)
         for ob in objs:
             ob.select_set(True)
-        bpy.ops.view3d.view_selected
+        bpy.ops.view3d.view_selected()
 
     def pageturner(self, context):
         print(self.TutorialCounter)
@@ -323,9 +338,14 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide00(self, context):
         self.cleanscene(context)
+        self.viewloc = (-5, 21, -2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 10
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
         self.set_slidenum(0)
         self.label.text = "Welcome to the Tutorial"
-        self.headloc = Vector((0, 0, 4))
+        self.headloc = Vector((0, 0, 5))
+        self.headlinescale = Vector((3, 3, 3))
         self.linebreak(
             "This little tutorial is designed to get you started. If you need a more detailed description try the documentation under PUrP.modicolitor.com.%% BTW, If you think 'This guy just deleted my work.', don't worry. We are in a new scene, when you close the Tutorial you'll get back to your original scene.%% This interactive Tutorial will generate new objects to show you what the addon is capable off. Be encouraged to play with the objects and settings in the scene. However, don't be sad when you go to another slide or out of the Tutorial and everything is gone :-D.")
         headline = self.add_text(
@@ -379,13 +399,23 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
         # self.applyallscene(context)
         self.focus(context, self.tutorialscene.objects)
+# diversity
 
     def slide03(self, context):
         self.cleanscene(context)
         self.set_slidenum(3)
-        self.label.text = "Many Connectors shapes: the settings"
+        self.label.text = "Many Connectors shapes: Settings"
         self.linebreak("Here you see a couple of examples of connectors. They can have all kinds of shapes and produce different functionalities. Quiet divers, right.% You can produce all of these connectors by adjusting the settings in the 'Add, Exchange, Apply'-dropdown. With 'Add Connector' a new connector will be born using the current settings in the 'Add, Exchange, Apply'-dropdown. If you haven't specified another (mesh) object by selecting it or another connector is selected, the addon will try to map (something like parenting) the connector to the last known 'Center Object'. This is the object set in the top line in 'Add,Exhange,Apply'.%You can change the settings via the 'Add, Exchange, Apply'-dropdown or via the gizmos visible when a connector is selected. While changing settings via gizmot will take immediate effect on mesh and setting in the dropdown, changes in the 'Add, Exchange, Apply'-dropdown will only take effect after pressing the 'Exchange'-Button. %% If your are interested to know which settings produced a specific connector, select the connector of intrest and press 'Active to Settings' in the 'Add, Exchange, Apply'-dropdown. The dropdown now shows the settings of the active connector. You can 'past' these new settings onto an existing connector by selecting it and press 'Exchange'.%%Useful Detail: I just switched off 'Add with Viewport Visibility'. Althoug, it might be nice to see the preview of the bool modifier already cutting a part, it makes working extremly slow. You can also toggle the visibility on/off by pressing 'Toggle Modifier Visibility' in the 'Mapping Order,Visibility'-dropdown")
 
+        self.viewloc = (-5, 21, -2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
+        headline = self.add_text(
+            context, self.headloc, "A Large Variety of Options")
+        headline.rotation_euler[0] = 1.507
+        headline.scale = (5, 5, 5)
         # singleconnectors
         singloc = Vector((-10, -10, 0))
         singletext = self.add_text(context, singloc, "Single Connectors")
@@ -449,14 +479,15 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         # cube with stopper
         cubestopperloc = Vector((27, 0, 0))
         cubestopper = self.add_primitive(context, cubestopperloc, 'Cube')
-        cubestopper.scale = Vector((15, 10, 10))
+        cubestopper.scale = Vector((5, 3, 3))
         plancol = self.add_planar(
-            context, Vector((22, 0, 6)), 1, 7.2, 0.04,  False, '2', 1.2, 1.2, 1, 3, 5, True, False, False)
+            context, Vector(
+                (27, 0, 2)), 1, 3, 0.04,  False, '2', 1.2, 1.2, 1, 1, 3, True, False, False)
 
         # planar collection without stopper
         largeplaneloc = Vector((10, 32, 0))
         largeplane1 = self.add_primitive(context, largeplaneloc, 'Cube')
-        largeplane1.scale = Vector((15, 45, 1))
+        largeplane1.scale = Vector((15, 48, 1))
         type = 1
         plancolloc = Vector((4, 10, 1))
         while type <= 16:
@@ -468,7 +499,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         # planar collection with stopper
         largeplaneloc = Vector((30, 32, 0))
         largeplane1 = self.add_primitive(context, largeplaneloc, 'Cube')
-        largeplane1.scale = Vector((15, 45, 1))
+        largeplane1.scale = Vector((15, 48, 1))
         type = 1
         plancolloc = Vector((24.5, 10, 1))
         while type <= 16:
@@ -477,6 +508,8 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             plancolloc += Vector((0, 3, 0))
             type += 1
         self.focus(context, self.tutorialscene.objects)
+        deselectall(context)
+# connector modes
 
     def slide04(self, context):
         self.cleanscene(context)
@@ -484,7 +517,52 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.label.text = "Connector Modes"
         self.linebreak("There are 4 types of connector modes. %- Stick, %- Male-Female (mf)  %- Flat %- Planar %%We saw a mf-connector in the first example. After applying, one of the resulting objects will be male and one will be female (if you know what I mean...).%Stick mode will generate two female daughter objects and an additional 'Stick'-Object to connect both (if you know what I mean...). Having the stick as an additional part can be beneficial. You need to reprint less, when your oversize value is off. We'll talk about oversize later.%Flat is actually just a stupid plane. It cuts two things in half without any connector. Still can be useful if you want to glue stuff together anyway.%Plane is compared to the other modes a whole new world. Mathematically speaking (or was it geographically) the functionallity is here parallel to the maincut and not perpendicular like in the first two cases. Moreover, a planar can generate a large number of couplings with one object while the first two only produce one coupling. That's why I'll call the first 3 modes Stick, MF and Flat  (yeah, I know flat doesn't...bla) Single Connector Modes and the other is planar .... for consistency ... you'll get it... later... maybe.")
         headline = self.add_text(context, self.headloc, "Connector Modes")
+        headline.scale = self.headlinescale
         headline.rotation_euler[0] = 1.507
+
+        # Stick
+        singloc = Vector((-15, -10, 0))
+        singletext = self.add_text(context, singloc, "Stick")
+        singletext.scale = Vector((2.3, 2.3, 2.3))
+        # cube
+        cube1loc = Vector((-15, 0, 0))
+        Cube1 = self.add_primitive(context, cube1loc, 'Cube')
+        Cube1.scale = Vector((3, 3, 3))
+        con1 = self.add_single(context, cube1loc, 1, 1, '1', False,
+                               '1',  16, '1', 1.5, 0.04, 16, 0, 0, False, False, False)
+        # Male-Female
+        singloc = Vector((-5, -10, 0))
+        singletext = self.add_text(context, singloc, "Male-Female")
+        singletext.scale = Vector((2.3, 2.3, 2.3))
+        # cube
+        cube1loc = Vector((-5, 0, 0))
+        Cube1 = self.add_primitive(context, cube1loc, 'Cube')
+        Cube1.scale = Vector((3, 3, 3))
+        con1 = self.add_single(context, cube1loc, 1, 1, '2', False,
+                               '1',  16, '1', 1.5, 0.04, 16, 0, 0, False, False, False)
+
+        # Flat
+        singloc = Vector((5, -10, 0))
+        singletext = self.add_text(context, singloc, "Flat")
+        singletext.scale = Vector((2.3, 2.3, 2.3))
+        # cube
+        cube1loc = Vector((5, 0, 0))
+        Cube1 = self.add_primitive(context, cube1loc, 'Cube')
+        Cube1.scale = Vector((3, 3, 3))
+        con1 = self.add_single(context, cube1loc, 1, 1, '3', False,
+                               '1',  16, '1', 1.5, 0.04, 16, 0, 0, False, False, False)
+
+        # planar
+        singloc = Vector((15, -10, 0))
+        singletext = self.add_text(context, singloc, "Planar")
+        singletext.scale = Vector((2.3, 2.3, 2.3))
+        # cube
+        cube1loc = Vector((15, 0, 0))
+        Cube1 = self.add_primitive(context, cube1loc, 'Cube')
+        Cube1.scale = Vector((3, 3, 3))
+        planar = self.add_planar(
+            context, Vector((15, 0, 2)), 0.5, 4, 0.04, False, '4', 2, 2, 1, 1, 1, False, False, False)
+# Single Connectors
 
     def slide05(self, context):
         self.cleanscene(context)
@@ -494,6 +572,8 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Single Connectors consist of one maincut and two inlay objects.%%The maincut causes the initial seperation of the object in two parts. You can choose the maincut type to be Flat or Joint. The Flat type is only a plane with a solidify modifier. It creates a flat base cut. However, the Joint type produces a circular ... joint cut (Please mail better terms) useful for example for ellbows of your actionfigure. It is not forbiden to enter edit mode and change the shape to your liking. In most cases also 'Exchange' will not replace your adjusted maincut. %%The inlay shapes can be either cube, cylinder or cone. I forbit selecting them. Believe me, you'll mess it up. Use the panel or the Gizmos to change them. It's better for all of us. They are parented to the maincut anyway. So only use them to transform the connector. Depending on the chosen Inlay Type additional settings might become available. For example cylinders have additional settings to adjust the vertcount and radius, for cone you can set the upper and lower radius individually. However, also consider that some configuration will not make sense. For example a cone in stick configuration will not be  However, they also have a lot of parameters in comon. Lets talk about them in the next part together with the gizmos system.%%%Useful Detail: You might get the error 'This connector didn't cut through'! Is this really what you want?'. Then you might Undo and check which coupling might needs repositioning. ")
         headline = self.add_text(context, self.headloc, "Single Connectors")
         headline.rotation_euler[0] = 1.507
+        headline.scale = (5, 5, 5)
+        # [[flat [as text], joint [as text],] [flat mf (cube) (cylinder) (Cone)]
 
     def slide06(self, context):
         self.cleanscene(context)
@@ -504,6 +584,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline = self.add_text(
             context, self.headloc, "Single Connector Gizmos")
         headline.rotation_euler[0] = 1.507
+        # [[flat [as text], joint [as text],] [flat mf (cube) (cylinder) (Cone)]
 
     def slide07(self, context):
         self.cleanscene(context)
@@ -513,6 +594,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Planar connectors are essentially a plane with a coupling element and two array modifiers two duplicate it. In this version 16 different connector types (shapes) are avaiable: cubic, dovetail, different puzzle shapes, arrow, t-shape,... . Try out what fits for your project (recommendations for additional shapes welcome)   One Array duplicates allong the line, called Linelength. The other Array generates copies of the original lines with Linecount beeing the number of lines and the Linedistance between those lines. Together with the Oversize, these 4 settings can be also changed via the 4 Gizmos in the corners of a plane. BTW: You can keep the mouse on the gizmos to get small definition what it does. Additionally you'll find 3 Arrow shaped gizmos: the left and right arrows control the Right- and Left Offset. This is the distance between the coupling element and the end of a repeating unit. Maybe reduce the 'Linelength' to 1 to get a clearer understand of what they do.%%A Subclass of Planar are called Planar with Stopper ...if you like. In this configuration the coupling parts ends somewhere in the middle of the plane and the rest is only a flat cut. Get one by activating the 'Stopper' checkbox and add or Exchange a connector. Models printed with this will not fall through like a puzzle piece but will be stopped at the right height when putting together. This is ideal for example to make wallholders with replaceable parts, canvases, guitars,.... where ever you need the pieces slide into each other and stay where they are supposed to. When you have Stopper activated, you'll see the setting Stopper Height and when its in the connector also in the Gizmos as a down arrow.")
         headline = self.add_text(context, self.headloc, "Planar Connectors")
         headline.rotation_euler[0] = 1.507
+        # [center planar, planar with stopper je mit text (im Hintergrund overview von seite 3)]
 
     def slide08(self, context):
         self.cleanscene(context)
@@ -523,6 +605,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline = self.add_text(
             context, self.headloc, "Positioning and Scaling")
         headline.rotation_euler[0] = 1.507
+        # [figure + one connector, and half done puzzle (make a Puzzle)]
 
     def slide09(self, context):
         self.cleanscene(context)
@@ -532,6 +615,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "The oversize setting allows to compensate for printing inaccuracies.%We all know it: 3D printing is a wonderful thing but not really exact. Typically, a 3D printed part is a bit larger than you actually tell it to be. For FDM (fuse depositon molding) printers, this comes for example from smearing material a bit over the side while following printing path. Also the shape of an object and as a result the path the printer takes, will have an influence on the oversize. Try printing two walls connected in a 90° angle. Especially, with high printing velocities you'll see thickening add the outside of the corner. Of course, also nozzle size, problems with overhanging parts, brim, orientation of the part... the number of influencing parameters is large why it is unfortunately hard to give a perfect recommendation for all cases. However, the oversize is the option to compensate for all those parameters. Keep in mind, that the oversize is an absolut value. When the printers oversize 0.4 mm for a small object, your print has the same oversize for a bigger object. On the one hand this means the connector can have the same oversize despite their size. On the other hand your PUrP Oversize might get wrong when scalling object later (e.g. in the slicer software).%% Useful Detail: Here are typicall parameter:% Nozzle 0.8 mm blender meter to cm, oversize 0.03.%% But I really recommand to print small test pieces with different oversize values until you figure out the best values for your 3D Printer.")
         headline = self.add_text(context, self.headloc, "Oversize")
         headline.rotation_euler[0] = 1.507
+        # [Cube, Cylinder, joint, planar mit objecten, text (play with the oversize) ]
 
     def slide10(self, context):
         self.cleanscene(context)
@@ -541,6 +625,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Mapping is the way a connector are bound to the object they are supposed to cut (Centerobject). It includes parenting. When you move the object in the viewport the connectors will follow. Moreover, mapping also includes having the boolean modifiers of a connectors already on the Centerobj allowing to preview the result (when you can work with a slow blender). The addon will check for these attributes during applying.% However, you can change the mapping of a connector by using the 'Remap Connector to Active'-Button. Select the connector you wane remap and then the new Centerobject it should be mapped to and press the 'Remap Connector to Active'-Button. Now the parenting and the modifiers exist on the other object.%Moreover, if you don't wanne have a connector mapped to any object, you can either add them with the checkbox 'Add Unmapped' in the 'Add, Exchange,...'- dropdown enabled or you select an existing connector and press 'Unmap Connector' in the 'Mapping, Order, Visibility' -dropdown.%%Useful Detail: If a mapped connector doesn't touch/cut any part of a Centerobject during applying (for example Apply All). It will remain in the scene and will be labeled unmapped.")
         headline = self.add_text(context, self.headloc, "Mapping")
         headline.rotation_euler[0] = 1.507
+        # [high cube 3 connectors, apply the one in the middle, check the mapping of the new objects, remap one connector]
 
     def slide11(self, context):
         self.cleanscene(context)
@@ -550,6 +635,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "By Applying a Connector you finalize the editing process, cut the model in pieces and add the connectors. You can choose to select one or several connectors and Press 'Apply Connectors(s)' to have only specific connectors applied or you press 'Apply All' (both in 'Add,Exchange,Apply'-dropdown) to apply all connectors mapped to a Centerobject (or the Centerobj the selected Connector is mapped to).%The order in which the Connectors are applied can be displayed as little numbers above the Connectors by  Toggling on/off with 'Toggle Order' in the 'Mapping,Order,Visibility'-dropdown. The order can be changed by selecting a connector and pressing either 'Up in Order' or 'Down in Order'. The order rarely is necessary but in an example like here on the right it can be important.%%Useful Detail: By default the connectors are getting deleted after applying. If they are precious to you check the checkbox 'Keep Connector' before applying and they will be kept unmapped.")
         headline = self.add_text(context, self.headloc, "Applying and Order")
         headline.rotation_euler[0] = 1.507
+        # 3x[one cube with two planar and a single] with different order
 
     def slide12(self, context):
         self.cleanscene(context)
@@ -559,6 +645,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "The 'Special Apply'-dropdown has some extra operations that might get helpful:%- 'Planar To Multiple Objects' allows you to decide which objects are also should be cut through in addition to the Centerobject the planar is mapped to. For example (left) you make a puzzle and applied only the first planar, the second will be only applied to the one row its mapped to. Select all rows first and select the remaining planar last. Then Press  Planar To Multiple Objects'. BTW: 'Apply All' will do this automatically. %- 'Multiple Planar to Object' does it the other way around. Select several Planar Connector, select the Centerobj of choice last and press the button. This is a bit of a relict from where 'Apply All' was'nt smart enough, but it might become helpful in some configurations. %- 'Single To Multiple Objects' This allows to connect one Single Connector beeing applied to several Objects. Imagine your character needs a new hat. Select the hat and the charakter and the Single Connector last and press 'Single To Multiple Objects'. You can also enable 'Ignore Main Cut' to do exactly that during applying.")
         headline = self.add_text(context, self.headloc, "Special Apply Menu")
         headline.rotation_euler[0] = 1.507
+        # [Puzzle with one applied(Cube with planar and single, single applied)[text: Planar to Multiple Objects], PUzzle both unapplied,  figure + Head ]
 
     def slide13(self, context):
         self.cleanscene(context)
@@ -568,6 +655,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Especially when you desect large objects to fit in your 3D printer, you always need to know how big your print real estate is at all times. In the 'Build Volume'-Dropdown, you can set the size of your 3D printer in cm (probably if you haven't changed it globaly to freedom units) and press 'Generate Buildvolume' to get cube (set to wireframe). When added you can adjust also its repeation in x,y and z. You can at as many as you like. The settings will only be avaiable for the last selected Build Volume. The BuildVolumes are nothing more than simple objects to get a feel for the avaiable space. Otherwise they do nothing.")
         headline = self.add_text(context, self.headloc, "BuildVolume")
         headline.rotation_euler[0] = 1.507
+        # [Figure with connector, Buildvolume with 2x2x4 ]
 
     def slide14(self, context):
         self.cleanscene(context)
@@ -577,6 +665,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Here is a typical workflow too work with the addon:%1. Import/append model (keep backup)%2. Select the model%3. Set the 3d cursor to a point where you want to add a connector. Press Add Connector,%4. Adjust settings, exchange, position with 's' and 'r'-shortcuts, fine tune with the gizmos...%5. Repeat to add more connectors as you like, use 'Active to Setting' and 'Exchange' as copy and paste of connector settings.%[6-53]. ...%54. Maybe print a few test cuts to figure out the best oversize value and adjust the connectors accordingly.%55. Adjust all Oversize values according to you test results%56. Apply All Connectors or do it manually one by one%57. 3D Print %58. PUZZLE THEM TOGHETHER  %%Let Blender be your canvas and make cool stuff. Please send me pics, models and suggestions to info@modicolitor.com")
         headline = self.add_text(context, self.headloc, "Typical Process")
         headline.rotation_euler[0] = 1.507
+        #[Figure + Buildvolume]
 
     def slide15(self, context):
         self.cleanscene(context)
@@ -586,3 +675,4 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             "Before I let you go explore more on your own here are somethings to keep in mind to have everything working nicely as intended:%- The objects you are using must be manifold (water tight). A single plane will not work. It needs thickness. Also enable the 3D Printing addon shiped with blender it allows to check 'how manifold' (and pregnant) your object is and often repairs it. %- The addon is strongly reliant (abh) on blenders boolean modifier. With the 2.91 update the exact solver arrived and the number of fails drastically decreased. However, sometimes the boolean modifier just produce s***. In these cases increasing or reducing resolution and repositioning might help. %- All other modifiers must be applied before starting to apply the Connector. Keep in mind the Addon ignores all modifiers not created by itself. When you have a large stack of modifiers before (or just one) before you start cutting, the preview before and the result after applying the connector will look not as expected. %- Always also consider the orientation during printing. Overhangs are always a problem in fdm printing. In addition, also the x-y-resolution is different than in z-direction. Good cut design can lead to less overhangs and better results. However, the oversize might change when the orientation during printing changes (seen in rare cases where it needs to be really precise).% I guess it's obvious, but let me make sure everyone understands: we are cuttings things in pieces with this addon. When this model is the only version you have and you save the cutted model over the only original, that's it! The model is gone. The addon does not make any safety copies. Please keep your heads together. :-) %%Useful Detail: Have Fun!!!")
         headline = self.add_text(context, self.headloc, "Last thoughts ")
         headline.rotation_euler[0] = 1.507
+        # [page3?]

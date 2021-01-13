@@ -9,6 +9,7 @@ import os
 # from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
+from . gen_mesh import gen_figure
 # import copy
 
 
@@ -2453,14 +2454,14 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
         coup = context.object
         selected = context.selected_objects
 
-        for ob in selected:
-            if ob != coup:
-                Cob = ob
-        origin_in_bb(context, coup, Cob)
+        # for ob in selected:
+        #    if ob != coup:
+        #        Cob = ob
+        #origin_in_bb(context, coup, Cob)
 
-        context.view_layer.objects.active = coup
-        Cob.select_set(True)
-
+        #context.view_layer.objects.active = coup
+        # Cob.select_set(True)
+        gen_figure(context, (0, 0, 0))
         # correctname(context, coup)
         return {'FINISHED'}
 

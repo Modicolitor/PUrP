@@ -28,6 +28,9 @@ general operator bug:
 [] oversize more digits
 [] Buildvolume should not have a gizmo
 [] after apply one planar, the second planar ist not deleted, wrong mapping before?
+[] stopperheight gizmo slower als zscale 
+[] 
+
 
 Known Issues
 [] planar coupscale gizmot, only updates values after applying (low level problem)
