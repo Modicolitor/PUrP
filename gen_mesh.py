@@ -256,3 +256,4 @@ def gen_arrow(context, loc):
 
     bm.to_mesh(me)
     bm.free()  # free
+    bpy.ops.object.modifier_apply(modifier='PUrP_Mirror')
