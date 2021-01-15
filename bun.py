@@ -9,7 +9,7 @@ import os
 # from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
 from .warning import noCutthroughWarn, coneTrouble
-from . gen_mesh import gen_figure
+from . gen_mesh import gen_figure, gen_hat, gen_arrow
 # import copy
 
 
@@ -2461,7 +2461,7 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
 
         #context.view_layer.objects.active = coup
         # Cob.select_set(True)
-        gen_figure(context, (0, 0, 0))
+        gen_arrow(context, (0, 0, 0))
         # correctname(context, coup)
         return {'FINISHED'}
 
