@@ -144,7 +144,7 @@ def gen_figure(context, loc):
 def gen_hat(context, loc):
 
     bpy.ops.mesh.primitive_circle_add(
-        radius=0.1, fill_type='NGON', enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        radius=0.1, fill_type='NGON', enter_editmode=False, align='WORLD', location=loc, scale=(1, 1, 1))
     ob = context.object
     # mod = ob.modifiers.new(name="PUrP_Mirror", type="MIRROR")
 

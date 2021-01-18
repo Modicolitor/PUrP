@@ -37,7 +37,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.closebutton.text = "X"
         self.closebutton.set_mouse_down(self.closebutton_press)
 
-        lineamount = 25
+        lineamount = 27
         self.lines = []
         x = 20
         y = 50
@@ -343,9 +343,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide00(self, context):
         self.cleanscene(context)
-        self.viewloc = (-5, 21, -2)
+        self.viewloc = (-0, -21, 2)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 10
+        self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
         self.set_slidenum(0)
         self.label.text = "Welcome to the Tutorial"
@@ -364,13 +364,23 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         daughters = self.applycoup(context, [con1])
         daughters[0].location[2] -= 1
         daughters[1].location[2] += 1
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
         deselectall(context)
+        context.view_layer.objects.active = headline
         # arrow = gen_arrow(context, (-12, 0, 0))
         # arrow.rotation_euler[1] = 1.5078
+        # hat = gen_hat(context, (0, 0, 0))
+        # hat.location = (9.99, 0, 3.739)
+        # hat.scale = (0.45, 0.45, 0.45)
 
     def slide01(self, context):
         self.cleanscene(context)
+
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(1)
         self.label.text = "What does the addon do?"
         self.linebreak(
@@ -384,12 +394,18 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con1 = self.add_single(context, cubeloc, 1, 1, '2',  True,
                                '1',  16, '1', 1.5, 0.04, 16, 0, 0, 1, 1, False)
         # self.applyallscene(context)
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
         deselectall(context)
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
+        context.view_layer.objects.active = headline
 
     def slide02(self, context):
         self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(2)
         self.label.text = "The Result"
         self.linebreak("This is the result you would get when you apply the connector from the last slide to the cube. The cube is now cut in half. Moreover, the bottom part has a male connector attached while the top part has a hole in the shape of the connector. If you would print that you could put both parts together again easily. This can be helpful for many things.%% - Print large: 3D-printers are typically very small. Use the addon to desect large models into printable bits. Your lifesized Koro is only a few clicks and days of printing away (support cloud.blender.org!!) % - Add Functionality: Using cylinders as Inlays allows to turn parts against each other. A 'joint'-cut allows to make maken even more delicate joints.  Print your own actionfigure, monster, sculpture,... with movable parts.% -PUZZLES: Of course you can make puzzles with PuzzleyourPrint. Sculpt your and print it. it'll change the whole experience. %- Wallholders and Fixation: You can add Dovetail and other shapes to make objects slide into each other and if you like stop at the right point. This is ideal for wallholders and nice to hide the screws. ")
@@ -406,7 +422,8 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.tutorialscene.objects['PUrPCube'].location[2] = -4
 
         # self.applyallscene(context)
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
+        headline.select_set(True)
     # diversity
 
     def slide03(self, context):
@@ -415,9 +432,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.label.text = "Many Connectors shapes: Settings"
         self.linebreak("Here you see a couple of examples of connectors. They can have all kinds of shapes and produce different functionalities. Quiet divers, right.% You can produce all of these connectors by adjusting the settings in the 'Add, Exchange, Apply'-dropdown. With 'Add Connector' a new connector will be born using the current settings in the 'Add, Exchange, Apply'-dropdown. If you haven't specified another (mesh) object by selecting it or another connector is selected, the addon will try to map (something like parenting) the connector to the last known 'Center Object'. This is the object set in the top line in 'Add,Exhange,Apply'.%You can change the settings via the 'Add, Exchange, Apply'-dropdown or via the gizmos visible when a connector is selected. While changing settings via gizmos will take immediate effect on the mesh or the settings in the dropdown, changes in the 'Add, Exchange, Apply'-dropdown will only take effect after pressing the 'Exchange'-Button. % If your are interested to know which settings produced a specific connector, select the connector of intrest and press 'Active to Settings' in the 'Add, Exchange, Apply'-dropdown. The dropdown now shows the settings of the active connector. You can 'past' these new settings onto an existing connector by selecting it and press 'Exchange'.%%Useful Detail: I just switched off 'Add with Viewport Visibility'. Althoug, it might be nice to see the preview of the bool modifier already cutting a part, it makes working extremly slow. You can also toggle the visibility on/off by pressing 'Toggle Modifier Visibility' in the 'Mapping Order,Visibility'-dropdown")
 
-        self.viewloc = (-5, 21, -2)
-        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 20
+        self.viewloc = (1, -58, 40)
+        self.viewrot = (0.881, 0.474, 0.005, 0.0004)
+        self.viewdistance = 40
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         headline = self.add_text(
@@ -534,13 +551,19 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                 context, plancolloc, 1, 1, 0.04, False, str(type), 1.2, 1.2, 1, 3, 5, True, False, False, 3.2)
             plancolloc += Vector((0, 3, 0))
             type += 1
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
         deselectall(context)
-        headline.select_set(True)
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
     # connector modes
 
     def slide04(self, context):
         self.cleanscene(context)
+        self.viewloc = (0.63, -57, 27)
+        self.viewrot = (0.842, 0.540, 0.012, 0.006)
+        self.viewdistance = 50
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(4)
         self.label.text = "Connector Modes"
         self.linebreak("There are 4 types of connector modes. %- Stick, %- Male-Female (mf)  %- Flat %- Planar %%We saw a mf-connector in the first example. After applying, one of the resulting objects will be male and one will be female (if you know what I mean...).%Stick mode will generate two female daughter objects and an additional 'Stick'-Object to connect both (if you know what I mean...). Having the stick as an additional part can be beneficial. You need to reprint less, when your oversize value is off. We'll talk about oversize later.%Flat is actually just a stupid plane. It cuts two things in half without any connector. Still can be useful if you want to glue stuff together anyway.%Plane is compared to the other modes a whole new world. Mathematically speaking (or was it topologically, geographically) the functionallity is here parallel to the maincut and not perpendicular like in the first two cases. Moreover, a planar can generate a large number of couplings with one object while the first two only produce one coupling. That's why I'll call the first 3 modes Stick, MF and Flat  (yeah, I know flat doesn't...bla) Single Connector Modes and the other is multiconnectors... ok they are called  planar  .... for consistency ... you'll get it... later... maybe.")
@@ -549,7 +572,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline.rotation_euler[0] = 1.507
         self.viewloc = (-5, 21, -2)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 20
+        self.viewdistance = 40
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         # Stick
@@ -629,10 +652,18 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             context, Vector((15, 10, 2)), 0.5, 4, 0.04, False, '4', 2, 2, 1, 1, 1, False, False, False, 3.2)
         daug = self.applycoup(context, [planar])
         daug[1].location[1] += 2
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
+
     # Single Connectors
 
     def slide05(self, context):
         self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(5)
         self.label.text = "Single Connectors"
         self.linebreak(
@@ -687,9 +718,16 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         Cube1.scale = Vector((3, 3, 3))
         con1 = self.add_single(context, cube1loc, 1, 0.5, '2', False,
                                '1',  16, '3', 1.0, 0.04, 16, 0, 0, 1, 0, False)
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide06(self, context):
         self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(6)
         self.label.text = "Single Connector Gizmos"
 
@@ -724,10 +762,16 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con3 = self.add_single(context, cube1loc, 1, 0.5, '2', False,
                                '1',  16, '3', 1.0, 0.04, 16, 0, 0, 1, 0, False)
         deselectall(context)
-        con1.select_set(True)
+        # con1.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide07(self, context):
         self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(7)
         self.label.text = "Planar Connectors "
         self.linebreak(
@@ -736,7 +780,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [center planar, planar with stopper je mit text (im Hintergrund overview von seite 3)]
-        text = self.add_text(context, (-7.5, -5, 0), "Without Stopper")
+        text = self.add_text(context, (-13, -5, 0), "Without Stopper")
         text.scale = (3, 3, 3)
         # cube without stopper
         cubestopperloc = Vector((-5, 0, 0))
@@ -745,7 +789,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         plancol = self.add_planar(context, (-5, 0, 2), 1, 5.0, 0.04,
                                   False, '2', 1.2, 1.2, 1, 1, 3, False, False, False, 3.2)
 
-        text = self.add_text(context, (7.5, -5, 0), "With Stopper")
+        text = self.add_text(context, (13, -5, 0), "With Stopper")
         text.scale = (3, 3, 3)
         # cube with stopper
         cubestopperloc = (5, 0, 0)
@@ -796,13 +840,19 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                 context, plancolloc, 1, 1, 0.04, False, str(type), 1.2, 1.2, 1, 3, 1.0, True, False, False, 3.2)
             plancolloc += Vector((0, 3, 0))
             type += 1
-        self.focus(context, self.tutorialscene.objects)
+        #self.focus(context, self.tutorialscene.objects)
         deselectall(context)
-        deselectall(context)
-        headline.select_set(True)
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide08(self, context):
         self.cleanscene(context)
+        self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(8)
         self.label.text = "Positioning and Scaling"
         self.linebreak(
@@ -858,7 +908,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         arrow.rotation_euler[1] = -1.57079632679489
 
         # down arrow
-        arrow = gen_arrow(context, (+3, 0, 7))
+        arrow = gen_arrow(context, (+4.5, 0, 2.5))
         arrow.scale = (0.25, 0.25, 0.25)
         arrow.rotation_euler[1] = 2.5
 
@@ -869,11 +919,19 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         puzzle1 = self.add_planar(
             context, Vector((6.6674, -1.7019, 0.26765)), 0.30, 1, 0.04, False, '4', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.32)
         puzzle2 = self.add_planar(
-            context, Vector((20, +10, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
-        #puzzle2.rotation_euler[2] = 1.5708
+            context, Vector((20, 0, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
+        # puzzle2.rotation_euler[2] = 1.5708
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide09(self, context):
         self.cleanscene(context)
+        self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 10
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(9)
         self.label.text = "Oversize"
         self.linebreak(
@@ -901,15 +959,25 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         cubestopper.scale = Vector((5, 3, 3))
         plancol = self.add_planar(
             context, Vector(
-                (27, 0, 2)), 1, 3, 0.04,  False, '2', 1.2, 1.2, 1, 1, 3, False, False, False, 3.2)
+                (7.5, 0, 2)), 1, 4, 0.04,  False, '2', 1.2, 1.2, 1, 1, 3, False, False, False, 3.2)
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide10(self, context):
         self.cleanscene(context)
+        self.cleanscene(context)
+        self.viewloc = (-5, 21, -2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(10)
         self.label.text = "Mapping"
         self.linebreak(
-            "Mapping is the way a connector are bound to the object they are supposed to cut (Centerobject). It includes parenting. When you move the object in the viewport the connectors will follow. Moreover, mapping also includes having the boolean modifiers of a connectors already on the Centerobj allowing to preview the result (when you can work with a slow blender). The addon will check for these attributes during applying.% However, you can change the mapping of a connector by using the 'Remap Connector to Active'-Button. Select the connector you wane remap and then the new Centerobject it should be mapped to and press the 'Remap Connector to Active'-Button. Now the parenting and the modifiers exist on the other object.%Moreover, if you don't wanne have a connector mapped to any object, you can either add them with the checkbox 'Add Unmapped' in the 'Add, Exchange,...'- dropdown enabled or you select an existing connector and press 'Unmap Connector' in the 'Mapping, Order, Visibility' -dropdown.%%Useful Detail: If a mapped connector doesn't touch/cut any part of a Centerobject during applying (for example Apply All). It will remain in the scene and will be labeled unmapped.")
-        headline = self.add_text(context, self.headloc, "Mapping")
+            "Mapping is the way connectors are bound to the object they are supposed to cut (Centerobject). It includes parenting. When you move the object in the viewport the connectors will follow. Moreover, mapping also includes having the boolean modifiers of a connectors already on the Centerobj allowing to preview the result (when you can work with a slow blender). The addon will check for these attributes during applying. A Connector can only be mapped to one Centerobject% However, you can change the mapping of a connector by using the 'Remap Connector to Active'-Button. Select the connector you wane remap and then the new Centerobject it should be mapped to and press the 'Remap Connector to Active'-Button. Now the parenting and the modifiers exist on the other object.%Moreover, if you don't wanne have a connector mapped to any object, you can either add them with the checkbox 'Add Unmapped' in the 'Add, Exchange,...'- dropdown enabled or you select an existing connector and press 'Unmap Connector' in the 'Mapping, Order, Visibility' -dropdown.%%Useful Detail: If a mapped connector doesn't touch/cut any part of a Centerobject during applying (for example Apply All). It will remain in the scene and will be labeled unmapped.")
+
+        headloc = (self.headloc[0], self.headloc[1], self.headloc[2]+7)
+        headline = self.add_text(context, headloc, "Mapping")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [high cube 3 connectors, apply the one in the middle, check the mapping of the new objects, remap one connector]
@@ -924,18 +992,28 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con2 = self.add_single(context, (0, 0, 5), 1, 1, '3', False,
                                '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
         arrow = gen_arrow(context, (-12, 0, 0))
-        arrow.rotation_euler[1] = 1.5078
-        self.add_text(context, (-15, 0, 0),
-                      "Apply this one and check \nthe mapping of the remaining couples. \nTry to change their mapping. ")
-        arrow.rotation_euler[0] = 1.5078
+        arrow.rotation_euler[1] = 1.57079632679489
+        hinweis = self.add_text(context, (-20, 0, 0),
+                                "Apply this one and check \nthe mapping of the remaining couples. \nThen change the mapping of\none of them to the other Centerobject.")
+        hinweis.rotation_euler[0] = 1.57079632679489
+
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide11(self, context):
         self.cleanscene(context)
+
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(11)
         self.label.text = "Applying and Order"
         self.linebreak(
             "By Applying a Connector you finalize the editing process, cut the model in pieces and add the connectors. You can choose to select one or several connectors and Press 'Apply Connectors(s)' to have only specific connectors applied or you press 'Apply All' (both in 'Add,Exchange,Apply'-dropdown) to apply all connectors mapped to a Centerobject (or the Centerobj the selected Connector is mapped to).%The order in which the Connectors are applied can be displayed as little numbers above the Connectors by  Toggling on/off with 'Toggle Order' in the 'Mapping,Order,Visibility'-dropdown. The order can be changed by selecting a connector and pressing either 'Up in Order' or 'Down in Order'. The order rarely is necessary but in an example like here on the right it can be important.%%Useful Detail: By default the connectors are getting deleted after applying. If they are precious to you check the checkbox 'Keep Connector' before applying and they will be kept unmapped.")
-        headline = self.add_text(context, self.headloc, "Applying and Order")
+        headline = self.add_text(
+            context, (self.headloc[0], self.headloc[1], self.headloc[2]+10), "Applying and Order")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # 3x[one cube with two planar and a single] with different order
@@ -945,101 +1023,192 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
         largeplanep.scale = Vector((7, 7, 7))
 
-        puz1loc = (largeplaneloc[0]-2, largeplaneloc[1]-0, largeplaneloc[2]+0)
+        puz1loc = (largeplaneloc[0]-2, largeplaneloc[1]-0, largeplaneloc[2]+4)
         puzzle1 = self.add_planar(
-            context, puz1loc, 0.30, 5, 0.04, False, '10', 1.22, 1.22, 1, 2, 1.0, False, False, False, 3.32)
+            context, puz1loc, 0.30, 8.5, 0.04, False, '10', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.32)
 
-        puz2loc = (largeplaneloc[0]-0.5,
-                   largeplaneloc[1]-1.885, largeplaneloc[2]+2)
+        puz2loc = (largeplaneloc[0]-0.33,
+                   largeplaneloc[1]-2, largeplaneloc[2]+4)
         puzzle2 = self.add_planar(
-            context, puz2loc, 0.30, 5, 0.04, False, '13', 1.22, 1.22, 1, 2, 1.0, False, False, False, 3.34)
-        puzzle2.rotation_euler[2] = 1.5708
+            context, puz2loc, 0.30, 8.5, 0.04, False, '13', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.34)
+        puzzle2.rotation_euler[2] = 1.57079632679489
 
-        con2 = self.add_single(context, largeplaneloc, 1, 1, '2', False,
-                               '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
+        con2 = self.add_single(context, largeplaneloc, 1.44, 1, '2', False,
+                               '1',  16, '1', 1.0, 0.04, 16, 0, 0, 1, 0, False)
 
-        self.add_text(context, (0, 0, 0),
-                      "Mach ordentlich und kopiere mit anderer reinfolge; order trigger,m  vielleicht copy für applied")
+        # Version Mitte
+        largeplaneloc = Vector((0, 0, 0))
+        largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
+        largeplanep.scale = Vector((7, 7, 7))
+
+        puz1loc = (largeplaneloc[0]-2, largeplaneloc[1]-0, largeplaneloc[2]+4)
+        puzzle1 = self.add_planar(
+            context, puz1loc, 0.30, 8.5, 0.04, False, '10', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.32)
+        con2 = self.add_single(context, largeplaneloc, 1.44, 1, '2', False,
+                               '1',  16, '1', 1.0, 0.04, 16, 0, 0, 1, 0, False)
+
+        puz2loc = (largeplaneloc[0]-0.33,
+                   largeplaneloc[1]-2, largeplaneloc[2]+4)
+        puzzle2 = self.add_planar(
+            context, puz2loc, 0.30, 8.5, 0.04, False, '13', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.34)
+        puzzle2.rotation_euler[2] = 1.57079632679489
+
+        # Version rechts
+        largeplaneloc = Vector((10, 0, 0))
+        largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
+        largeplanep.scale = Vector((7, 7, 7))
+
+        con2 = self.add_single(context, largeplaneloc, 1.44, 1, '2', False,
+                               '1',  16, '1', 1.0, 0.04, 16, 0, 0, 1, 0, False)
+
+        puz1loc = (largeplaneloc[0]-2, largeplaneloc[1]-0, largeplaneloc[2]+4)
+        puzzle1 = self.add_planar(
+            context, puz1loc, 0.30, 8.5, 0.04, False, '10', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.32)
+
+        puz2loc = (largeplaneloc[0]-0.33,
+                   largeplaneloc[1]-2, largeplaneloc[2]+4)
+        puzzle2 = self.add_planar(
+            context, puz2loc, 0.30, 8.5, 0.04, False, '13', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.34)
+        puzzle2.rotation_euler[2] = 1.57079632679489
+
+        self.add_text(context, (0, -10, 0),
+                      "All 3 Cubes have the same Connectors \napplied, but in different orders.\n(BTW Its about the principle, the results will all not look pretty :-D)")
+
+        hinweis = self.add_text(context, (-20, 0, 10),
+                                "Select one or several connectors and press 'Apply Connector(s)'.\n")
+        hinweis.rotation_euler[0] = 1.57079632679489
+        hinweis = self.add_text(context, (20, 0, 10),
+                                "Select one Centerobject and press 'Toggle Order'\nto get the order displayed.\nTry 'Apply All' to see the results.")
+        hinweis.rotation_euler[0] = 1.57079632679489
+
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide12(self, context):
         self.cleanscene(context)
+
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(12)
         self.label.text = "Special Apply Menu"
         self.linebreak(
-            "The 'Special Apply'-dropdown has some extra operations that might get helpful:%- 'Planar To Multiple Objects' allows you to decide which objects are also should be cut through in addition to the Centerobject the planar is mapped to. For example (left) you make a puzzle and applied only the first planar, the second will be only applied to the one row its mapped to. Select all rows first and select the remaining planar last. Then Press  Planar To Multiple Objects'. BTW: 'Apply All' will do this automatically. %- 'Multiple Planar to Object' does it the other way around. Select several Planar Connector, select the Centerobj of choice last and press the button. This is a bit of a relict from where 'Apply All' was'nt smart enough, but it might become helpful in some configurations. %- 'Single To Multiple Objects' This allows to connect one Single Connector beeing applied to several Objects. Imagine your character needs a new hat. Select the hat and the charakter and the Single Connector last and press 'Single To Multiple Objects'. You can also enable 'Ignore Main Cut' to do exactly that during applying.")
+            "The 'Special Apply'-dropdown has some extra operations that might get helpful:%- 'Planar To Multiple Objects' allows you to decide which objects are also should be cut through in addition to the Centerobject the planar is mapped to. For example (left) you make a puzzle and applied only the first planar, the second will be only applied to the one row its mapped to. Select all rows first and select the remaining planar last. Then Press  Planar To Multiple Objects'. BTW: 'Apply All' will do this automatically. %- 'Multiple Planar to Object' does it the other way around. Select several Planar Connector, select the Centerobj of choice last and press the button. Typically 'Appyl All' handels theses cases reliably. However, this can become useful if you can't use 'Apply All'.%- 'Single To Multiple Objects' This allows to connect one Single Connector beeing applied to several Objects. Imagine your character needs a new hat. Select the hat and the charakter and the Single Connector last and press 'Single To Multiple Objects'. You can also enable 'Ignore Main Cut' to do exactly that during applying.")
         headline = self.add_text(context, self.headloc, "Special Apply Menu")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [Puzzle with one applied(Cube with planar and single, single applied)[text: Planar to Multiple Objects], PUzzle both unapplied,  figure + Head ]
 
-        self.text(context, (-10, -10, 0),
-                  "Select all Puzzlestripes, \n select Connector last  and press 'Planar to Multiple Objects'\nTry also 'Apply All' to see the difference")
-        largeplaneloc = Vector((-10, 0, 0))
+        # puzzle1
+        self.add_text(context, (-15, -10, 0),
+                      "Select all Puzzlestripes, \n select Connector last  and \npress 'Planar to Multiple Objects'\nTry also 'Apply All'\nto see the difference")
+        largeplaneloc = Vector((-12, 0, 0))
         largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
         largeplanep.scale = Vector((10, 10, 0.2))
         puzzle1 = self.add_planar(
-            context, Vector((-6.6674, -1.7019, 0.26765)), 0.30, 1, 0.04, False, '4', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.32)
+            context, Vector((-15.34, -1.35, 0.26765)), 0.30, 1, 0.04, False, '4', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.32)
         puzzle2 = self.add_planar(
-            context, Vector((-11.391, -3.3397, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
+            context, Vector((-10.58, -3.39, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
         puzzle2.rotation_euler[2] = 1.5708
         self.applycoup(context, [puzzle1])
 
+        self.add_text(context, (15, -10, 0),
+                      "Select both Connectors and \nthen plane last and press \n'Multiple Connectors to Object'.")
+        # puzzle2
         largeplaneloc = Vector((0, 0, 0))
         largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
         largeplanep.scale = Vector((10, 10, 0.2))
         puzzle1 = self.add_planar(
-            context, Vector((3.3, -1.7019, 0.26765)), 0.30, 1, 0.04, False, '4', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.32)
+            context, Vector((-3.340, -1.3582, 0.26765)), 0.30, 1, 0.04, False, '4', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.32)
         puzzle2 = self.add_planar(
-            context, Vector((-1.391, -3.3397, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
+            context, Vector((+1.425, -3.3397, 0.36302)), 0.30, 1, 0.04, False, '5', 1.22, 1.22, 2, 3, 1.0, False, False, False, 3.34)
         puzzle2.rotation_euler[2] = 1.5708
 
         # figure + hat
 
-        gen_hat(context, (10, 0, 5))
-        gen_figure(context, (10, 0, 0))
-        con2 = self.add_single(context, (10, 0, 4), 0.5, 1, '2', False,
-                               '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
+        hat = gen_hat(context, (0, 0, 0))
+        hat.location = (15, 0, 3.739)
+        hat.scale = (0.45, 0.45, 0.45)
+        gen_figure(context, (15, 0, 0))
+        con2 = self.add_single(context, (15, 0, 3.72), 0.16, 0.65, '2', False,
+                               '1',  16, '2', 2.76, 0.04, 16, 0, 0, 1, 0, False)
+        self.add_text(context, (0, -10, 0),
+                      "Select both Connectors and \nthen plane last and press \n'Multiple Connectors to Object'.")
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
 
     def slide13(self, context):
         self.cleanscene(context)
+
+        self.viewloc = (-5, 21, -2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(13)
         self.label.text = "BuildVolume"
         self.linebreak(
             "Especially when you desect large objects to fit in your 3D printer, you always need to know how big your print real estate is at all times. In the 'Build Volume'-Dropdown, you can set the size of your 3D printer in cm (probably if you haven't changed it globaly to freedom units) and press 'Generate Buildvolume' to get cube (set to wireframe). When added you can adjust also its repeation in x,y and z. You can at as many as you like. The settings will only be avaiable for the last selected Build Volume. The BuildVolumes are nothing more than simple objects to get a feel for the avaiable space. Otherwise they do nothing.")
-        headline = self.add_text(context, self.headloc, "BuildVolume")
+        headline = self.add_text(
+            context, (self.headloc[0], self.headloc[1], self.headloc[2]+55), "BuildVolume")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [Figure with connector, Buildvolume with 2x2x4 ]
-        gen_figure(context, (0, 0, 0))
+        fig = gen_figure(context, (0, 0, 0))
+        fig.scale = (14, 14, 14)
+        context.scene.cursor.location = (-18.7, -21.5, 6.5)
         bpy.ops.object.makebuildvolume()
         context.object.modifiers['PUrP_BuildVol_ArrayX'].count = 3
         context.object.modifiers['PUrP_BuildVol_ArrayY'].count = 3
         context.object.modifiers['PUrP_BuildVol_ArrayZ'].count = 3
 
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
+
     def slide14(self, context):
         self.cleanscene(context)
+        self.viewloc = (-5, 21, -2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
         self.set_slidenum(14)
         self.label.text = "Typical Process"
         self.linebreak(
             "Here is a typical workflow too work with the addon:%1. Import/append model (keep backup)%2. Select the model%3. Set the 3d cursor to a point where you want to add a connector. Press Add Connector,%4. Adjust settings, exchange, position with 's' and 'r'-shortcuts, fine tune with the gizmos...%5. Repeat to add more connectors as you like, use 'Active to Setting' and 'Exchange' as copy and paste of connector settings.%[6-53]. ...%54. Maybe print a few test cuts to figure out the best oversize value and adjust the connectors accordingly.%55. Adjust all Oversize values according to you test results%56. Apply All Connectors or do it manually one by one%57. 3D Print %58. PUZZLE THEM TOGHETHER  %%Let Blender be your canvas and make cool stuff. Please send me pics, models and suggestions to info@modicolitor.com")
-        headline = self.add_text(context, self.headloc, "Typical Process")
+        headline = self.add_text(
+            context, (self.headloc[0], self.headloc[1], self.headloc[2]+55), "Typical Process")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [Figure + Buildvolume]
 
-        gen_figure(context, (0, 0, 0))
+        fig = gen_figure(context, (0, 0, 0))
+        fig.scale(14, 14, 14)
+        context.scene.cursor.location = (-18.7, -21.5, 6.5)
         bpy.ops.object.makebuildvolume()
         context.object.modifiers['PUrP_BuildVol_ArrayX'].count = 3
         context.object.modifiers['PUrP_BuildVol_ArrayY'].count = 3
         context.object.modifiers['PUrP_BuildVol_ArrayZ'].count = 3
 
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
+
     def slide15(self, context):
         self.cleanscene(context)
+        self.viewloc = (0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 10
+        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(15)
         self.label.text = "Last thoughts "
         self.linebreak(
             "Before I let you go explore more on your own here are somethings to keep in mind to have everything working nicely as intended:%- The objects you are using must be manifold (water tight). A single plane will not work. It needs thickness. Also enable the 3D Printing addon shiped with blender it allows to check 'how manifold' (and pregnant) your object is and often repairs it. %- The addon is strongly reliant (abh) on blenders boolean modifier. With the 2.91 update the exact solver arrived and the number of fails drastically decreased. However, sometimes the boolean modifier just produce s***. In these cases increasing or reducing resolution and repositioning might help. %- All other modifiers must be applied before starting to apply the Connector. Keep in mind the Addon ignores all modifiers not created by itself. When you have a large stack of modifiers before (or just one) before you start cutting, the preview before and the result after applying the connector will look not as expected. %- Always also consider the orientation during printing. Overhangs are always a problem in fdm printing. In addition, also the x-y-resolution is different than in z-direction. Good cut design can lead to less overhangs and better results. However, the oversize might change when the orientation during printing changes (seen in rare cases where it needs to be really precise).% I guess it's obvious, but let me make sure everyone understands: we are cuttings things in pieces with this addon. When this model is the only version you have and you save the cutted model over the only original, that's it! The model is gone. The addon does not make any safety copies. Please keep your heads together. :-) %%Useful Detail: Have Fun!!!")
-        headline = self.add_text(context, self.headloc, "Last thoughts ")
+        headline = self.add_text(
+            context, (self.headloc[0], self.headloc[1], self.headloc[2]), "Last thoughts ")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # [page3?]
+        # headline.select_set(True)
+        context.view_layer.objects.active = headline
