@@ -12,7 +12,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     CoupSize = bpy.props.FloatProperty(
         name="Inlay Size", default=1.0, min=0.0)
     Oversize = bpy.props.FloatProperty(
-        name="DynamicOversize", default=0.04)
+        name="DynamicOversize", default=0.040, min=0.000, precision=3)
     zScale = bpy.props.FloatProperty(
         name="zScale", default=1.0, min=0.0001)
     aRadius = bpy.props.FloatProperty(

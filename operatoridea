@@ -19,14 +19,14 @@ after applying
 bugs:
 general operator bug:
 
-[] Tour durch das Addon im Addon
+[++++] Tour durch das Addon im Addon
 
 [] remove active connector ??(when its not there)
-[] when check box Add unmapped and exchange makes unmapped signal but its still mapped.
+[+] when check box Add unmapped and exchange makes unmapped signal but its still mapped.
 [] upper radius cone gizmos weird, radius top 0 produces self overlap
-[] planar ui shows radius settings, inlay verts, --> remove please
+[+] planar ui shows radius settings, inlay verts, --> remove please
 [] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
-[] oversize more digits
+[+] oversize more digits
 [] Buildvolume should not have a gizmo
 [] after apply one planar, the second planar ist not deleted, wrong mapping before?
 [] stopperheight gizmo slower als zscale 
