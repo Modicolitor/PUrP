@@ -1067,7 +1067,7 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
         ob = context.object
 
         if ob != None:
-            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" and "Planar" not in ob.name):
+            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" and "Planar" and "BuildVolume" not in ob.name):
                 if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
                     try:
                         test = context.scene.PUrP.GlobalScale
