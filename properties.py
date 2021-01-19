@@ -36,7 +36,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     BevelOffset = bpy.props.FloatProperty(
         name="Beveloffset", default=0.0, min=0.0)
     StopperHeight = bpy.props.FloatProperty(
-        name="Beveloffset", default=0.2, min=0.0)
+        name="Beveloffset", default=1.0, min=0.0)
     StopperBool = bpy.props.BoolProperty(
         name="Beveloffset", default=False)
     InlayToggleBool = bpy.props.BoolProperty(

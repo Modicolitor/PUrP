@@ -43,9 +43,10 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
 
             subcol.prop(PUrP, "SingleCouplingModes",
                         expand=True, text='Connector Modes')
-            if context.scene.PUrP.SingleCouplingModes != '4':
+            if PUrP.SingleCouplingModes != '4':
                 subcol.prop(PUrP, "SingleMainTypes", text='Maincut Type')
-                subcol.prop(PUrP, "SingleCouplingTypes", text='Inlay Type')
+                if PUrP.SingleCouplingModes == '3':
+                    subcol.prop(PUrP, "SingleCouplingTypes", text='Inlay Type')
 
             else:
                 subcol.prop(PUrP, "PlanarCouplingTypes", text='Connector Type')
@@ -55,22 +56,24 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.prop(PUrP, "CoupScale", text='Connector Scale')
 
             # for stick, mf, planecut
-            if context.scene.PUrP.SingleCouplingModes == '1' or context.scene.PUrP.SingleCouplingModes == '2' or context.scene.PUrP.SingleCouplingModes == '3':
-                subcol.prop(PUrP, "CoupSize", text='Inlay Size')
-                subcol.prop(PUrP, "zScale", text='z-Scale')
-                subcol.prop(PUrP, "Oversize", text='Oversize')
+            if PUrP.SingleCouplingModes == '1' or PUrP.SingleCouplingModes == '2' or PUrP.SingleCouplingModes == '3':
+                if not PUrP.SingleCouplingModes == '3':
+                    subcol.prop(PUrP, "CoupSize", text='Inlay Size')
+                    subcol.prop(PUrP, "zScale", text='z-Scale')
+                    subcol.prop(PUrP, "Oversize", text='Oversize')
                 subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
-                subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
-                subcol.prop(PUrP, "BevelSegments", text='Bevel Segments')
-            if context.scene.PUrP.SingleMainTypes == '2':
+                if not PUrP.SingleCouplingModes == '3':
+                    subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
+                    subcol.prop(PUrP, "BevelSegments", text='Bevel Segments')
+            if PUrP.SingleMainTypes == '2' and not PUrP.SingleCouplingModes == '4' and not PUrP.SingleCouplingModes == '3':
                 subcol.prop(context.scene.PUrP, "MaincutVert",
                             text='Maincut Verts')
-            if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3":  # cylinder cone
-                subcol.prop(context.scene.PUrP, "CylVert",
+            if PUrP.SingleCouplingTypes == "2" or PUrP.SingleCouplingTypes == "3" and not PUrP.SingleCouplingModes == '4' and not PUrP.SingleCouplingModes == '3':  # cylinder cone
+                subcol.prop(PUrP, "CylVert",
                             text='Inlay Vertices')
                 subcol.prop(context.scene.PUrP, "aRadius", text='Radius')
                 # subcol.prop(PUrP, "aRadius", text='Radius 1')
-            if PUrP.SingleCouplingTypes == "3":
+            if PUrP.SingleCouplingTypes == "3" and not PUrP.SingleCouplingModes == '4' and not PUrP.SingleCouplingModes == '3':
                 subcol.prop(PUrP, "bRadius", text='Radius Top')
 
             if context.scene.PUrP.SingleCouplingModes == '4':
