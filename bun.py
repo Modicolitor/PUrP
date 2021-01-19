@@ -998,7 +998,8 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
                         # oldname = obj.name
-                        parentname = obj.parent.name[:]
+                        # if not is_unmap:
+                        #parentname = obj.parent.name[:]
 
                         for ob in context.selected_objects:  # deselte all
                             ob.select_set(False)
@@ -1047,7 +1048,8 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                     # bpy.ops.object.transform_apply(
                     #    location=False, rotation=False, scale=True)
                     if is_unmap:
-                        unmapped_signal(context, obj)
+                        unmap_coup(context, obj)
+                        #unmapped_signal(context, obj)
 
             # hideselectinlay(context, obj)
 
@@ -1616,12 +1618,16 @@ def applySingleCoup(context, coup, CenterObj, delete):
 
         for Daughter in CenterObjDaughters:
             DCoupList = []
-            print(f"Apply sortDaughter {Daughter}")
+            print(f"Apply sortDaughter {Daughter.name}")
             for coupname in oriCoupNames:
                 coup = objects[coupname]
                 if bvhOverlap(context, coup, Daughter):
-                    coup.parent = Daughter
+                    #coup.parent = Daughter
+                    remap_coup(context, coup, Daughter)
                     DCoupList.append(coup)
+
+                else:
+                    unmap_coup(context, coup)
 
             # all modifiers of all couplings which are identified as overlapping
             DAllMods = AllCoupMods(context, DCoupList, Daughter)

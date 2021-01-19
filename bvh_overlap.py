@@ -45,7 +45,10 @@ def bvhOverlap(context, coup, CenterObj):
             mod.use_relative_offset = False
             mod.use_constant_offset = True
             mod.constant_offset_displace = coup.modifiers["PUrP_Array_2"].constant_offset_displace
+        # try:
         bpy.ops.object.modifier_apply(modifier=mod.name)
+        # except:
+        #    print('Problem in Applying the Modifier')
 
     coup_tmp.select_set(True)
     coup_tmp.matrix_world = matrix
