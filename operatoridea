@@ -33,9 +33,9 @@ general operator bug:
 [] planar connectorscale gizmot does not update panel
 [] linedistance gizmot should be visible when when connector has more than one line (not PUrP properties dependent); same for Bevelgizmos single
 [] Active to setting error when flat flat
-[] rename tool tip gizmos (coupling --> connector)
-[] zScale gizmo single löscht zscale value in panel (shared?)
-[] apply unmapped produces error should produce warning 
+[+] rename tool tip gizmos (coupling --> connector)
+[???] zScale gizmo single löscht zscale value in panel (shared?)
+[+] apply unmapped produces error should produce warning 
 
 Known Issues
 [] planar coupscale gizmot, only updates values after applying (low level problem)

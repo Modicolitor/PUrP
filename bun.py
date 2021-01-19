@@ -1105,6 +1105,12 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
         selected = selectedtocouplist(context, selected)
         print(f"Selected {selected}")
+        # sort out unmapped
+        for coup in selected[:]:
+            if is_unmapped(context, coup):
+                selected.remove(coup)
+                self.report({'WARNING'}, "Connector is unmapped!")
+
         for obj in selected:
             if obj.parent not in Centerobjs:
                 Centerobjs.append(obj.parent)

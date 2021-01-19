@@ -26,7 +26,7 @@ import copy
 
 
 class PP_OT_OversizeGizmo(bpy.types.Operator):
-    '''Change the Oversize of the coupling'''
+    '''Change the Oversize of the Connector'''
     bl_idname = "object.oversize"
     bl_label = "oversize"
     bl_options = {'REGISTER', "UNDO"}
@@ -201,7 +201,7 @@ class PP_OT_CouplSizeGizmo(bpy.types.Operator):
 
 
 class PP_OT_zScaleGizmo(bpy.types.Operator):
-    '''Change the z-scale of the connector'''
+    '''Change the z-scale of the Connector'''
     bl_idname = "object.zscale"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -284,7 +284,7 @@ def is_stick(context, coup):
 
 
 class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
-    '''Change the beveloffset of the coupling'''
+    '''Change the beveloffset of the Connector'''
     bl_idname = "purp.bevoffset"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -340,7 +340,7 @@ class PP_OT_BevelOffsetGizmo(bpy.types.Operator):
 
 
 class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
-    '''Change the beveloffset of the coupling'''
+    '''Change the bevelsegments of the Connector'''
     bl_idname = "purp.bevseggiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -394,7 +394,7 @@ class PP_OT_BevelSegmentGizmo(bpy.types.Operator):
 
 
 class PP_OT_CoupScaleGizmo(bpy.types.Operator):
-    '''Change the Size of the Connector'''
+    '''Change the Connector Scale'''
     bl_idname = "purp.coupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -481,7 +481,7 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
 
 
 class PP_OT_LowerRadiusGizmo(bpy.types.Operator):
-    '''Change the cylinder Radius or the lower radius of the cone'''
+    '''Change the cylinder radius or the lower radius of the cone'''
     bl_idname = "purp.lowerradiusgizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -602,7 +602,7 @@ def coneanalysizer(context, ob):
 
 
 class PP_OT_UpperRadiusGizmo(bpy.types.Operator):
-    '''Change the cylinder Radius or the lower radius of the cone'''
+    '''Change the upper radius of the cone'''
     bl_idname = "purp.upperradiusgizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1134,7 +1134,7 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
 
 
 class PP_OT_FlatCoupScaleGizmo(bpy.types.Operator):
-    '''Change Connector Size'''
+    '''Change connector scale'''
     bl_idname = "purp.flatcoupscalegizmo"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1527,7 +1527,7 @@ class PUrP_PlanarGizmo(GizmoGroup):
 
 
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
-    '''Change the right offset of the coupling'''
+    '''Change the right offset of the connector'''
     bl_idname = "purp.roffsetgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1603,7 +1603,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
-    '''Change the left offset of the coupling'''
+    '''Change the left offset of the connector'''
     bl_idname = "purp.loffsetgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1681,7 +1681,7 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
-    '''Change the Zscale of the coupling'''
+    '''Change the Zscale of the connector'''
     bl_idname = "purp.planzscalegiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1805,7 +1805,7 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
-    '''Change the Zscale of the coupling'''
+    '''Change the stopper height of the connector'''
     bl_idname = "purp.stopperheightgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1876,7 +1876,7 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
-    '''Change the Zscale of the coupling'''
+    '''Change linecount of the connector'''
     bl_idname = "purp.linecountgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1930,7 +1930,7 @@ class PP_OT_PlanarLineCountGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
-    '''Change the Zscale of the coupling'''
+    '''Change the linelength of the connector'''
     bl_idname = "purp.linelengthgiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -1984,7 +1984,7 @@ class PP_OT_PlanarLineLengthGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarLineDistanceGizmo(bpy.types.Operator):
-    '''Change the Zscale of the coupling'''
+    '''Change the linedistance of the connector'''
     bl_idname = "purp.linedistancegiz"
     bl_label = "couplsize"
     bl_options = {'REGISTER', "UNDO"}
@@ -2106,7 +2106,7 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
-    '''Change the Connector Scale '''
+    '''Change the connector scale '''
     bl_idname = "purp.planarcoupscalegizmo"
     bl_label = "couplscale"
     bl_options = {'REGISTER', "UNDO"}
