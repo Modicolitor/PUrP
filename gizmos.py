@@ -1067,7 +1067,7 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
         ob = context.object
 
         if ob != None:
-            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" and "Planar" and "BuildVolume" not in ob.name):
+            if "PUrP" in ob.name and "diff" not in ob.name and "fix" not in ob.name and "union" not in ob.name and "Planar" not in ob.name and "BuildVolume" not in ob.name:
                 if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
                     try:
                         test = context.scene.PUrP.GlobalScale
@@ -1442,15 +1442,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mcsize.use_draw_offset_scale = True
         mcsize.matrix_basis = ob.matrix_world.normalized()
         mcsize.use_draw_value = True
-        # mps.matrix_offset[2][0] = 0.2
-        # mps.matrix_offset[2][2] = 0.5
-        # mps.matrix_basis[2][3] += 0.8
-        # mps.matrix_basis[0][3] += 0.5
         mcsize.line_width = 3
-
         mcsize.color = 0.03, 0.8, 0.03
         mcsize.alpha = 0.5
-
         mcsize.color_highlight = 0.01, 1.0, 0.01
         mcsize.alpha_highlight = 1.0
         mcsize.scale_basis = 2
@@ -1505,7 +1499,9 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mplength.scale_basis = 1
 
         mpdistance = self.linedistance
-        if context.scene.PUrP.LineCount > 1:  # disable when there is only one line
+        # disable when there is only one line
+        # context.scene.PUrP.LineCount > 1 or
+        if context.object.modifiers[1].count > 1:
             mpdistance.matrix_basis = ob.matrix_world.normalized()
             mpdistance.matrix_offset[2][3] = 1
             mpdistance.matrix_offset[0][3] = -1
@@ -1834,7 +1830,7 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
             sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
-            self.value = self.lowestz + self.delta * PUrP.GlobalScale / 1000
+            self.value = self.lowestz + self.delta * PUrP.GlobalScale / sensi
 
             self.execute(context)
 
@@ -2106,7 +2102,7 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
 
 
 class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
-    '''Change the connector scale '''
+    '''Change the connector scale'''
     bl_idname = "purp.planarcoupscalegizmo"
     bl_label = "couplscale"
     bl_options = {'REGISTER', "UNDO"}
@@ -2125,11 +2121,13 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         ob.scale = self.value
         print(self.value)
 
-        coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-        vx3 = ob.data.vertices[3].co.x*ob.scale.x
-        print(
-            f"vx3 co{ob.data.vertices[3].co} scale{ob.scale[0]} vx3 {vx3} coupscale {abs(vx3) / coupfaktor}  ")
-        PUrP.CoupScale = abs(vx3) / coupfaktor
+        #coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+        # vx = ob.data.vertices[3].co  # @ob.matrix_world  # *ob.scale.x
+        #vx3 = vx[0]
+        # print(
+        #    f"vx3 co{ob.data.vertices[3].co} scale{ob.scale[0]} vx3 {vx3} coupscale {abs(vx3) / coupfaktor}")
+        #PUrP.CoupScale = abs(vx3) / coupfaktor
+        #PUrP.CoupScale = 25
         PUrP.OffsetRight, PUrP.OffsetLeft, PUrP.zScale, PUrP.StopperHeight = planaranalysizerGlobal(
             context, ob)
 
@@ -2150,8 +2148,9 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
             self.execute(context)
         elif event.type == 'LEFTMOUSE':  # Confirm
             PUrP = context.scene.PUrP
-            bpy.ops.object.transform_apply(
-                location=False, rotation=False, scale=True)
+            applyScale(context.object)
+            # bpy.ops.object.transform_apply(
+            #    location=False, rotation=False, scale=True)
             coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
             vx3 = ob.data.vertices[3].co.x*ob.scale.x
             PUrP.CoupScale = abs(vx3) / coupfaktor

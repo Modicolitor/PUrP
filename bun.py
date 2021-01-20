@@ -3208,7 +3208,7 @@ def planaranalysizerGlobal(context, Coup):
     PUrP = context.scene.PUrP
 
     coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
-    v3c = Coup.data.vertices[3].co  # @Coup.matrix_world
+    v3c = Coup.data.vertices[3].co@Coup.matrix_world
 
     # compensate for the 3 different position of vert3 in planar objects
     if "Cubic" in Coup.data.name or "Puzzle" in Coup.data.name:
@@ -3271,7 +3271,7 @@ def planaranalysizerGlobal(context, Coup):
     else:
         zScale = distance[0]
 
-    return OffsetRight, OffsetLeft, zScale, StopperHeight
+    return abs(OffsetRight), abs(OffsetLeft), zScale, StopperHeight
 
 
 def zSym(obj):
