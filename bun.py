@@ -1361,8 +1361,8 @@ def centerObjDecider(context, CenterObj):
                 # print(f"centerObjdecider Cmod name {Cmod.name}")
                 if Cmod == mod:
                     if bvhOverlap(context, Objects[mod], Cobj):
-                        # print(
-                        #    f"centerObjdecider send applySingleCoup mod.name {mod.name} and CObj {Cobj}")
+                        print(
+                            f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
                         if "Planar" in Cmod:
                             if len(centerObjList(context, Cobj.modifiers[Cmod].object)) > 1:
                                 print("all ast eins")
@@ -1371,6 +1371,7 @@ def centerObjDecider(context, CenterObj):
                                     context, Cobj.modifiers[Cmod].object, Cobj, False)
                             else:
                                 print("all ast zwei")
+                                ensure_mod(context, Objects[mod], Cobj, '')
                                 applySingleCoup(
                                     context, Cobj.modifiers[Cmod].object, Cobj, True)
                         else:
