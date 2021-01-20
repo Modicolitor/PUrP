@@ -1349,16 +1349,57 @@ def centerObjDecider(context, CenterObj):
         for pCobj in Objects[:]:
             if pCobj.PUrPCobj == True:
                 Cobjlist.append(pCobj)
-
+        is_sing = False
+        is_plan = False
+        PlanCobs = []
         # go through the potential Cobjects and check if they overlap with the coup (identified in )
         for Cobj in Cobjlist[:]:
+            CoupNameslist, Cobjmodslist = couplingList(Cobj)
+            if is_single(context, Objects[mod]):
+                is_sing = True
+                if mod in CoupNameslist:
+                    if bvhOverlap(context, Objects[mod], Cobj):
+                        applySingleCoup(
+                            context, Cobj.modifiers[mod].object, Cobj, False)
+            elif is_planar(context, Objects[mod]):
+                is_plan = True
+                if bvhOverlap(context, Objects[mod], Cobj):
+                    PlanCobs.append(Cobj)
+                    print(
+                        f"CObj {Cobj} appended to PlanCobs list in decider")
+                    #ensure_mod(context, Objects[mod], Cobj, '')
+                    # applySingleCoup(
+                    #    context, Cobj.modifiers[mod].object, Cobj, False)
+                else:
+                    print(f"Cob {Cobj} is not overlapping with {mod}")
+
+        # deleting single
+        if is_sing:
+            removeCoupling(context, Objects[mod])
+
+        # extra apply round for all Cobj with this coup, necessary to delete planar in the end
+        if is_plan:
+            for n, Cobj in enumerate(PlanCobs):
+                if n < len(PlanCobs)-1:
+                    ensure_mod(context, Objects[mod], Cobj, '')
+                    applySingleCoup(
+                        context, Cobj.modifiers[mod].object, Cobj, False)
+                else:
+                    print("all ast zwei")
+                    ensure_mod(context, Objects[mod], Cobj, '')
+                    applySingleCoup(
+                        context, Cobj.modifiers[mod].object, Cobj, True)
+
+            '''
             print(f"centerObjdecider Cobj {Cobj}")
 
-            CoupNameslist, Cobjmodslist = couplingList(Cobj)
+            
             # go through the modifiers of the current Cboj, check if the name of a modifier is the same as the name of the initial mod, if yes check overlapp
             for Cmod in CoupNameslist[:]:
                 # print(f"centerObjdecider Cmod name {mod.name}")
                 # print(f"centerObjdecider Cmod name {Cmod.name}")
+                #####
+                # er schaut die pieces gar nicht an: tauschen bediengung 1 und 2 mehr overhead aber so kriegt man ensure unter
                 if Cmod == mod:
                     if bvhOverlap(context, Objects[mod], Cobj):
                         print(
@@ -1382,6 +1423,7 @@ def centerObjDecider(context, CenterObj):
                             f"There is mod {Cmod} in CenterObj {Cobj}")
                         # mid = Cobj.modifiers[mod]
                         # Cobj.modifiers.remove(mid)
+            '''
 
 # takes coup and CenterObj and returns the distance
 
@@ -1608,9 +1650,9 @@ def applySingleCoup(context, coup, CenterObj, delete):
 
             if len(DCoupList) > 0:
                 remap_coup(context, DCoupList[0], Daughter)
-            else:
-                if not delete:
-                    unmap_coup(context, coup)
+            # else:
+            #    if not delete:
+            #        unmap_coup(context, coup)
 
             # all modifiers of all couplings which are identified as overlapping
             DAllMods = AllCoupMods(context, DCoupList, Daughter)
