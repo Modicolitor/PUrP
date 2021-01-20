@@ -2188,7 +2188,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                     PUrP.SingleCouplingModes = "2"
 
             scalefactor = PUrP.GlobalScale * PUrP.CoupScale  # * PUrP.CoupSize
-            yv0 = self.obout.data.vertices[0].co.y
+            if not is_flat(context, obj):
+                yv0 = self.obout.data.vertices[0].co.y
 
             if len(children) != 0:  # nicht flatcut
                 # print(f"meshadata name {obj.data.name}")

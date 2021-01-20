@@ -19,23 +19,13 @@ after applying
 bugs:
 general operator bug:
 
-[++++] Tour durch das Addon im Addon
 
-[] remove active connector ??(when its not there)
-[+] when check box Add unmapped and exchange makes unmapped signal but its still mapped.
+
+
 [] upper radius cone gizmos weird, radius top 0 produces self overlap
-[+] planar ui shows radius settings, inlay verts, --> remove please
 [] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
-[+] oversize more digits
-[+] Buildvolume should not have a gizmo
 
-[+] stopperheight gizmo slower als zscale 
-[+] planar connectorscale gizmot does not update panel
-[+] linedistance gizmot should be visible when when connector has more than one line (not PUrP properties dependent); same for Bevelgizmos single
-[] Active to setting error when flat flat
-[+] rename tool tip gizmos (coupling --> connector)
-[???] zScale gizmo single löscht zscale value in panel (shared?)
-[+] apply unmapped produces error should produce warning 
+
 
 
 
@@ -74,6 +64,19 @@ Publishing:
 
 
 resolved bug:
+[???] zScale gizmo single löscht zscale value in panel (shared?)
+[+] apply unmapped produces error should produce warning 
+[+] planar ui shows radius settings, inlay verts, --> remove please
+[+] when check box Add unmapped and exchange makes unmapped signal but its still mapped.
+
+[+] oversize more digits
+[+] Buildvolume should not have a gizmo
+
+[+] stopperheight gizmo slower als zscale 
+[+] planar connectorscale gizmot does not update panel
+[+] linedistance gizmot should be visible when when connector has more than one line (not PUrP properties dependent); same for Bevelgizmos single
+[+] Active to setting error when flat flat
+[+] rename tool tip gizmos (coupling --> connector)
 [ +] single to Multiple: unmapp still moves coupling 
                         mf apply witout ignore works only when mapped to the base? why is that? (Cob flag?)
 
