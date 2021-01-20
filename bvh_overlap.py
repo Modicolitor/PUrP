@@ -1,4 +1,5 @@
 import bpy
+#from bpy.ops.object import subdivision_set
 import mathutils
 #from .bun import is_planar, applyScalRot
 
@@ -32,7 +33,7 @@ def bvhOverlap(context, coup, CenterObj):
     for mod in coup.modifiers:
         mod = coup_tmp.modifiers.new(name=mod.name, type=mod.type)
         if "PUrP_Solidify" == mod.name:
-            mod = coup.modifiers["PUrP_Solidify"]
+            #mod = coup.modifiers["PUrP_Solidify"]
             mod.thickness = coup.modifiers["PUrP_Solidify"].thickness
             mod.offset = coup.modifiers["PUrP_Solidify"].offset
             mod.solidify_mode = coup.modifiers["PUrP_Solidify"].solidify_mode
@@ -40,15 +41,22 @@ def bvhOverlap(context, coup, CenterObj):
         elif "PUrP_Array_1" == mod.name:
             mod.count = coup.modifiers["PUrP_Array_1"].count
             mod.relative_offset_displace = coup.modifiers["PUrP_Array_1"].relative_offset_displace
+            mod.use_merge_vertices = coup.modifiers["PUrP_Array_2"].use_merge_vertices
         elif "PUrP_Array_2" == mod.name:
             mod.count = coup.modifiers["PUrP_Array_2"].count
             mod.use_relative_offset = False
             mod.use_constant_offset = True
             mod.constant_offset_displace = coup.modifiers["PUrP_Array_2"].constant_offset_displace
-        # try:
-        bpy.ops.object.modifier_apply(modifier=mod.name)
-        # except:
-        #    print('Problem in Applying the Modifier')
+            mod.use_merge_vertices = coup.modifiers["PUrP_Array_2"].use_merge_vertices
+        try:
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+        except:
+            print('Problem in Applying the Modifier')
+
+    '''mod = coup_tmp.modifiers.new(name='PUrP_Helpsubsurf', type='SUBSURF')
+    mod.levels = 2
+    mod.subdivision_type = 'SIMPLE'
+    bpy.ops.object.modifier_apply(modifier=mod.name)'''
 
     coup_tmp.select_set(True)
     coup_tmp.matrix_world = matrix
