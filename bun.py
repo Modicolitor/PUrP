@@ -997,10 +997,6 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
                         # print(f"2obj.data.name {obj.data.name}")
                         loc = obj.location.copy()
                         trans = obj.matrix_world.copy()
-                        # oldname = obj.name
-                        # if not is_unmap:
-                        #parentname = obj.parent.name[:]
-
                         for ob in context.selected_objects:  # deselte all
                             ob.select_set(False)
                         obj.select_set(True)
@@ -1029,27 +1025,10 @@ class PP_OT_ExChangeCoup(bpy.types.Operator):
 
                     coupModeDivision(context, CenterObj,
                                      obj.name, is_unmap, viewportvis)
-                    # print(f"obj at rescale {obj}")
 
-                    # scalefactor = PUrP.GlobalScale * PUrP.CoupScale
-                    # for vert in obj.data.vertices:
-                    #    vert.co *= 3 * scalefactor
-                    # obj.data.vertices[0].co = mathutils.Vector(
-                    #    (- 3 * scalefactor, - 3 * scalefactor, 0))
-                    # obj.data.vertices[1].co = mathutils.Vector(
-                    #    (3 * scalefactor, - 3 * scalefactor, 0))
-                    # obj.data.vertices[2].co = mathutils.Vector(
-                    #    (- 3 * scalefactor, 3 * scalefactor, 0))
-                    # obj.data.vertices[3].co = mathutils.Vector(
-                    #    (3 * scalefactor, 3 * scalefactor, 0))   ####why not simply scaled  scaled
-
-                    # obj.select_set(True)
-                    # context.view_layer.objects.active = obj
-                    # bpy.ops.object.transform_apply(
-                    #    location=False, rotation=False, scale=True)
                     if is_unmap:
                         unmap_coup(context, obj)
-                        #unmapped_signal(context, obj)
+                        # unmapped_signal(context, obj)
 
             # hideselectinlay(context, obj)
 
@@ -1341,6 +1320,8 @@ def centerObjDecider(context, CenterObj):
     PUrP_name = PUrP.PUrP_name
     Objects = bpy.data.objects
 
+    # name, mods = couplingList(CenterObj)
+    '''
     CenterMods = CenterObj.modifiers[:]
     ModList = []
     for PriMod in CenterMods:  # look through the modifers of the centerObj and make a list of the Couplings that need to be applied
@@ -1352,55 +1333,54 @@ def centerObjDecider(context, CenterObj):
             primodname = PriMod.name[:]
             print(f"primodname {primodname}")
             ModList.append(primodname)
-    # name, ModList = couplingList(CenterObj)
+    '''
+    CoupName, ModList = couplingList(CenterObj)
+    print(f"Modlist in beginning of decider {ModList}")
 
-    for mod in ModList:
-        print(f"centerObjdecider mod name {mod}")
-        if PUrP_name in mod:
-            if "PUrP_Planar" in mod or ("diff" not in mod) and ("union" not in mod):
+    for mod in CoupName[:]:
+        # print(f"centerObjdecider mod name {mod.name}")
 
-                # potential Cobj list (checking the Object bool),otherwise when I loo through all objects and delete objects during the round, the Objects change adress
-                Cobjlist = []
-                for pCobj in Objects:
-                    if pCobj.PUrPCobj == True:
-                        Cobjlist.append(pCobj)
+        # "PUrP_Planar" in mod.name or ("diff" not in mod.name) and ("union" not in mod.name):
+        # if is_coup(context, Objects[mod.name]):
 
-                for Cobj in Cobjlist:
-                    print(f"centerObjdecider Cobj {Cobj}")
+        # potential Cobj list (checking the Object bool), to find potentiall objects which could be found to be overlapping and needs to be cut
+        # typicall for second planar after applying
+        Cobjlist = []
+        for pCobj in Objects[:]:
+            if pCobj.PUrPCobj == True:
+                Cobjlist.append(pCobj)
 
-                    # now collect all the modifiers that belong to a single coupling (not diff and union), and nothing from user
-                    Cobjmodslist = []
-                    for ele in Cobj.modifiers:
-                        if ("PUrP_" in ele.name) and ("diff" not in ele.name) and ("union" not in ele.name):
-                            Cobjmodslist.append(ele)
-                        elif "PUrP_Planar" in ele.name:
-                            print("decider Planar to list")
-                            Cobjmodslist.append(ele)
+        # go through the potential Cobjects and check if they overlap with the coup (identified in )
+        for Cobj in Cobjlist[:]:
+            print(f"centerObjdecider Cobj {Cobj}")
 
-                    for Cmod in Cobjmodslist:  # look through addon own modifier liste and
-                        # print(f"centerObjdecider Cmod name {Cmod.name}")
-                        if Cmod.name == mod:
-
-                            if bvhOverlap(context, Objects[mod], Cobj):
-                                print(
-                                    f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
-                                if "Planar" in Cmod.name:
-                                    if len(centerObjList(context, Cmod.object)) > 1:
-                                        print("all ast eins")
-                                        applySingleCoup(
-                                            context, Cmod.object, Cobj, False)
-                                    else:
-                                        print("all ast zwei")
-                                        applySingleCoup(
-                                            context, Cmod.object, Cobj, True)
-                                else:
-                                    applySingleCoup(
-                                        context, Cmod.object, Cobj, True)
+            CoupNameslist, Cobjmodslist = couplingList(Cobj)
+            # go through the modifiers of the current Cboj, check if the name of a modifier is the same as the name of the initial mod, if yes check overlapp
+            for Cmod in CoupNameslist[:]:
+                # print(f"centerObjdecider Cmod name {mod.name}")
+                # print(f"centerObjdecider Cmod name {Cmod.name}")
+                if Cmod == mod:
+                    if bvhOverlap(context, Objects[mod], Cobj):
+                        # print(
+                        #    f"centerObjdecider send applySingleCoup mod.name {mod.name} and CObj {Cobj}")
+                        if "Planar" in Cmod:
+                            if len(centerObjList(context, Cobj.modifiers[Cmod].object)) > 1:
+                                print("all ast eins")
+                                ensure_mod(context, Objects[mod], Cobj, '')
+                                applySingleCoup(
+                                    context, Cobj.modifiers[Cmod].object, Cobj, False)
                             else:
-                                print(
-                                    f"There is mod {Cmod} in CenterObj {Cobj}")
-                                # mid = Cobj.modifiers[mod]
-                                # Cobj.modifiers.remove(mid)
+                                print("all ast zwei")
+                                applySingleCoup(
+                                    context, Cobj.modifiers[Cmod].object, Cobj, True)
+                        else:
+                            applySingleCoup(
+                                context, Cobj.modifiers[Cmod].object, Cobj, True)
+                    else:
+                        print(
+                            f"There is mod {Cmod} in CenterObj {Cobj}")
+                        # mid = Cobj.modifiers[mod]
+                        # Cobj.modifiers.remove(mid)
 
 # takes coup and CenterObj and returns the distance
 
@@ -1491,6 +1471,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
 
     # apply boolean to seperate Centralobj parts
     context.view_layer.objects.active = CenterObj
+
     bpy.ops.object.modifier_apply(modifier=obj.name)
 
     # seperate by loose parts
@@ -1622,11 +1603,12 @@ def applySingleCoup(context, coup, CenterObj, delete):
             for coupname in oriCoupNames:
                 coup = objects[coupname]
                 if bvhOverlap(context, coup, Daughter):
-                    #coup.parent = Daughter
-                    remap_coup(context, coup, Daughter)
                     DCoupList.append(coup)
 
-                else:
+            if len(DCoupList) > 0:
+                remap_coup(context, DCoupList[0], Daughter)
+            else:
+                if not delete:
                     unmap_coup(context, coup)
 
             # all modifiers of all couplings which are identified as overlapping
@@ -1670,48 +1652,34 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
         PUrP = context.scene.PUrP
         PUrP_name = PUrP.PUrP_name
         data = bpy.data
-        global Daughtercollection
+        # global Daughtercollection
 
         # wenn nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
         if context.selected_objects == None:
-            print('Its None und nicht "None"')
-            for obj in data.objects:
-                for child in obj.child:  # gibt es kinder Coupling in diesem Object
-                    if PUrP_name in child:
-                        CenterBool = True
-                        pass
-                if CenterBool:
-                    # Daughtercollection = []
-                    # Daughtercollection.append(obj)
-                    centerObjDecider(context, obj)
-
-                    # CenterObjCollector()
+            self.report(
+                {'WARNING'}, "Please select a Centerobject or a connector!")
 
         elif context.selected_objects != None:
-
+            Cobjlist = []
             selected = context.selected_objects[:]
             for obj in selected:
-                CenterBool = False
+                # CenterBool = False
                 # wenn couplin type selected , finde Papa und sende es
-                if PUrP_name in obj.name:
-                    print("I am a selected Connector such meinen Papa")
-                    # applyCenterObj(obj.parent)
-                    # Daughtercollection = []
-                    # Daughtercollection.append(obj.parent)
-                    # CenterObjCollector()
-                    centerObjDecider(context, obj.parent)
+                if is_coup(context, obj):
+                    # print("I am a selected Connector such meinen Papa")
+                    if obj.parent not in Cobjlist:
+                        Cobjlist.append(obj.parent)
+
                 else:
                     for child in obj.children:  # gibt es kinder Coupling in diesem Object
-                        if PUrP_name in child.name:
-                            CenterBool = True
-                            pass
+                        if is_coup(context, child):
+                            if obj not in Cobjlist:
+                                Cobjlist.append(obj)
 
-                if CenterBool:
-                    # Daughtercollection = []
-                    # Daughtercollection.append(obj)
-                    # CenterObjCollector()
-                    centerObjDecider(context, obj)
-                    # applyCenterObj(obj)
+            print(
+                f"List of Centerobj on the way to the Cobjdecider {Cobjlist}")
+            for obj in Cobjlist:
+                centerObjDecider(context, obj)
 
         # wenn coupling selected, apply für alle
 
@@ -1768,7 +1736,7 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
                         obj.parent.modifiers.remove(mod)
 
                 obj.select_set(True)
-                #print(f'selected objects{context.selected_objects}')
+                # print(f'selected objects{context.selected_objects}')
                 bpy.ops.object.delete(use_global=True)
             else:
                 obj.select_set(True)
@@ -2470,9 +2438,9 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
         # for ob in selected:
         #    if ob != coup:
         #        Cob = ob
-        #origin_in_bb(context, coup, Cob)
+        # origin_in_bb(context, coup, Cob)
 
-        #context.view_layer.objects.active = coup
+        # context.view_layer.objects.active = coup
         # Cob.select_set(True)
         gen_arrow(context, (0, 0, 0))
         # correctname(context, coup)
@@ -3476,12 +3444,12 @@ def copy_obj(context, child, newname):
 
 
 def change_parent(context, obj, parent):
-    print(f"I change the parent of {obj.name} in {parent}")
+    # print(f"I change the parent of {obj.name} in {parent}")
     mw = obj.matrix_world
-    print(f"mw in Change Parent {mw}")
+    # print(f"mw in Change Parent {mw}")
     obj.parent = parent
     obj.matrix_world = mw
-    print(f"obj mw after Parent change {obj.matrix_world}")
+    # print(f"obj mw after Parent change {obj.matrix_world}")
 
 
 def cut_n_separate(context, coup, Cobj):

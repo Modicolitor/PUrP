@@ -26,7 +26,7 @@ general operator bug:
 [] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
 
 
-
+[] toggle modifier visbility operator poll (limit to active is_coup)
 
 
 

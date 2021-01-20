@@ -5,7 +5,7 @@ import mathutils
 
 
 def bvhOverlap(context, coup, CenterObj):
-    print(f"in BVHanfang coup.location {coup.location}")
+    #print(f"in BVHanfang coup.location {coup.location}")
     # making a copy of the coup plane
     matrix = coup.matrix_world
     couptmpdata = coup.data.copy()
