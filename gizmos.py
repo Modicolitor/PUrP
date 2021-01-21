@@ -231,7 +231,7 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
             PUrP.zScale = 2*up0z / \
                 scalefactor  # self.value / PUrP.CoupSize
         else:
-            print(up0z)
+            # print(up0z)
             PUrP.zScale = up0z/(scalefactor)
         return {'FINISHED'}
 
@@ -440,8 +440,8 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
             sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
-            print(
-                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
+            # print(
+            #    f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
             self.value = self.init_scale + mathutils.Vector(
                 (self.delta / sensi, self.delta / sensi, self.delta / sensi))
 
@@ -736,8 +736,8 @@ class PP_OT_SingleThicknessGizmo(bpy.types.Operator):
             sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
             self.value = self.init_count + self.delta / sensi
-            print(
-                f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
+            # print(
+            #    f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1540,7 +1540,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         PUrP = context.scene.PUrP
         korrvalue = self.value - 1.5*self.coupfaktor * PUrP.CoupScale
         PUrP.OffsetRight = korrvalue
-        print(self.value)
+        # print(self.value)
         if korrvalue >= 0:
             for v in self.rightestV:
                 v.co.x = self.value
@@ -1618,7 +1618,7 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         PUrP = context.scene.PUrP
         korrvalue = -self.value - 1.5*self.coupfaktor * PUrP.CoupScale
         PUrP.OffsetLeft = korrvalue
-        print(self.value)
+        # print(self.value)
         if korrvalue >= 0:
             for v in self.leftestV:
                 v.co.x = self.value
@@ -2065,8 +2065,8 @@ class PP_OT_PlanarThicknessGizmo(bpy.types.Operator):
             sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_y - self.init_value
             self.value = self.init_count + self.delta / sensi
-            print(
-                f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
+            # print(
+            #    f"self.value {self.value}   self.delta {self.delta}  self.init_value {self.init_value} ")
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -2119,7 +2119,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         ob = context.object
 
         ob.scale = self.value
-        print(self.value)
+        # print(self.value)
 
         #coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
         # vx = ob.data.vertices[3].co  # @ob.matrix_world  # *ob.scale.x
@@ -2139,8 +2139,8 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         if event.type == 'MOUSEMOVE':  # Apply
             sensi = 1000 if not event.shift else 10000
             self.delta = event.mouse_x - self.init_value
-            print(
-                f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
+            # print(
+            #    f"mouse x {event.mouse_x} self.init_value {self.init_value} self.delta {self.delta} self.value {self.value} ")
             self.value = self.init_scale + \
                 mathutils.Vector(
                     (self.delta / sensi, self.delta / sensi, self.delta / sensi))
@@ -2165,7 +2165,7 @@ class PP_OT_PlanarCoupScaleGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
-        print("Hallo invoke")
+        #print("Hallo invoke")
         ob = context.object
         self.init_scale = ob.scale.copy()
         self.init_value = event.mouse_x
