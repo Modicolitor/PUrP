@@ -5,7 +5,7 @@ from bpy.types import Operator
 import copy
 from mathutils import Vector
 from .bun import deselectall, is_coup, applyScale, applySingleCoup
-
+from math import pi
 
 from .tutwindowengine import *
 # from .tutwindowengine import BL_UI_OT_draw_operator
@@ -388,6 +388,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline = self.add_text(
             context, self.headloc, "What does the addon do?")
         headline.rotation_euler[0] = 1.507
+        headline.scale = (3, 3, 3)
         cubeloc = Vector((0, 0, 0))
         Cube = self.add_primitive(context, cubeloc, 'Cube')
         Cube.scale = Vector((4, 4, 4))
@@ -395,6 +396,13 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                                '1',  16, '1', 1.5, 0.04, 16, 0, 0, 1, 1, False)
         # self.applyallscene(context)
         #self.focus(context, self.tutorialscene.objects)
+
+        arrow = gen_arrow(context, (-6.5, 0, 0))
+        arrow.rotation_euler[1] = pi/2
+        arrow.scale = (0.5, 0.5, 0.5)
+        text = self.add_text(context, (-11, 0, 0), 'This is a Connector')
+        text.rotation_euler[0] = pi/2
+
         deselectall(context)
         #self.focus(context, self.tutorialscene.objects)
         context.view_layer.objects.active = headline
@@ -411,6 +419,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.linebreak("This is the result you would get when you apply the connector from the last slide to the cube. The cube is now cut in half. Moreover, the bottom part has a male connector attached while the top part has a hole in the shape of the connector. If you would print that you could put both parts together again easily. This can be helpful for many things.%% - Print large: 3D-printers are typically very small. Use the addon to desect large models into printable bits. Your lifesized Koro is only a few clicks and days of printing away (support cloud.blender.org!!) % - Add Functionality: Using cylinders as Inlays allows to turn parts against each other. A 'joint'-cut allows to make maken even more delicate joints.  Print your own actionfigure, monster, sculpture,... with movable parts.% -PUZZLES: Of course you can make puzzles with PuzzleyourPrint. Sculpt your and print it. it'll change the whole experience. %- Wallholders and Fixation: You can add Dovetail and other shapes to make objects slide into each other and if you like stop at the right point. This is ideal for wallholders and nice to hide the screws. ")
         headline = self.add_text(context, self.headloc, "The Result")
         headline.rotation_euler[0] = 1.507
+        headline.scale = (3, 3, 3)
         cubeloc = Vector((0, 0, 0))
         Cube = self.add_primitive(context, cubeloc, 'Cube')
         Cube.scale = Vector((4, 4, 4))
@@ -418,9 +427,21 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con1 = self.add_single(context, cubeloc, 1, 1, '2',  True,
                                '1',  16, '1', 1.5, 0.04, 16, 0, 0, 1, 1, False)
 
-        self.applycoup(context, [con1])
-        self.tutorialscene.objects['PUrPCube'].location[2] = -4
+        daughters = self.applycoup(context, [con1])
+        daughters[0].location[2] = -3
+        daughters[1].location[2] = 1
 
+        arrow = gen_arrow(context, (-6.5, 0, 2))
+        arrow.rotation_euler[1] = pi/2
+        arrow.scale = (0.5, 0.5, 0.5)
+        text = self.add_text(context, (-10, 0, 1.76), 'Female Part')
+        text.rotation_euler[0] = pi/2
+
+        arrow = gen_arrow(context, (-6.5, 0, -4))
+        arrow.rotation_euler[1] = pi/2
+        arrow.scale = (0.5, 0.5, 0.5)
+        text = self.add_text(context, (-10, 0, -4.23), 'Male Part')
+        text.rotation_euler[0] = pi/2
         # self.applyallscene(context)
         #self.focus(context, self.tutorialscene.objects)
         headline.select_set(True)
@@ -438,11 +459,11 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         headline = self.add_text(
-            context, self.headloc, "A Large Variety of Options")
+            context, (self.headloc[0], self.headloc[1], self.headloc[0] + 5), "A Large Variety of Options")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
         # singleconnectors
-        singloc = Vector((-10, -10, 0))
+        singloc = Vector((-20, -10, 0))
         singletext = self.add_text(context, singloc, "Single Connectors")
         singletext.scale = Vector((2.3, 2.3, 2.3))
         # cube mf
@@ -486,23 +507,24 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         coneloc = Vector((-20, 20, 0))
         self.add_primitive(context, coneloc, 'Sphere')
         self.add_single(context, coneloc, 1, 0.5, '2', False,
-                        '1', 16, '3', 1, 0.04, 16, 0, 1, 1, 0.3, False)
+                        '1', 16, '3', 0.7, 0.04, 16, 0, 1, 1, 0.3, False)
 
         # flat
         sphereloc = Vector((-35, 0, 0))
-        self.add_primitive(context, sphereloc, 'Sphere')
+        Cube1 = self.add_primitive(context, sphereloc, 'Sphere')
+        Cube1.scale = Vector((2, 2, 2))
         self.add_single(context, sphereloc, 1.5, 1, '3', False,
                         '1', 16, '1', 2, 0.04, 16, 0, 1, 1, 1, False)
 
         cube1loc = Vector((-35, 10, 0))
         Cube1 = self.add_primitive(context, cube1loc, 'Sphere')
-        Cube1.scale = Vector((3, 3, 3))
+        Cube1.scale = Vector((2, 2, 2))
         con1 = self.add_single(context, cube1loc, 1, 1, '1', False,
                                '1',  16, '2', 1.5, 0.04, 16, 0.4, 3, 1, 1, False)
 
         cube1loc = Vector((-35, 20, 0))
         Cube1 = self.add_primitive(context, cube1loc, 'Sphere')
-        Cube1.scale = Vector((3, 3, 3))
+        Cube1.scale = Vector((2, 2, 2))
         con1 = self.add_single(context, cube1loc, 1, 1, '1', False,
                                '1',  16, '2', 1.5, 0.04, 3, 0.4, 3, 1, 1, False)
 
@@ -559,9 +581,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide04(self, context):
         self.cleanscene(context)
-        self.viewloc = (0.63, -57, 27)
-        self.viewrot = (0.842, 0.540, 0.012, 0.006)
-        self.viewdistance = 50
+        self.viewloc = (5, -21, 8)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         self.set_slidenum(4)
@@ -570,10 +592,6 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         headline = self.add_text(context, self.headloc, "Connector Modes")
         headline.scale = self.headlinescale
         headline.rotation_euler[0] = 1.507
-        self.viewloc = (-5, 21, -2)
-        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 40
-        self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         # Stick
         singloc = Vector((-15, -10, 0))
@@ -659,7 +677,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide05(self, context):
         self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -723,7 +741,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide06(self, context):
         self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -767,7 +785,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide07(self, context):
         self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -805,8 +823,8 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         plancol = self.add_planar(context,
                                   (-5, 5, 2), 1, 5.0, 0.04,  False, '2', 1.2, 1.2, 1, 1, 3, False, False, False, 3.2)
         daughters = self.applycoup(context, [plancol])
-        daughters[0].location[1] -= 1
-        daughters[1].location[1] += 1
+        daughters[0].location[1] -= 1.3
+        daughters[1].location[1] += 1.3
 
         # cube with stopper applied
         cubestopperloc = Vector((5, 5, 0))
@@ -815,8 +833,8 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         plancol = self.add_planar(context, (5, 5, 2), 1, 3, 0.04,
                                   False, '2', 1.2, 1.2, 1, 1, 2, True, False, False, 3.2)
         daughters = self.applycoup(context, [plancol])
-        daughters[0].location[1] -= 1
-        daughters[1].location[1] += 1
+        daughters[0].location[1] -= 1.3
+        daughters[1].location[1] += 1.3
 
         # planar collection without stopper
         largeplaneloc = Vector((-14.8, 32, 0))
@@ -847,8 +865,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide08(self, context):
         self.cleanscene(context)
-        self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -894,7 +911,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con1.rotation_euler[0] = 1.57079632679489*2
 
         # anweisung
-        text = self.add_text(context, (0, 0, 5),
+        text = self.add_text(context, (0, 0, 5.5),
                              "Position and rotate \nthe connector to complete \nthe character and the puzzle")
         text.rotation_euler[0] = 1.57079632679489
         # up arrow
@@ -926,10 +943,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide09(self, context):
         self.cleanscene(context)
-        self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 10
+        self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         self.set_slidenum(9)
@@ -965,8 +981,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide10(self, context):
         self.cleanscene(context)
-        self.cleanscene(context)
-        self.viewloc = (-5, 21, -2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -991,9 +1006,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                                '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
         con2 = self.add_single(context, (0, 0, 5), 1, 1, '3', False,
                                '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
-        arrow = gen_arrow(context, (-12, 0, 0))
+        arrow = gen_arrow(context, (-10, 0, 0))
         arrow.rotation_euler[1] = 1.57079632679489
-        hinweis = self.add_text(context, (-20, 0, 0),
+        hinweis = self.add_text(context, (-18.5, 0, 1.27 ),
                                 "Apply this one and check \nthe mapping of the remaining couples. \nThen change the mapping of\none of them to the other Centerobject.")
         hinweis.rotation_euler[0] = 1.57079632679489
 
@@ -1002,8 +1017,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide11(self, context):
         self.cleanscene(context)
-
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -1086,8 +1100,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide12(self, context):
         self.cleanscene(context)
-
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -1142,7 +1155,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
     def slide13(self, context):
         self.cleanscene(context)
 
-        self.viewloc = (-5, 21, -2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
@@ -1169,10 +1182,11 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide14(self, context):
         self.cleanscene(context)
-        self.viewloc = (-5, 21, -2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
+
         self.set_slidenum(14)
         self.label.text = "Typical Process"
         self.linebreak(
@@ -1196,9 +1210,9 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def slide15(self, context):
         self.cleanscene(context)
-        self.viewloc = (0, -21, 2)
+        self.viewloc = (5, -21, 8)
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
-        self.viewdistance = 10
+        self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         self.set_slidenum(15)

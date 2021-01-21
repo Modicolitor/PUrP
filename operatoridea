@@ -21,7 +21,19 @@ general operator bug:
 
 
 
-
+[] apply connector with several planar weird (slide 3 selectec all, apply connector(s)), out of range problem File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1132, in execute
+    applySingleCoup(context, coup, CenterObj, True)
+  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1519, in applySingleCoup
+    oriCoupNames.remove(oriCoupname)
+ValueError: list.remove(x): x not in list
+[] slide 11 apply all mischfälle wirft errors aus: Error: Python: Traceback (most recent call last):
+  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1670, in execute
+    centerObjDecider(context, obj)
+  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1366, in centerObjDecider
+    context, Cobj.modifiers[mod].object, Cobj, False)
+  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1461, in applySingleCoup
+    context.view_layer.objects.active = CenterObj
+RuntimeError: Error: ViewLayer 'View Layer' does not contain object 'Cube.003' 
 
 
 

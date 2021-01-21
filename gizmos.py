@@ -419,7 +419,7 @@ class PP_OT_CoupScaleGizmo(bpy.types.Operator):
 
         oversizeToPrim(context, singcoupmode(
             context, None, context.object), self.obout, self.obin)
-        print(f" obname {ob.name}")
+        #print(f" obname {ob.name}")
         if "Planar" in ob.name:
             # print(1)
             coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
