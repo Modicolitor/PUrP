@@ -22,17 +22,14 @@ general operator bug:
 
 
 
-[] upper radius cone gizmos weird, radius top 0 produces self overlap
-
-
-
-
 
 
 
 Known Issues
-[] planar coupscale gizmot, only updates values after applying (low level problem)
+
 [] sometime unmap jumps connector? ground weird parenting ding
+[] upper radius cone gizmos weird, radius top 0 produces self overlap
+
 
 New Option
 []? Moving origing to the different pieces?
@@ -62,6 +59,7 @@ Publishing:
 
 
 resolved bug:
+[+] planar coupscale gizmot, only updates values after applying (low level problem)
 [+] toggle modifier visbility operator poll (limit to active is_coup)object.togglecoupvisibility
 [++++] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
 [???] zScale gizmo single löscht zscale value in panel (shared?)
