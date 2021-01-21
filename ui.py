@@ -45,7 +45,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                         expand=True, text='Connector Modes')
             if PUrP.SingleCouplingModes != '4':
                 subcol.prop(PUrP, "SingleMainTypes", text='Maincut Type')
-                if PUrP.SingleCouplingModes == '3':
+                if not PUrP.SingleCouplingModes == '3':
                     subcol.prop(PUrP, "SingleCouplingTypes", text='Inlay Type')
 
             else:
@@ -143,8 +143,8 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
             subcol.operator("object.applysingletoobjects", text='Single Connector To Multiple Objects',
                             icon="MOD_INSTANCE")
             subcol.prop(PUrP, "IgnoreMainCut", text="Ignore Main Cut")
-            subcol.operator("object.pp_ot_overlapcheck",
-                            text='Check Overlap', icon="HIDE_OFF")
+            # subcol.operator("object.pp_ot_overlapcheck",
+            #                text='Check Overlap', icon="HIDE_OFF")
             # subcol.operator("object.pp_ot_testcorrectname", text='Test correct name',
             #                icon="MOD_INSTANCE")
 
@@ -237,6 +237,7 @@ class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
                                 "count", text='Build Volume Z Repeat')
 
 
+'''
 class PP_PT_PuzzlePrintActiveObject(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -274,7 +275,7 @@ class PP_PT_PuzzlePrintActiveObject(bpy.types.Panel):
                             text=str(PUrP.zScale)[:5], icon="MESH_CUBE")
             subcol.operator("purp.roffsetgiz",
                             text=str(PUrP.OffsetRight)[:5], icon="MESH_CUBE")
-
+'''
 
 '''
 class PP_PT_PuzzlePrintActive(bpy.types.Panel):

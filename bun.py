@@ -1314,6 +1314,9 @@ def removeCoupling(context, Coupl):
         Coupl.select_set(True)
         bpy.ops.object.delete(use_global=False)
 
+# excuting function of apply all
+#  finds all coups connected to given Cobj and checks all objects in the scene if they overlap and need to be applied
+
 
 def centerObjDecider(context, CenterObj):
     PUrP = context.scene.PUrP
@@ -1321,30 +1324,10 @@ def centerObjDecider(context, CenterObj):
     Objects = bpy.data.objects
 
     # name, mods = couplingList(CenterObj)
-    '''
-    CenterMods = CenterObj.modifiers[:]
-    ModList = []
-    for PriMod in CenterMods:  # look through the modifers of the centerObj and make a list of the Couplings that need to be applied
-        if ("PUrP_" in PriMod.name) and ("diff" not in PriMod.name) and ("union" not in PriMod.name):
-            primodname = PriMod.name[:]
-            print(f"primodname {primodname}")
-            ModList.append(primodname)
-        elif "PUrP_Planar" in PriMod.name:
-            primodname = PriMod.name[:]
-            print(f"primodname {primodname}")
-            ModList.append(primodname)
-    '''
     CoupName, ModList = couplingList(CenterObj)
     print(f"Modlist in beginning of decider {ModList}")
 
     for mod in CoupName[:]:
-        # print(f"centerObjdecider mod name {mod.name}")
-
-        # "PUrP_Planar" in mod.name or ("diff" not in mod.name) and ("union" not in mod.name):
-        # if is_coup(context, Objects[mod.name]):
-
-        # potential Cobj list (checking the Object bool), to find potentiall objects which could be found to be overlapping and needs to be cut
-        # typicall for second planar after applying
         Cobjlist = []
         for pCobj in Objects[:]:
             if pCobj.PUrPCobj == True:
@@ -1367,9 +1350,6 @@ def centerObjDecider(context, CenterObj):
                     PlanCobs.append(Cobj)
                     print(
                         f"CObj {Cobj} appended to PlanCobs list in decider")
-                    #ensure_mod(context, Objects[mod], Cobj, '')
-                    # applySingleCoup(
-                    #    context, Cobj.modifiers[mod].object, Cobj, False)
                 else:
                     print(f"Cob {Cobj} is not overlapping with {mod}")
 
@@ -1390,42 +1370,7 @@ def centerObjDecider(context, CenterObj):
                     applySingleCoup(
                         context, Cobj.modifiers[mod].object, Cobj, True)
 
-            '''
-            print(f"centerObjdecider Cobj {Cobj}")
-
-            
-            # go through the modifiers of the current Cboj, check if the name of a modifier is the same as the name of the initial mod, if yes check overlapp
-            for Cmod in CoupNameslist[:]:
-                # print(f"centerObjdecider Cmod name {mod.name}")
-                # print(f"centerObjdecider Cmod name {Cmod.name}")
-                #####
-                # er schaut die pieces gar nicht an: tauschen bediengung 1 und 2 mehr overhead aber so kriegt man ensure unter
-                if Cmod == mod:
-                    if bvhOverlap(context, Objects[mod], Cobj):
-                        print(
-                            f"centerObjdecider send applySingleCoup mod.name {mod} and CObj {Cobj}")
-                        if "Planar" in Cmod:
-                            if len(centerObjList(context, Cobj.modifiers[Cmod].object)) > 1:
-                                print("all ast eins")
-                                ensure_mod(context, Objects[mod], Cobj, '')
-                                applySingleCoup(
-                                    context, Cobj.modifiers[Cmod].object, Cobj, False)
-                            else:
-                                print("all ast zwei")
-                                ensure_mod(context, Objects[mod], Cobj, '')
-                                applySingleCoup(
-                                    context, Cobj.modifiers[Cmod].object, Cobj, True)
-                        else:
-                            applySingleCoup(
-                                context, Cobj.modifiers[Cmod].object, Cobj, True)
-                    else:
-                        print(
-                            f"There is mod {Cmod} in CenterObj {Cobj}")
-                        # mid = Cobj.modifiers[mod]
-                        # Cobj.modifiers.remove(mid)
-            '''
-
-# takes coup and CenterObj and returns the distance
+        # takes coup and CenterObj and returns the distance
 
 
 def SideOfPlane(context, coup, CenterObj):
@@ -2095,7 +2040,7 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
 
         if (context.view_layer.objects.active != None):
             if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-                if ("SingleConnector" in context.view_layer.objects.active.name) or ("PlanarConnector" in context.view_layer.objects.active.name):
+                if is_coup(context, context.object):
                     return True
         else:
             return False
@@ -3112,7 +3057,7 @@ class PP_OT_ConnectorHide(bpy.types.Operator):
 
         if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
             if (context.object != None):
-                if len(context.selected_objects) > 0:
+                if is_coup(context, context.object):
                     return True
         return False
 

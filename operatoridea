@@ -23,10 +23,8 @@ general operator bug:
 
 
 [] upper radius cone gizmos weird, radius top 0 produces self overlap
-[] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
 
 
-[] toggle modifier visbility operator poll (limit to active is_coup)
 
 
 
@@ -64,6 +62,8 @@ Publishing:
 
 
 resolved bug:
+[+] toggle modifier visbility operator poll (limit to active is_coup)object.togglecoupvisibility
+[++++] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
 [???] zScale gizmo single löscht zscale value in panel (shared?)
 [+] apply unmapped produces error should produce warning 
 [+] planar ui shows radius settings, inlay verts, --> remove please
