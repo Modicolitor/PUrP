@@ -261,7 +261,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def cleanscene(self, context):
         deselectall(context)
-        objs = bpy.data.scenes['PUrPTutorial'].objects
+        objs = self.tutorialscene.objects
         bpy.ops.object.delete({"selected_objects": objs})
 
     def applycoup(self, context, coups):
@@ -555,7 +555,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         largeplane1 = self.add_primitive(context, largeplaneloc, 'Cube')
         largeplane1.scale = Vector((15, 48, 1))
         type = 1
-        plancolloc = Vector((4, 10, 1))
+        plancolloc = Vector((4.6, 10, 1))
         while type <= 16:
 
             plancol = self.add_planar(
@@ -1008,7 +1008,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                                '1',  16, '2', 1.0, 0.04, 16, 0, 0, 1, 0, False)
         arrow = gen_arrow(context, (-10, 0, 0))
         arrow.rotation_euler[1] = 1.57079632679489
-        hinweis = self.add_text(context, (-18.5, 0, 1.27 ),
+        hinweis = self.add_text(context, (-18.5, 0, 1.27),
                                 "Apply this one and check \nthe mapping of the remaining couples. \nThen change the mapping of\none of them to the other Centerobject.")
         hinweis.rotation_euler[0] = 1.57079632679489
 

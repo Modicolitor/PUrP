@@ -19,29 +19,25 @@ after applying
 bugs:
 general operator bug:
 
+[?] in setting up oversize, one connector was unmapped (and without signal)
 
 
-[] apply connector with several planar weird (slide 3 selectec all, apply connector(s)), out of range problem File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1132, in execute
+[] apply connector with several planar weird (slide 3 selectec all, apply connector(s)), not in oriCoupNames ( zeile 1520 keine lösung, verhindert nur error, aber restliche connectors nicht applied)
+ problem File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1132, in execute
     applySingleCoup(context, coup, CenterObj, True)
   File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1519, in applySingleCoup
     oriCoupNames.remove(oriCoupname)
 ValueError: list.remove(x): x not in list
-[] slide 11 apply all mischfälle wirft errors aus: Error: Python: Traceback (most recent call last):
-  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1670, in execute
-    centerObjDecider(context, obj)
-  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1366, in centerObjDecider
-    context, Cobj.modifiers[mod].object, Cobj, False)
-  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1461, in applySingleCoup
-    context.view_layer.objects.active = CenterObj
-RuntimeError: Error: ViewLayer 'View Layer' does not contain object 'Cube.003' 
+
 
 
 
 Known Issues
-
+[] Apply all will also cut another object when a connector is mapped wrongly too 
 [] sometime unmap jumps connector? ground weird parenting ding
-[] upper radius cone gizmos weird, radius top 0 produces self overlap
-
+[] upper radius cone gizmos weird, radius top 0 produces self overlap --> failure when upper raidus < Oversize, Oversize to prim looks good
+[~] active to coup increases Main --> reason remap didn't apply scale before remapping, now its applying but coup scales stil by 1/Centerobj.scale 
+[-] cylinder radius should be the diamter (for consistency to cube) or double initial cylinder height  --> changes too much and doesn't matter
 
 New Option
 []? Moving origing to the different pieces?
@@ -71,6 +67,13 @@ Publishing:
 
 
 resolved bug:
+[+] slide 11 apply all mischfälle wirft errors aus: Error: RuntimeError: Error: ViewLayer 'View Layer' does not contain object 'Cube.003' 
+[+] silent "Object was never Cobj before" warning
+[+] mainplane needs to be exchanged also when the Connector scale changes
+[+] check for renaming, I had a case with .001
+[+] apply all should keep connectors which are not overlapping 
+  [+] check if apply all respects "keep connector option" 
+[+] remap doesn't respect modvisibility setting
 [+] planar coupscale gizmot, only updates values after applying (low level problem)
 [+] toggle modifier visbility operator poll (limit to active is_coup)object.togglecoupvisibility
 [++++] is planar 2 of puzzle correctly mapped when one is applied, two planar makes problems with the second apply (not delted but applied in Order slide)
