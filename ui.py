@@ -105,6 +105,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
             subcol.operator("apl.allcoup", text='Apply All',
                             icon="EXPERIMENTAL")  # zeige button an
             subcol.prop(PUrP, "KeepCoup", text="Keep Connector")
+            subcol.prop(PUrP, "CutAll", text="Cut Everything")
             # subcol.operator_menu_hold(
             #    "purp.zscalemenu", "ZScale", text="Zscale")
 

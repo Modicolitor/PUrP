@@ -22,13 +22,12 @@ general operator bug:
 [?] in setting up oversize, one connector was unmapped (and without signal)
 
 
-[] apply connector with several planar weird (slide 3 selectec all, apply connector(s)), not in oriCoupNames ( zeile 1520 keine lösung, verhindert nur error, aber restliche connectors nicht applied)
- problem File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1132, in execute
-    applySingleCoup(context, coup, CenterObj, True)
-  File "C:\Blender\2.91\scripts\addons\purp\bun.py", line 1519, in applySingleCoup
-    oriCoupNames.remove(oriCoupname)
-ValueError: list.remove(x): x not in list
 
+[] test Apply connector designed  
+    slide 3 
+    puzzle 
+    multiple single with multiple objects 
+    Cut all option --> crashes at alide 3
 
 
 

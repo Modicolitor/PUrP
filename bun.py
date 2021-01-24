@@ -2569,17 +2569,24 @@ def is_mapped_correct(context, coup, CObj):
     # defintion
     # parented to CenterObj
     # all bool mods on CenterObj
+    print(f" coup parent in is mapped correct {coup.parent}")
     if coup.parent == CObj:
         modnames, mods = listPUrPMods(CObj)
+        print(modnames)
         if len(modnames) != 0:
             if coup.name in modnames:
+                print('coup name in modnames')
                 if is_stick(context, coup):
+                    print('coup name in modnames')
                     if coup.name + "_stick_diff" in modnames:
+                        print('coup name in modnames')
                         return True
                 elif is_mf(context, coup):
                     if coup.name + "_diff" in modnames:
                         if coup.name + "_union" in modnames:
                             return True
+                elif is_planar(context, coup):
+                    return True
 
     print(f"coup {coup.name} is not mapped correctly to CObj")
     return False
@@ -2602,33 +2609,40 @@ def remap_coup(context, coup, CenterObj):
             coup.parent.modifiers.remove(mod)
 
     if is_single(context, coup):
-        mod = CenterObj.modifiers.new(
+
+        ensure_mod(context, coup, CenterObj, '')
+        '''mod = CenterObj.modifiers.new(
             name=coup.name, type="BOOLEAN")
         set_modvisbility(context, mod)
         mod.object = coup
         mod.operation = 'DIFFERENCE'
         set_BoolSolver(context, mod)
-
+        '''
         # inlay modifiers
         for child in coup.children:
             if "Order" not in child.name and "fix" not in child.name:
-                mod = CenterObj.modifiers.new(
-                    name=child.name, type="BOOLEAN")
-                set_modvisbility(context, mod)
-                mod.object = child
-                mod.show_viewport = False
-                set_BoolSolver(context, mod)
+
+                # mod = CenterObj.modifiers.new(
+                #     name=child.name, type="BOOLEAN")
+                #set_modvisbility(context, mod)
+                #mod.object = child
+                #mod.show_viewport = False
+                #set_BoolSolver(context, mod)
                 if "_diff" in child.name:
-                    mod.operation = 'DIFFERENCE'
+                    ensure_mod(context, child, CenterObj, 'diff')
+                    #mod.operation = 'DIFFERENCE'
                 elif '_union' in child.name:
-                    mod.operation = 'UNION'
+                    ensure_mod(context, child, CenterObj, 'union')
+                    #mod.operation = 'UNION'
     elif is_planar(context, coup):
+        ensure_mod(context, coup, CenterObj, '')
+        '''
         mod = CenterObj.modifiers.new(
             name=coup.name, type="BOOLEAN")
         set_modvisbility(context, mod)
         mod.object = coup
         mod.operation = 'DIFFERENCE'
-        set_BoolSolver(context, mod)
+        set_BoolSolver(context, mod)'''
 
     matrix_w = coup.matrix_world
     print(matrix_w)
