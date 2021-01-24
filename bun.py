@@ -1075,6 +1075,32 @@ def centerObjList(context, coup):
     return parents
 
 
+# sort coups in order on the centerobjs to have the order reflected --> [coup1center1,coup2center1,...,coup1center2,coup2, center2 ]
+
+
+def sort_coups(context, coups):
+    # collect all Cobjs from coups
+    CObjs = []
+    coupnames = []
+    sortedcoups = []
+    for coup in coups:
+        coupnames.append(coup.name)
+        if coup.parent not in CObjs:
+            CObjs.append(coup.parent)
+
+    for Cobj in CObjs:
+        for mod in Cobj.modifiers:
+            if mod.name in coupnames:
+                if mod.object not in sortedcoups:
+                    sortedcoups.append(mod.object)
+
+    print(f"End Sort coups return {sortedcoups} ")
+    return sortedcoups
+
+    # go through Cobj
+    #   go through  modifiers und bei übereinstimmung in die sorted coups list
+
+
 class PP_OT_ApplyCoupling(bpy.types.Operator):
     bl_label = "ApplyCouplings"
     bl_idname = "apl.coup"
@@ -1096,9 +1122,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         PUrP = context.scene.PUrP
         PUrP_name = context.scene.PUrP.PUrP_name
 
-        # how many parents (different connectors can have different CenterObj)
-        Centerobjs = []
-
+        # [+]coups from selected, sort out unmapped
         selected = selectedtocouplist(context, selected)
         print(f"Selected {selected}")
         # sort out unmapped
@@ -1106,6 +1130,55 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
             if is_unmapped(context, coup):
                 selected.remove(coup)
                 self.report({'WARNING'}, "Connector is unmapped!")
+
+        # sort coups in order on the centerobjs to have the order reflected --> [coup1center1,coup2center1,...,coup1center2,coup2, center2 ]
+        sortedCoups = sort_coups(context, selected)
+
+        # Plan
+        # [+]coups from selected, sort out unmapped
+        ###
+
+        # gehe durch die coups
+        for coup in sortedCoups:
+            if not PUrP.CutAll:
+                #  apply to parent (klappt wenn applysingle sortiert alle richtig)
+                CenterObj = coup.parent
+                # hmm only enough for planar, other wise only diff and union not there, but whole line should be not necessary
+                ensure_mod(context, coup, CenterObj, '')
+                applySingleCoup(context, coup, CenterObj, True)
+            else:
+                Centerobjs = context.view_layer.objects
+                # collecte all CObjs which are touching
+                TouchedCobjs = []
+                for Centerobj in Centerobjs:
+                    if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj):
+                        if bvhOverlap(context, coup, Centerobj):
+                            TouchedCobjs.append(Centerobj)
+
+                for n, Centerobj in enumerate(TouchedCobjs):
+                    # ensure for planar and for single
+                    remap_coup(context, coup, Centerobj)
+                    if not n == len(TouchedCobjs)-1:
+                        applySingleCoup(context, coup, Centerobj, False)
+                    else:
+                        applySingleCoup(context, coup, Centerobj, True)
+
+        '''
+                for obj in selected:
+                    if obj.parent not in Centerobjs:
+                        Centerobjs.append(obj.parent)
+                    # case planar cuts several objects but only has one parent
+                    if is_planar(context, obj):
+                        # get potential Cobj
+                        Centerobjs.extend(otherparents(context, obj))
+
+        # entweder
+
+        # oder mit check box [] cut unmapped (all) gehe durch alle möglichen objecte
+        # check overlap ensure mod
+
+        # how many parents (different connectors can have different CenterObj)
+        Centerobjs = []
 
         for obj in selected:
             if obj.parent not in Centerobjs:
@@ -1150,10 +1223,10 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                     applySingleCoup(context, coup, CenterObj, True)
                 # else:
                 #    unmap_coup(context, coup)
-
+        '''
         PUrP = context.scene.PUrP
         if PUrP.OrderBool:
-            update_order(context, CenterObj)
+            update_order(context, Centerobj)
         return{"FINISHED"}
 
 
@@ -1852,10 +1925,6 @@ def listPUrPMods(CenterObj):  # returns list of mod names
     mods = []
     for mod in CenterObj.modifiers:
         if ("PUrP" in mod.name):
-            # if ("diff" not in mod.name) and ("union" not in mod.name):
-            #    namelist.append(mod.name)
-            #    mods.append(mod)
-            # elif ("Planar" in mod.name):
             namelist.append(mod.name)
             mods.append(mod)
     return namelist, mods
@@ -2496,9 +2565,33 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         return {'FINISHED'}
 
 
+def is_mapped_correct(context, coup, CObj):
+    # defintion
+    # parented to CenterObj
+    # all bool mods on CenterObj
+    if coup.parent == CObj:
+        modnames, mods = listPUrPMods(CObj)
+        if len(modnames) != 0:
+            if coup.name in modnames:
+                if is_stick(context, coup):
+                    if coup.name + "_stick_diff" in modnames:
+                        return True
+                elif is_mf(context, coup):
+                    if coup.name + "_diff" in modnames:
+                        if coup.name + "_union" in modnames:
+                            return True
+
+    print(f"coup {coup.name} is not mapped correctly to CObj")
+    return False
+
+
 def remap_coup(context, coup, CenterObj):
     # applyScale(CenterObj)
+    # check if already mapped correctly
+    if is_mapped_correct(context, coup, CenterObj):
+        return
 
+    #
     if coup.parent != None:
         Couplist = [coup]
 
@@ -3388,7 +3481,7 @@ def copy_obj(context, child, newname):
     matrix = child.matrix_world
     childtmpdata = child.data.copy()
     child_new = bpy.data.objects.new(
-        name="newname", object_data=childtmpdata)
+        name=newname, object_data=childtmpdata)
 
     col = in_collection(context, child)
     col.objects.link(child_new)
@@ -3438,6 +3531,29 @@ def remove_mod(context, ele, CObj, nameadd):
     if modname in CObj.modifiers:
         CObj.modifiers.remove(CObj.modifiers[modname])
         return True
+
+
+'''
+def ensure_allmods(context, coup, CObj):
+    if is_planar(context,coup):
+        ensure_mod(context, coup, CObj, '')
+    elif is_single(context, coup):
+        ensure_mod(context, coup, CObj, '')
+        
+        for child in coup.children:
+            if coup.name + "_stick_fix" in child.name:
+                fix = child
+            elif coup.name + "_stick_diff" in child.name or coup.name + "_diff" in child.name:
+                diff = child
+            elif coup.name + "_union" in child.name:
+                union = child
+        if is_stick(context, coup):
+            ensure_mod(context, coup, CObj, 'diff')
+        elif is_mf(context,coup):
+            ensure_mod(context, coup, CObj, 'diff')
+        else:
+            print("seems to be flat")
+'''
 
 
 def ensure_mod(context, ele, CObj, nameadd):

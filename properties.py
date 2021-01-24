@@ -63,6 +63,8 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         name="Is Exactoption in Bool available", default=True)
     OrderBool = bpy.props.BoolProperty(
         name="Is Order on or off", default=False)
+    CutAll = bpy.props.BoolProperty(
+        name="When False Connectors are only applied to the parent, when True Connectors are applied to all objects they touch", default=False)
 
     MaincutVert = bpy.props.IntProperty(
         name='Vertexcount',
