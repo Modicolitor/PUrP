@@ -891,9 +891,9 @@ def ReplaceOrNotMain(context, coup):
             return False
 
     elif is_joint(context, coup) and PUrP.SingleMainTypes == '2':
-        if amount_jointverts(context, coup) == PUrP.MaincutVert:
-            return False
-        if coup.data.vertices[1].co.y / (3 * PUrP.GlobalScale) != PUrP.CoupScale:
+        if amount_jointverts(context, coup) != PUrP.MaincutVert:
+            return True
+        elif coup.data.vertices[1].co.y / (3 * PUrP.GlobalScale) != PUrP.CoupScale:
             print("Exchanged MainCut")
             return True
         else:
@@ -1619,12 +1619,12 @@ def applySingleCoup(context, coup, CenterObj, delete):
                 #coup.parent = DaughterOne
                 #coup.matrix_world = mw
                 DOneCoupList.append(coup)
-
-            if bvhOverlap(context, coup, DaughterTwo):
-                remap_coup(context, coup, DaughterTwo)
-                #coup.parent = DaughterTwo
-                #coup.matrix_world = mw
-                DTwoCoupList.append(coup)
+            if DaughterTwo != None:
+                if bvhOverlap(context, coup, DaughterTwo):
+                    remap_coup(context, coup, DaughterTwo)
+                    #coup.parent = DaughterTwo
+                    #coup.matrix_world = mw
+                    DTwoCoupList.append(coup)
 
             if len(DTwoCoupList) == 0 and len(DOneCoupList) == 0:
                 print(
@@ -2622,18 +2622,21 @@ def remap_coup(context, coup, CenterObj):
         for child in coup.children:
             if "Order" not in child.name and "fix" not in child.name:
 
-                # mod = CenterObj.modifiers.new(
-                #     name=child.name, type="BOOLEAN")
-                #set_modvisbility(context, mod)
-                #mod.object = child
-                #mod.show_viewport = False
-                #set_BoolSolver(context, mod)
-                if "_diff" in child.name:
-                    ensure_mod(context, child, CenterObj, 'diff')
-                    #mod.operation = 'DIFFERENCE'
-                elif '_union' in child.name:
-                    ensure_mod(context, child, CenterObj, 'union')
-                    #mod.operation = 'UNION'
+                if is_mf(context, coup):
+                    if "_diff" in child.name:
+                        ensure_mod(context, child, CenterObj, 'diff')
+                        #mod.operation = 'DIFFERENCE'
+                    elif '_union' in child.name:
+                        ensure_mod(context, child, CenterObj, 'union')
+                        #mod.operation = 'UNION'
+                elif is_stick(context, coup):
+                    if "_stick_diff" in child.name:
+                        ensure_mod(context, child, CenterObj, 'stick_diff')
+                        #mod.operation = 'DIFFERENCE'
+                    # elif '_union' in child.name:
+                     #   ensure_mod(context, child, CenterObj, 'union')
+                        #mod.operation = 'UNION'
+
     elif is_planar(context, coup):
         ensure_mod(context, coup, CenterObj, '')
         '''
@@ -3157,9 +3160,11 @@ class PP_OT_AllConnectorHide(bpy.types.Operator):
 
     def execute(self, context):
         couplist = selectedtocouplist(context, bpy.data.objects)
-        hide = couplist[0].hide_viewport
-        for coup in couplist:
-            coupvisset(context, coup, not hide)
+        if len(couplist) > 0:
+            hide = couplist[0].hide_viewport
+            for coup in couplist:
+                coupvisset(context, coup, not hide)
+
         return {'FINISHED'}
 
 
@@ -3584,7 +3589,7 @@ def ensure_mod(context, ele, CObj, nameadd):
         print(f"{modname} found in {CObj.name}")
         return True
 
-    print(f"{modname} not found, add modifier")
+    print(f"{modname} not found in {CObj.name}, add modifier")
 
     mod = CObj.modifiers.new(
         type='BOOLEAN', name=modname)

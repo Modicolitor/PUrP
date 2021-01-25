@@ -21,7 +21,12 @@ general operator bug:
 
 [?] in setting up oversize, one connector was unmapped (and without signal)
 
+[] joint exchange when maincut verts change
 
+[] error joint when not cutting through 
+[] visibility all error when no coup in the scene
+
+[+] errror in ensure mod when applying defkis --> stick mods where ensured wrongly 
 
 [] test Apply connector designed  
     slide 3 
