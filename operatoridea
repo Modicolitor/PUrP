@@ -21,12 +21,25 @@ general operator bug:
 
 [?] in setting up oversize, one connector was unmapped (and without signal)
 
-[] joint exchange when maincut verts change
+[] add to rotated Cobjects, rotates the connector
 
-[] error joint when not cutting through 
-[] visibility all error when no coup in the scene
+[] somehow stick got added without beeing mapped (apply complaints about that but no signal), mapping (parent there but no modifier, when lost?)
 
-[+] errror in ensure mod when applying defkis --> stick mods where ensured wrongly 
+[] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
+
+
+[] strong deformed main connector scale gizmo error
+Python: Traceback (most recent call last):
+  File "C:\Blender\2.91\scripts\addons\purp\gizmos.py", line 451, in modal
+    location=False, rotation=False, scale=True)
+  File "C:\Blender\2.91\scripts\modules\bpy\ops.py", line 132, in __call__
+    ret = _op_call(self.idname_py(), None, kw)
+RuntimeError: Operator bpy.ops.object.transform_apply.poll() failed, context is incorrect
+
+[] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)
+
+
+
 
 [] test Apply connector designed  
     slide 3 
@@ -71,6 +84,10 @@ Publishing:
 
 
 resolved bug:
+[+] stick zscale gizmot put panel to zero when coupling is rotated --> uses local matrix now
+[+] visibility all error when no coup in the scene
+[+] errror in ensure mod when applying defkis --> stick mods where ensured wrongly 
+[+] joint exchange when maincut verts change
 [+] slide 11 apply all mischfälle wirft errors aus: Error: RuntimeError: Error: ViewLayer 'View Layer' does not contain object 'Cube.003' 
 [+] silent "Object was never Cobj before" warning
 [+] mainplane needs to be exchanged also when the Connector scale changes

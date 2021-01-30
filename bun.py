@@ -1370,7 +1370,8 @@ def removeCoupling(context, Coupl):
                     except:
                         bpy.ops.object.modifier_remove(modifier=mod.name)
 
-                child.name = Coupl.parent.name
+                if Coupl.parent != None:
+                    child.name = Coupl.parent.name
                 child.display_type = 'SOLID'
                 # child.location = mathutils.Vector((0,0,0))
                 globloc = Coupl.matrix_world

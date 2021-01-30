@@ -225,10 +225,11 @@ class PP_OT_zScaleGizmo(bpy.types.Operator):
         scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
         upverts, b, aRadius, bRadius = coneanalysizer(
             context, self.obout)
-        up0 = upverts[0].co@self.obout.matrix_world
+        #up0 = upverts[0].co@context.object.matrix_world
+        up0 = upverts[0].co@self.obout.matrix_local
         up0z = up0[2]
         if is_stick(context, context.object):
-            PUrP.zScale = 2*up0z / \
+            PUrP.zScale = 2*abs(up0z) / \
                 scalefactor  # self.value / PUrP.CoupSize
         else:
             # print(up0z)
