@@ -1426,15 +1426,23 @@ def centerObjDecider(context, CenterObj):
         is_sing = False
         is_plan = False
         PlanCobs = []
+        SingCobs = []
         # go through the potential Cobjects and check if they overlap with the coup (identified in )
         for Cobj in Cobjlist[:]:
             CoupNameslist, Cobjmodslist = couplingList(Cobj)
             if is_single(context, Objects[mod]):
                 is_sing = True
+                print("is_sing")
+
                 if mod in CoupNameslist:
+                    print("mod in")
                     if bvhOverlap(context, Objects[mod], Cobj):
+                        SingCobs.append(Cobj)
+
                         applySingleCoup(
                             context, Cobj.modifiers[mod].object, Cobj, False)
+                    else:
+                        unmap_coup(context, Objects[mod])
             elif is_planar(context, Objects[mod]):
                 is_plan = True
                 if bvhOverlap(context, Objects[mod], Cobj):
@@ -1446,7 +1454,23 @@ def centerObjDecider(context, CenterObj):
 
         # deleting single
         if is_sing:
-            removeCoupling(context, Objects[mod])
+            if len(SingCobs) == 0:
+                unmap_coup(context, Objects[mod])
+            else:
+                # single should only have one but who knows, need to unmapp correctly when not overlapping
+                for n, Cobj in enumerate(SingCobs):
+                    if n < len(PlanCobs)-1:
+                        ensure_allmods(context, Objects[mod], Cobj)
+                        applySingleCoup(
+                            context, Cobj.modifiers[mod].object, Cobj, False)
+                    else:
+                        print("all ast zwei sing apply cobdecider")
+                        ensure_mod(context, Objects[mod], Cobj, '')
+                        applySingleCoup(
+                            context, Cobj.modifiers[mod].object, Cobj, True)
+
+            # if not is_unmapped(context, Objects[mod]):
+            #    removeCoupling(context, Objects[mod])
 
         # extra apply round for all Cobj with this coup, necessary to delete planar in the end
         if is_plan:
