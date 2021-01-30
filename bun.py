@@ -1142,10 +1142,18 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         for coup in sortedCoups:
             if not PUrP.CutAll:
                 #  apply to parent (klappt wenn applysingle sortiert alle richtig)
-                CenterObj = coup.parent
-                # hmm only enough for planar, other wise only diff and union not there, but whole line should be not necessary
-                ensure_mod(context, coup, CenterObj, '')
-                applySingleCoup(context, coup, CenterObj, True)
+                # maybe unmapped in the process?
+                if is_unmapped(context, coup):
+                    unmap_coup(context, coup)
+                    continue
+                else:
+                    Centerobj = coup.parent
+                    if bvhOverlap(context, coup, Centerobj):
+                        # hmm only enough for planar, other wise only diff and union not there, but whole line should be not necessary
+                        ensure_allmods(context, coup, Centerobj)
+                        applySingleCoup(context, coup, Centerobj, True)
+                    else:
+                        unmap_coup(context, coup)
             else:
                 Centerobjs = context.view_layer.objects
                 # collecte all CObjs which are touching
@@ -1513,7 +1521,7 @@ def unmapped_signal(context, coup):
 
     SignalText.location.z += 0.5 * PUrP.GlobalScale
 
-    SignalText.data.body = "UNMAPED"
+    SignalText.data.body = "UNMAPPED"
     SignalText.data.extrude = 0.05
     SignalText.show_in_front = True
     SignalText.display_type = 'WIRE'
@@ -1617,14 +1625,14 @@ def applySingleCoup(context, coup, CenterObj, delete):
             if bvhOverlap(context, coup, DaughterOne):
                 # mw = coup.matrix_world
                 remap_coup(context, coup, DaughterOne)
-                #coup.parent = DaughterOne
-                #coup.matrix_world = mw
+                # coup.parent = DaughterOne
+                # coup.matrix_world = mw
                 DOneCoupList.append(coup)
             if DaughterTwo != None:
                 if bvhOverlap(context, coup, DaughterTwo):
                     remap_coup(context, coup, DaughterTwo)
-                    #coup.parent = DaughterTwo
-                    #coup.matrix_world = mw
+                    # coup.parent = DaughterTwo
+                    # coup.matrix_world = mw
                     DTwoCoupList.append(coup)
 
             if len(DTwoCoupList) == 0 and len(DOneCoupList) == 0:
@@ -1732,7 +1740,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
     def execute(self, context):
         PUrP = context.scene.PUrP
         PUrP_name = PUrP.PUrP_name
-        #data = bpy.data
+        # data = bpy.data
         # global Daughtercollection
 
         # wenn nichts selected, gehe durch alle objecte und schaue ob die bearbeitet wurden (müssen Couplings haben)
@@ -1784,8 +1792,8 @@ class PP_OT_DeleteCoupling(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        #active = context.view_layer.objects.active
-        #objects = bpy.data.objects
+        # active = context.view_layer.objects.active
+        # objects = bpy.data.objects
         selected = context.selected_objects[:]
 
         coups = []
@@ -2626,17 +2634,17 @@ def remap_coup(context, coup, CenterObj):
                 if is_mf(context, coup):
                     if "_diff" in child.name:
                         ensure_mod(context, child, CenterObj, 'diff')
-                        #mod.operation = 'DIFFERENCE'
+                        # mod.operation = 'DIFFERENCE'
                     elif '_union' in child.name:
                         ensure_mod(context, child, CenterObj, 'union')
-                        #mod.operation = 'UNION'
+                        # mod.operation = 'UNION'
                 elif is_stick(context, coup):
                     if "_stick_diff" in child.name:
                         ensure_mod(context, child, CenterObj, 'stick_diff')
-                        #mod.operation = 'DIFFERENCE'
+                        # mod.operation = 'DIFFERENCE'
                     # elif '_union' in child.name:
                      #   ensure_mod(context, child, CenterObj, 'union')
-                        #mod.operation = 'UNION'
+                        # mod.operation = 'UNION'
 
     elif is_planar(context, coup):
         ensure_mod(context, coup, CenterObj, '')
@@ -3477,7 +3485,14 @@ def is_flat(context, coup):
 
 
 def is_unmapped(context, coup):
-    if coup.parent == None:
+    # check for unmapped signal
+    if len(coup.children) != 0:
+        for c in coup.children:
+            if "Order" in c.name:
+                if "UNMAPPED" in c.data.body:
+                    return True
+
+    elif coup.parent == None:
         return True
     elif coup.name not in coup.parent.modifiers:
         return True
@@ -3553,13 +3568,12 @@ def remove_mod(context, ele, CObj, nameadd):
         return True
 
 
-'''
 def ensure_allmods(context, coup, CObj):
-    if is_planar(context,coup):
+    if is_planar(context, coup):
         ensure_mod(context, coup, CObj, '')
     elif is_single(context, coup):
         ensure_mod(context, coup, CObj, '')
-        
+
         for child in coup.children:
             if coup.name + "_stick_fix" in child.name:
                 fix = child
@@ -3567,13 +3581,14 @@ def ensure_allmods(context, coup, CObj):
                 diff = child
             elif coup.name + "_union" in child.name:
                 union = child
+
         if is_stick(context, coup):
-            ensure_mod(context, coup, CObj, 'diff')
-        elif is_mf(context,coup):
-            ensure_mod(context, coup, CObj, 'diff')
+            ensure_mod(context, fix, CObj, 'stick_diff')
+        elif is_mf(context, coup):
+            ensure_mod(context, diff, CObj, 'diff')
+            ensure_mod(context, union, CObj, 'union')
         else:
             print("seems to be flat")
-'''
 
 
 def ensure_mod(context, ele, CObj, nameadd):
