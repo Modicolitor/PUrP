@@ -1122,6 +1122,9 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
         PUrP = context.scene.PUrP
         PUrP_name = context.scene.PUrP.PUrP_name
 
+        # if there is no Centerobj
+        Centerobj = PUrP.CenterObj
+
         # [+]coups from selected, sort out unmapped
         selected = selectedtocouplist(context, selected)
         print(f"Selected {selected}")
@@ -1155,7 +1158,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                     else:
                         unmap_coup(context, coup)
             else:
-                Centerobjs = context.view_layer.objects
+                Centerobjs = context.view_layer.objects[:]
                 # collecte all CObjs which are touching
                 TouchedCobjs = []
                 for Centerobj in Centerobjs:
@@ -1165,73 +1168,13 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
                 for n, Centerobj in enumerate(TouchedCobjs):
                     # ensure for planar and for single
-                    remap_coup(context, coup, Centerobj)
+                    #remap_coup(context, coup, Centerobj)
+                    ensure_allmods(context, coup, Centerobj)
                     if not n == len(TouchedCobjs)-1:
                         applySingleCoup(context, coup, Centerobj, False)
                     else:
                         applySingleCoup(context, coup, Centerobj, True)
 
-        '''
-                for obj in selected:
-                    if obj.parent not in Centerobjs:
-                        Centerobjs.append(obj.parent)
-                    # case planar cuts several objects but only has one parent
-                    if is_planar(context, obj):
-                        # get potential Cobj
-                        Centerobjs.extend(otherparents(context, obj))
-
-        # entweder
-
-        # oder mit check box [] cut unmapped (all) gehe durch alle möglichen objecte
-        # check overlap ensure mod
-
-        # how many parents (different connectors can have different CenterObj)
-        Centerobjs = []
-
-        for obj in selected:
-            if obj.parent not in Centerobjs:
-                Centerobjs.append(obj.parent)
-            # case planar cuts several objects but only has one parent
-            if is_planar(context, obj):
-                Centerobjs.extend(otherparents(context, obj))
-
-        # start conditions: connectors selected
-        # sort selected by modifier order
-        print(f" Centerobjs in apply {Centerobjs}")
-        for CenterObj in Centerobjs:
-            # sort coups in modifier order
-            coupssorted = []
-            Connectornamelist, modlist = couplingList(CenterObj)
-            if len(Connectornamelist) == 0:
-                continue
-            print(
-                f"Connectornamelist {Connectornamelist} for centerobj {CenterObj}")
-            for coup in Connectornamelist:
-                coup = data.objects[coup]  # name to object
-                if coup in selected:
-                    coupssorted.append(coup)
-
-            for coup in coupssorted:
-                print(f"Coup will be send to apply {coup.name}")
-                # if bvhOverlap(context, coup, CenterObj):
-                if is_planar(context, coup):
-                    if coup.parent != CenterObj:
-                        coup.parent = CenterObj
-                    CenterObj = coup.parent
-                    if len(centerObjList(context, coup)) > 1:
-                        print("ast eins")
-                        ensure_mod(context, coup, CenterObj, '')
-                        applySingleCoup(context, coup, CenterObj, False)
-                    else:
-                        print("ast zwei")
-                        applySingleCoup(context, coup, CenterObj, True)
-                else:
-                    # non planar branch, only one CenterObj allowed
-                    CenterObj = coup.parent
-                    applySingleCoup(context, coup, CenterObj, True)
-                # else:
-                #    unmap_coup(context, coup)
-        '''
         PUrP = context.scene.PUrP
         if PUrP.OrderBool:
             update_order(context, Centerobj)
@@ -3616,6 +3559,8 @@ def ensure_allmods(context, coup, CObj):
 
 
 def ensure_mod(context, ele, CObj, nameadd):
+    PUrP = context.scene.PUrP
+
     data = bpy.data
     check = False
     if nameadd == "":   # coup and not an inlay
@@ -3641,6 +3586,11 @@ def ensure_mod(context, ele, CObj, nameadd):
         mod.operation = "UNION"
     elif "" == nameadd:
         mod.operation = "DIFFERENCE"
+
+    mod.show_viewport = False
+
+    if nameadd == '':
+        mod.show_viewport = PUrP.ViewPortVisAdd
 
     mod.object = data.objects[modname]
 
