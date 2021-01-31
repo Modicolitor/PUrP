@@ -121,6 +121,10 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
     bl_category = "PuzzleUrPrint"
     bl_options = {'DEFAULT_CLOSED'}
 
+    @ classmethod
+    def poll(cls, context):
+        return hasattr(context.scene, "PUrP")
+
     def draw(self, context):
         data = bpy.data
         layout = self.layout
@@ -156,6 +160,10 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
     bl_label = "Mapping, Order, Visibility"
     bl_category = "PuzzleUrPrint"
     bl_options = {'DEFAULT_CLOSED'}
+
+    @ classmethod
+    def poll(cls, context):
+        return hasattr(context.scene, "PUrP")
 
     def draw(self, context):
         data = bpy.data
@@ -204,6 +212,10 @@ class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
     bl_label = "Build Volume"
     bl_category = "PuzzleUrPrint"
     bl_options = {'DEFAULT_CLOSED'}
+
+    @ classmethod
+    def poll(cls, context):
+        return hasattr(context.scene, "PUrP")
 
     def draw(self, context):
         data = bpy.data
