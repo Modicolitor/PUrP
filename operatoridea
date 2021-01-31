@@ -27,6 +27,8 @@ general operator bug:
 
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
+[?] recover produced blend file where initialize is not available --> improve menu über if
+
 
 [] strong deformed main connector scale gizmo error
 Python: Traceback (most recent call last):
@@ -36,7 +38,7 @@ Python: Traceback (most recent call last):
     ret = _op_call(self.idname_py(), None, kw)
 RuntimeError: Operator bpy.ops.object.transform_apply.poll() failed, context is incorrect
 
-[] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)
+
 
 
 
@@ -84,6 +86,7 @@ Publishing:
 
 
 resolved bug:
+[+] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)
 [+] stick zscale gizmot put panel to zero when coupling is rotated --> uses local matrix now
 [+] visibility all error when no coup in the scene
 [+] errror in ensure mod when applying defkis --> stick mods where ensured wrongly 

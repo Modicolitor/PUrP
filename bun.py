@@ -60,6 +60,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         # handling CenterObj ###############
         # try to test if the object is not deleted
 
+        # find CenterObj
         if not add_unmap:
             if active != None:
                 if active.type == "MESH":
@@ -92,14 +93,14 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
                         return{"FINISHED"}
 
             # apply scale to CenterObj
-            bpy.ops.object.transform_apply(
-                location=False, rotation=False, scale=True)  # changed rotation to False is, that a problem for planar and stuff? But actually should
+            # bpy.ops.object.transform_apply(
+            #    location=False, rotation=False, scale=True)  # changed rotation to False is, that a problem for planar and stuff? But actually should
 
             CenterObj_name = CenterObj.name
             CenterObj.PUrPCobj = True
             Centerloc = CenterObj.location
             ensurenoscaling(context, CenterObj)
-        # make slice plane when not planar
+        # make main cut plane when not planar
         if PUrP.SingleCouplingModes != "4":
 
             newmain = genSinglemain(
@@ -127,20 +128,9 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         newMain = coupModeDivision(context, CenterObj, newname_mainplane,
                                    add_unmap, PUrP.ViewPortVisAdd)
 
-        if not add_unmap:
-            CObCo = CenterObj.location
-            CurCo = cursorloc
-            cursorlocrelativ = CurCo - CObCo
-        else:
-            cursorlocrelativ = cursorloc
-        if PUrP.SingleCouplingModes != "4":
-            newmain.location = cursorlocrelativ
-
-        elif PUrP.SingleCouplingModes == "4":
-            context.object.location = cursorlocrelativ
-            # context.object.select_set(True)
-
-        context.scene.cursor.location = cursorlocori
+        # compensate Cobjs rotation, setting world_matrix to scale and rot 1
+        newMain.matrix_world = ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1,
+                                                             0), (cursorloc[0], cursorloc[1], cursorloc[2], 1))
 
         # order refreshing
         if not add_unmap:
@@ -1168,7 +1158,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
 
                 for n, Centerobj in enumerate(TouchedCobjs):
                     # ensure for planar and for single
-                    #remap_coup(context, coup, Centerobj)
+                    # remap_coup(context, coup, Centerobj)
                     ensure_allmods(context, coup, Centerobj)
                     if not n == len(TouchedCobjs)-1:
                         applySingleCoup(context, coup, Centerobj, False)
