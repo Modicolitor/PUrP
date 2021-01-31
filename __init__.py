@@ -88,13 +88,13 @@ from bpy.types import Scene, Image, Object
 import bpy
 
 
-from .utils import addon_auto_imports
+#from .utils import addon_auto_imports
 
 bl_info = {  # für export als addon
     "name": "PuzzleUrPrint",
     "author": "Modicolitor",
-    "version": (0, 7),
-    "blender": (2, 90, 0),
+    "version": (0, 9),
+    "blender": (2, 91, 0),
     "location": "View3D > Tools",
     "description": "Cut your Objects into pieces and get Connectors to fit parts after Printing",
     "category": "Object"}
