@@ -81,7 +81,7 @@ from .ui import PP_PT_PuzzlePrintBuildVolumeMenu
 from .properties import PUrPropertyGroup
 
 
-from .modalops import PP_OT_PlanarZScaleMenu
+#from .modalops import PP_OT_PlanarZScaleMenu
 
 
 from bpy.types import Scene, Image, Object
@@ -170,7 +170,7 @@ classes = (PP_PT_PuzzlePrintAddMenu,
            PP_OT_OverlapcheckOperator,
            PP_OT_ConnectorHide,
            PP_OT_AllConnectorHide,
-           PP_OT_PlanarZScaleMenu,
+           # PP_OT_PlanarZScaleMenu,
            PUrPropertyGroup,
            BE_OT_Draw_Operator,
            PP_OT_TutorialButton,

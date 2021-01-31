@@ -21,16 +21,8 @@ general operator bug:
 
 [?] in setting up oversize, one connector was unmapped (and without signal)
 
-
-
 [] somehow stick got added without beeing mapped (apply complaints about that but no signal), mapping (parent there but no modifier, when lost?)
-
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
-
-
-
-
-
 
 
 [] test Apply connector designed  
