@@ -21,7 +21,7 @@ general operator bug:
 
 [?] in setting up oversize, one connector was unmapped (and without signal)
 
-[] add to rotated Cobjects, rotates the connector
+
 
 [] somehow stick got added without beeing mapped (apply complaints about that but no signal), mapping (parent there but no modifier, when lost?)
 
@@ -30,14 +30,7 @@ general operator bug:
 [?] recover produced blend file where initialize is not available --> improve menu über if
 
 
-[] strong deformed main connector scale gizmo error
-Python: Traceback (most recent call last):
-  File "C:\Blender\2.91\scripts\addons\purp\gizmos.py", line 451, in modal
-    location=False, rotation=False, scale=True)
-  File "C:\Blender\2.91\scripts\modules\bpy\ops.py", line 132, in __call__
-    ret = _op_call(self.idname_py(), None, kw)
-RuntimeError: Operator bpy.ops.object.transform_apply.poll() failed, context is incorrect
-
+[] gizmos not should not be available in edit mode (only in Object mode) 
 
 
 
@@ -86,6 +79,7 @@ Publishing:
 
 
 resolved bug:
+[+] add to rotated Cobjects, rotates the connector --> corrected matrix after applying
 [+] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)
 [+] stick zscale gizmot put panel to zero when coupling is rotated --> uses local matrix now
 [+] visibility all error when no coup in the scene

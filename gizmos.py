@@ -777,18 +777,18 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
     def poll(cls, context):
 
         ob = context.object
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            if ob != None:
+                if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
+                    if len(ob.children) > 1:  # flatcut has zero or
+                        try:
+                            test = context.scene.PUrP.GlobalScale
+                            return True
+                        except:
+                            return False
+                    return False
 
-        if ob != None:
-            if ("PUrP" in ob.name) and ("diff" and "fix" and "union" not in ob.name):
-                if len(ob.children) > 1:  # flatcut has zero or
-                    try:
-                        test = context.scene.PUrP.GlobalScale
-                        return True
-                    except:
-                        return False
-                return False
-
-            return False
+        return False
 
     def setup(self, context):
         # Run an operator using the dial gizmo
@@ -1066,18 +1066,18 @@ class PUrP_FlatCoupGizmo(GizmoGroup):
     def poll(cls, context):
 
         ob = context.object
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            if ob != None:
+                if "PUrP" in ob.name and "diff" not in ob.name and "fix" not in ob.name and "union" not in ob.name and "Planar" not in ob.name and "BuildVolume" not in ob.name:
+                    if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
+                        try:
+                            test = context.scene.PUrP.GlobalScale
+                            return True
+                        except:
+                            return False
+                    return False
 
-        if ob != None:
-            if "PUrP" in ob.name and "diff" not in ob.name and "fix" not in ob.name and "union" not in ob.name and "Planar" not in ob.name and "BuildVolume" not in ob.name:
-                if len(ob.children) == 0 or len(ob.children) == 1:  # flatcut has zero or
-                    try:
-                        test = context.scene.PUrP.GlobalScale
-                        return True
-                    except:
-                        return False
-                return False
-
-            return False
+        return False
 
     def setup(self, context):
         ob = context.object
@@ -1235,15 +1235,16 @@ class PUrP_PlanarGizmo(GizmoGroup):
     @classmethod
     def poll(cls, context):
         ob = context.object
+        if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+            if ob != None:
+                if ("PUrP" in ob.name) and ("Planar" in ob.name):
+                    try:
+                        test = context.scene.PUrP.GlobalScale
+                        return True
+                    except:
+                        return False
 
-        if ob != None:
-            if ("PUrP" in ob.name) and ("Planar" in ob.name):
-                try:
-                    test = context.scene.PUrP.GlobalScale
-                    return True
-                except:
-                    return False
-            return False
+        return False
 
     def setup(self, context):
         # Run an operator using the dial gizmo
