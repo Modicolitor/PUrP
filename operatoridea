@@ -27,10 +27,7 @@ general operator bug:
 
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
-[?] recover produced blend file where initialize is not available --> improve menu über if
 
-
-[] gizmos not should not be available in edit mode (only in Object mode) 
 
 
 
@@ -79,6 +76,10 @@ Publishing:
 
 
 resolved bug:
+[+] recover produced blend file where initialize is not available --> improve menu über if
+
+
+[+] gizmos not should not be available in edit mode (only in Object mode) 
 [+] add to rotated Cobjects, rotates the connector --> corrected matrix after applying
 [+] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)
 [+] stick zscale gizmot put panel to zero when coupling is rotated --> uses local matrix now

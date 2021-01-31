@@ -22,7 +22,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
         col = flow.column()
         row = layout.row()
 
-        if "PuzzleUrPrint" in data.collections:
+        if hasattr(context.scene, "PUrP"):  # "PuzzleUrPrint" in data.collections and
             PUrP = context.scene.PUrP
             try:
                 col.template_ID(PUrP, "CenterObj", filter='AVAILABLE')

@@ -520,7 +520,7 @@ def genPlanar(context, CenterObj, visibility, is_unmapped):
     newname = str(PUrP_name) + "PlanarConnector_" + str(random.randint(1, 999))
     nameadd = "_diff"
 
-    appendCoupling("planar.blend", objectname)
+    appendCoupling(context, "planar.blend", objectname)
     print(
         f'nache append active {context.object.name}, CenterObj {CenterObj.name}')
     context.object.name = str(newname) + str(nameadd)
@@ -731,7 +731,7 @@ def genPlanar(context, CenterObj, visibility, is_unmapped):
     return obj
 
 
-def appendCoupling(filename, objectname):
+def appendCoupling(context, filename, objectname):
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     subpath = "blend" + os.sep + filename
@@ -744,9 +744,9 @@ def appendCoupling(filename, objectname):
             name for name in data_from.objects if name == objectname]
 
     for obj in data_to.objects:
-        bpy.context.collection.objects.link(obj)
+        context.collection.objects.link(obj)
         obj.location = mathutils.Vector((0, 0, 0))
-        bpy.context.view_layer.objects.active = obj
+        context.view_layer.objects.active = obj
 
 
 def newmainPlane(context, CenterObj, unmapped):
@@ -2039,6 +2039,7 @@ class PP_OT_Ini(bpy.types.Operator):
         #########
         MColName = "PuzzleUrPrint"
 
+        # collection should not be necessary anymore
         if bpy.data.collections.find(MColName) < 0:
             collection = bpy.data.collections.new(
                 name=MColName)  # makes collection
