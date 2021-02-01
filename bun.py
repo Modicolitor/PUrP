@@ -1152,10 +1152,12 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 # collecte all CObjs which are touching
                 TouchedCobjs = []
                 for Centerobj in Centerobjs:
-                    if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj):
-                        if bvhOverlap(context, coup, Centerobj):
-                            TouchedCobjs.append(Centerobj)
-
+                    print(f'Test now Cobj {Centerobj}')
+                    if Centerobj.type == 'MESH':
+                        if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj):
+                            if bvhOverlap(context, coup, Centerobj):
+                                TouchedCobjs.append(Centerobj)
+                print(f'Found Touched Cobjs {TouchedCobjs}')
                 for n, Centerobj in enumerate(TouchedCobjs):
                     # ensure for planar and for single
                     # remap_coup(context, coup, Centerobj)
@@ -1353,9 +1355,14 @@ def centerObjDecider(context, CenterObj):
     # mods are actually coups
     for mod in CoupName[:]:
         Cobjlist = []
-        for pCobj in Objects[:]:
-            if pCobj.PUrPCobj == True:
-                Cobjlist.append(pCobj)
+        if PUrP.CutAll:
+            for pCobj in Objects[:]:
+                if pCobj.type == 'MESH':
+                    if not is_coup(context, pCobj) and not is_inlay(context, pCobj):
+                        Cobjlist.append(pCobj)
+        else:
+            Cobjlist = [Objects[mod].parent]
+
         is_sing = False
         is_plan = False
         PlanCobs = []
@@ -1382,7 +1389,7 @@ def centerObjDecider(context, CenterObj):
                 else:
                     print(f"Cob {Cobj} is not overlapping with {mod}")
 
-        # deleting single
+        # apply and deleting singles
         if is_sing:
             if len(SingCobs) == 0:
                 unmap_coup(context, Objects[mod])

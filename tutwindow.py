@@ -1086,7 +1086,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         puzzle2.rotation_euler[2] = 1.57079632679489
 
         self.add_text(context, (0, -10, 0),
-                      "All 3 Cubes have the same Connectors \napplied, but in different orders.\n(The order of the one on the right might be helpful for very large prints)")
+                      "All 3 Cubes have the same Connectors \napplied, but in different orders.\nThe order of the one on the right might be helpful for very large prints (use Apply All)")
 
         hinweis = self.add_text(context, (-20, 0, 10),
                                 "Select one or several connectors and press 'Apply Connector(s)'.\n")
