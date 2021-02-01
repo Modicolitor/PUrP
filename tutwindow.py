@@ -1025,7 +1025,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.set_slidenum(11)
         self.label.text = "Applying and Order"
         self.linebreak(
-            "By Applying a Connector you finalize the editing process, cut the model in pieces and add the connectors. You can choose to select one or several connectors and Press 'Apply Connectors(s)' to have only specific connectors applied or you press 'Apply All' (both in 'Add,Exchange,Apply'-dropdown) to apply all Connectors mapped to a Centerobject (or the Centerobj the selected Connector is mapped to). While 'Apply All' will make each connector cut everything they touch independent of the mapping, the 'Apply Connector(s)' will only be applied to the current Centerobj (..with two planar, the second one will only cut one result of the first... not good for puzzles) %The order in which the Connectors are applied can be displayed as little numbers above the Connectors by toggling on/off with 'Toggle Order' in the 'Mapping,Order,Visibility'-dropdown. The order can be changed by selecting a connector and pressing either 'Up in Order' or 'Down in Order'. Monitoring the order is rarely necessary but in an example like here it can be important.%%Useful Detail: By default the connectors are getting deleted after applying. If they are precious to you check the checkbox 'Keep Connector' before applying and they will be kept unmapped.")
+            "By Applying a Connector you finalize the editing process, cut the model in pieces and add the connectors. You can choose to select one or several connectors and Press 'Apply Connector(s)' to have only specific connectors applied or you press 'Apply All' (both in 'Add,Exchange,Apply'-dropdown) to apply all Connectors mapped to a Centerobject (or the Centerobj the selected Connector is mapped to). When the checkbox 'Cut Everthing' is disabled, the connectors will only cut the objects they are mapped to. For several planar connectors this will cause that not all resulting objects get cut by the following connector. Eneable 'Cut Everything' to have the connecotrs cut everything they touch.%The order in which the Connectors are applied can be displayed as little numbers above the Connectors by toggling on/off with 'Toggle Order' in the 'Mapping,Order,Visibility'-dropdown. The order can be changed by selecting a connector and pressing either 'Up in Order' or 'Down in Order'. Monitoring the order is rarely necessary but in an example like here it can be important.%%Useful Detail: By default the connectors are getting deleted after applying. If they are precious to you check the checkbox 'Keep Connector' before applying and they will be kept unmapped.")
         headline = self.add_text(
             context, (self.headloc[0], self.headloc[1], self.headloc[2]+10), "Applying and Order")
         headline.rotation_euler[0] = 1.507
@@ -1085,8 +1085,10 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             context, puz2loc, 0.30, 8.5, 0.04, False, '13', 1.5, 1.5, 1, 2, 1.0, False, False, False, 3.34)
         puzzle2.rotation_euler[2] = 1.57079632679489
 
+        context.scene.PUrP.CutAll = True
+
         self.add_text(context, (0, -10, 0),
-                      "All 3 Cubes have the same Connectors \napplied, but in different orders.\nThe order of the one on the right might be helpful for very large prints (use Apply All)")
+                      "All 3 Cubes have the same Connectors \napplied, but in different orders.\nThe order of the one on the right might be helpful for very large prints (use 'Cut Everything')")
 
         hinweis = self.add_text(context, (-20, 0, 10),
                                 "Select one or several connectors and press 'Apply Connector(s)'.\n")

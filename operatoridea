@@ -19,16 +19,13 @@ after applying
 bugs:
 general operator bug:
 
-[?] in setting up oversize, one connector was unmapped (and without signal)
-
-[] somehow stick got added without beeing mapped (apply complaints about that but no signal), mapping (parent there but no modifier, when lost?)
-[] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
-[] cut all option in tutorial
+[Test] somehow stick got added without beeing mapped (apply complaints about that but no signal), mapping (parent there but no modifier, when lost?)
+[Test] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
-
+[] Multiapply: Single not cutting everything --> Problem???
 
 
 
@@ -50,8 +47,10 @@ Known Issues
 New Option
 []? Moving origing to the different pieces?
 [] move parts from each other (PUzzle stuff, single schwierig, (bei apply?)
-[] shift increase precision of Gizmos
-[] create random planar array with random planar parts (with category chooser)
+
+[] *****create random planar array with random planar parts (with category chooser)
+[] **Kugelgelenk 
+[] ***Schraubensysteme
 
 
 Tests
@@ -75,11 +74,11 @@ Publishing:
 
 
 resolved bug:
-
+[+] shift increase precision of Gizmos
+[+] cut all option in tutorial
 [+] cutall option for apply all
 [+] recover produced blend file where initialize is not available --> improve menu über if
 [+]******* apply all has problems with mf (slide 11 right ) --> connector was applied twice
-
 [+] gizmos not should not be available in edit mode (only in Object mode) 
 [+] add to rotated Cobjects, rotates the connector --> corrected matrix after applying
 [+] remap operator has problems with remaping visibility (weird unmapped single joint am schwanz)

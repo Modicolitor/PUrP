@@ -56,7 +56,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     IgnoreMainCut = bpy.props.BoolProperty(
         name="Keep Connector", default=False)
     ViewPortVisAdd = bpy.props.BoolProperty(
-        name="Add with Viewport Visibility", default=True)
+        name="Add with Viewport Visibility", default=False)
     AddUnmapped = bpy.props.BoolProperty(
         name="Add with Connector without center object", default=False)
     ExactOptBool = bpy.props.BoolProperty(
@@ -64,7 +64,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
     OrderBool = bpy.props.BoolProperty(
         name="Is Order on or off", default=False)
     CutAll = bpy.props.BoolProperty(
-        name="When False Connectors are only applied to the parent, when True Connectors are applied to all objects they touch", default=False)
+        name="When False Connectors are only applied to the parent, when True Connectors are applied to all objects they touch", default=True)
 
     MaincutVert = bpy.props.IntProperty(
         name='Vertexcount',
