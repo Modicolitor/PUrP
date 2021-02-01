@@ -19,6 +19,8 @@ import copy
 
 
 class PP_OT_AddSingleCoupling(bpy.types.Operator):
+    '''Add a new Connector to the scene at the position of the 3D cursor. It will be mapped to the selected or the last center object and  the shape will be defined by the current settings in this panel.'''
+
     bl_label = "Add Single Couplings"
     bl_idname = "add.coup"
     bl_options = {'REGISTER', "UNDO"}
@@ -908,7 +910,7 @@ def amount_jointverts(context, coup):
 
 
 class PP_OT_ExChangeCoup(bpy.types.Operator):
-    '''Exchange selected couplings'''
+    '''Exchanges the selected couplings against a new connector defined by the setting in the panel. It can be use as the past part of copy and paste (with copy is "Active to settings")'''
     bl_idname = "object.exchangecoup"
     bl_label = "ExChangeCoupling"
     bl_options = {'REGISTER', "UNDO"}
@@ -1092,6 +1094,7 @@ def sort_coups(context, coups):
 
 
 class PP_OT_ApplyCoupling(bpy.types.Operator):
+    '''Applys selected Connectors. Finalizes the editing by cutting the model and adding the connectors. Behaviour changes relative to "Cut All" Checkbox'''
     bl_label = "ApplyCouplings"
     bl_idname = "apl.coup"
     bl_options = {'REGISTER', "UNDO"}
@@ -1681,7 +1684,7 @@ def applySingleCoup(context, coup, CenterObj, delete):
 
 
 class PP_OT_ApplyAllCouplings(bpy.types.Operator):
-    '''Applies all Couplings. If nothing is selected it applies the Couplings to all modified objects. If an Centerobject is selected, it only applies the all Coupling for this Object. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied'''
+    '''Applies all Couplings of all selected Centerobjs. If a Coupling is selected, all Couplings connectected to the same Centerobject will be applied.'''
     bl_idname = "apl.allcoup"
     bl_label = "PP_OT_ApplyAllCouplings"
     bl_options = {'REGISTER', "UNDO"}
@@ -1738,6 +1741,7 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
 
 
 class PP_OT_DeleteCoupling(bpy.types.Operator):
+    '''Deletes the selected Connectors (ignores everything else)'''
     bl_label = "DeleteCouplings"
     bl_idname = "rem.coup"
     bl_options = {'REGISTER', "UNDO"}
@@ -1929,6 +1933,7 @@ def modindex(modifier, modifiers):
 
 
 class PP_OT_MoveModDown(bpy.types.Operator):
+    '''Move the selected Connector down in order'''
     bl_idname = "pup.moddown"
     bl_label = "PP_OT_MoveModDown"
     bl_options = {'REGISTER', "UNDO"}
@@ -1961,6 +1966,7 @@ class PP_OT_MoveModDown(bpy.types.Operator):
 
 
 class PP_OT_MoveModUp(bpy.types.Operator):
+    '''Move the selected Connector up in order'''
     bl_idname = "pup.modup"
     bl_label = "PP_OT_MoveModup"
     bl_options = {'REGISTER', "UNDO"}
@@ -2014,6 +2020,7 @@ class PP_OT_MoveModUp(bpy.types.Operator):
 
 
 class PP_OT_Ini(bpy.types.Operator):
+    '''Initialize all PuzzleUrPrint-Magic'''
     bl_label = "Initialize PuzzleUrPrint"
     bl_idname = "purp.init"
     bl_options = {'REGISTER', "UNDO"}
@@ -2071,6 +2078,7 @@ class PP_OT_Ini(bpy.types.Operator):
 
 
 class PP_OT_TutorialButton(bpy.types.Operator):
+    '''Start the 10 min Tutorial to learn about most of the settings in the Addon'''
     bl_idname = "purp.tutorial"
     bl_label = "Start Tutorial"
     bl_options = {'REGISTER', "UNDO"}
@@ -2091,6 +2099,7 @@ class PP_OT_TutorialButton(bpy.types.Operator):
 
 
 class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
+    '''Toggle the boolean modifier visibility of the selected connectors. Will make stuff slow'''
     bl_idname = "object.togglecoupvisibility"
     bl_label = "PP_OT_ToggleCoupVisibility"
     bl_options = {'REGISTER', "UNDO"}
@@ -2138,7 +2147,7 @@ class PP_OT_ToggleCoupVisibilityOperator(bpy.types.Operator):
 
 
 class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
-    '''Use the settings of the active coupling as Default values. Helps to transfer settings from Connector to Connector or duplicate a Connector.'''
+    '''Load settings of the active connector into the panel settings. Can be used as copy settings, while "Exchange" acts as paste'''
 
     bl_idname = "object.activecoupdefault"
     bl_label = "PP_OT_ActiveCoupDefault"
@@ -2373,6 +2382,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
 
 
 class PP_OT_CouplingOrder(bpy.types.Operator):
+    '''Show Connector order of the selected Centerobject'''
     bl_idname = "pup.couplingorder"
     bl_label = "PP_OT_CouplingOrder"
     bl_options = {'REGISTER', "UNDO"}
@@ -2496,7 +2506,7 @@ class PP_OT_TestCorrectnameOperator(bpy.types.Operator):
 
 
 class PP_OT_ReMapCoups(bpy.types.Operator):
-    '''Remap selected couplings to active centerobject'''
+    '''Remap selected Connector to active object. First select Connector, then the object'''
     bl_idname = "object.remapcoups"
     bl_label = "PP_OT_ReMapCoups"
     bl_options = {'REGISTER', "UNDO"}
@@ -2692,6 +2702,7 @@ def unmap_coup(context, coup):
 
 
 class PP_OT_MakeBuildVolume(bpy.types.Operator):
+    '''Makes a wireframe cube in the size of the settings above. Nothing more than a scale landmark.'''
     bl_idname = "object.makebuildvolume"
     bl_label = "PP_OT_MakeBuildVolume"
     bl_options = {'REGISTER', "UNDO"}
@@ -2736,7 +2747,7 @@ class PP_OT_MakeBuildVolume(bpy.types.Operator):
 
 
 class PP_OT_ApplyPlanarMultiObj(bpy.types.Operator):
-    '''Applys the active  planar connector to all selected objects. First select all objects, then the planar connector last. Used  '''
+    '''Applys the active planar connector to all selected objects. First select all objects, then the planar connector last.'''
     bl_idname = "object.applyplanarmultiobj"
     bl_label = "PP_OT_ApplyPlanarMultiObj"
     bl_options = {'REGISTER', "UNDO"}
@@ -2807,7 +2818,7 @@ def ensuremodvis(context, mod):
 
 
 class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
-    '''Apply multiple planar connectors to the active Object. First select all planar connectors and then the CenterObj last. Helpful when CenterObj will be cut in a lot of pieces'''
+    '''Apply multiple planar connectors to the active object. First select all planar connectors and then the center obj last. Helpful when CenterObj will be cut in a lot of pieces'''
     bl_idname = "object.applymultipleplanartoobject"
     bl_label = "PP_OT_ApplyMultiplePlanarToObject"
     bl_options = {'REGISTER', "UNDO"}
@@ -2863,7 +2874,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
 
 
 class PP_OT_ApplySingleToObjects(bpy.types.Operator):
-    '''Applys the active SingleConnector to the selected objects. Select the objects first and the connector last.'''
+    '''Applys the active Singleconnector to the selected objects. Select the objects first and the connector last.'''
     bl_idname = "object.applysingletoobjects"
     bl_label = "Apply Selected Single Connectors to active object"
     bl_options = {'REGISTER', "UNDO"}
@@ -3098,6 +3109,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
 
 
 class PP_OT_ConnectorHide(bpy.types.Operator):
+    '''Toggles the viewport visibility of the selected connectors'''
     bl_idname = "purp.connectorhide"
     bl_label = "Toggle Connector Visibility of Selected"
     bl_options = {'REGISTER', "UNDO"}
@@ -3120,6 +3132,7 @@ class PP_OT_ConnectorHide(bpy.types.Operator):
 
 
 class PP_OT_AllConnectorHide(bpy.types.Operator):
+    '''Toggle viewport visibility of all Connectors in the scene'''
     bl_idname = "purp.allconnectorhide"
     bl_label = "Toggle Connector Visibility of All"
     bl_options = {'REGISTER', "UNDO"}

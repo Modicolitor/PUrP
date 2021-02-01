@@ -25,9 +25,9 @@ general operator bug:
 [Test] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
-[] Multiapply: Single not cutting everything --> Problem???
+[] Apply All: Single not cutting everything --> Problem??? 
 
-
+[] inlay where selectable in last testing
 
 [] test Apply connector designed  
     slide 3 
