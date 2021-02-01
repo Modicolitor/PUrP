@@ -25,8 +25,8 @@ general operator bug:
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
+[] cut all option in tutorial
 
-[] cutall option for apply all
 
 
 
@@ -75,6 +75,8 @@ Publishing:
 
 
 resolved bug:
+
+[+] cutall option for apply all
 [+] recover produced blend file where initialize is not available --> improve menu über if
 [+]******* apply all has problems with mf (slide 11 right ) --> connector was applied twice
 
