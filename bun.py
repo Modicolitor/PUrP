@@ -1371,9 +1371,6 @@ def centerObjDecider(context, CenterObj):
                     print("mod in")
                     if bvhOverlap(context, Objects[mod], Cobj):
                         SingCobs.append(Cobj)
-
-                        applySingleCoup(
-                            context, Cobj.modifiers[mod].object, Cobj, False)
                     else:
                         unmap_coup(context, Objects[mod])
             elif is_planar(context, Objects[mod]):
@@ -1391,6 +1388,7 @@ def centerObjDecider(context, CenterObj):
                 unmap_coup(context, Objects[mod])
             else:
                 # single should only have one but who knows, need to unmapp correctly when not overlapping
+                print(f"CenterDecider single list {SingCobs} ")
                 for n, Cobj in enumerate(SingCobs):
                     if n < len(PlanCobs)-1:
                         ensure_allmods(context, Objects[mod], Cobj)

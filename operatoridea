@@ -25,7 +25,7 @@ general operator bug:
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
-[]******* apply all has problems with mf (slide 11 right ) --> produces male extra object 
+
 [] cutall option
 
 
@@ -76,7 +76,7 @@ Publishing:
 
 resolved bug:
 [+] recover produced blend file where initialize is not available --> improve menu über if
-
+[+]******* apply all has problems with mf (slide 11 right ) --> connector was applied twice
 
 [+] gizmos not should not be available in edit mode (only in Object mode) 
 [+] add to rotated Cobjects, rotates the connector --> corrected matrix after applying
