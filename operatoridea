@@ -25,6 +25,13 @@ general operator bug:
 [] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
+[]******* apply all has problems with mf (slide 11 right ) --> produces male extra object 
+[] cutall option
+
+
+
+
+
 [] test Apply connector designed  
     slide 3 
     puzzle 
