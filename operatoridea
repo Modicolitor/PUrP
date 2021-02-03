@@ -27,15 +27,19 @@ general operator bug:
 
 [] Apply All: Single not cutting everything --> Problem??? 
 
+
+
+
 [] inlay where selectable in last testing
 
 [] test Apply connector designed  
     slide 3 
     puzzle 
+    godzilla defkis
     multiple single with multiple objects 
     Cut all option --> crashes at alide 3
 
-
+own tutorial panel
 
 Known Issues
 [] Apply all will also cut another object when a connector is mapped wrongly too 
@@ -74,6 +78,7 @@ Publishing:
 
 
 resolved bug:
+[+] refresh system for the tutorial
 [+] shift increase precision of Gizmos
 [+] cut all option in tutorial
 [+] cutall option for apply all

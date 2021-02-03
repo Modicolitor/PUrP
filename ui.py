@@ -111,7 +111,7 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
 
         else:
             col.operator("purp.init", icon="SHADERFX")
-            col.operator("purp.window_draw_operator", icon="SHADERFX")
+            #col.operator("purp.window_draw_operator", icon="LIGHT_DATA")
 
 
 class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
@@ -137,7 +137,7 @@ class PP_PT_PuzzlePrintSApplyMenu(bpy.types.Panel):
         col = flow.column()
         row = layout.row()
 
-        if "PuzzleUrPrint" in data.collections:
+        if hasattr(context.scene, "PUrP"):
             PUrP = context.scene.PUrP
             subcol = col.column()
             subcol.label(text="Special Apply Methods")
@@ -177,7 +177,7 @@ class PP_PT_PuzzlePrintOrderMenu(bpy.types.Panel):
         col = flow.column()
         row = layout.row()
 
-        if "PuzzleUrPrint" in data.collections:
+        if hasattr(context.scene, "PUrP"):
             PUrP = context.scene.PUrP
             subcol = col.box()
             subcol.label(text="Mapping")
@@ -229,7 +229,7 @@ class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
         col = flow.column()
         row = layout.row()
 
-        if "PuzzleUrPrint" in data.collections:
+        if hasattr(context.scene, "PUrP"):
             PUrP = context.scene.PUrP
             subcol = col.column()
             subcol.prop(PUrP, "BuildplateX", text='Buildplate X')
@@ -248,6 +248,41 @@ class PP_PT_PuzzlePrintBuildVolumeMenu(bpy.types.Panel):
                                 "count", text='Build Volume Y Repeat')
                     subcol.prop(mods["PUrP_BuildVol_ArrayZ"],
                                 "count", text='Build Volume Z Repeat')
+
+
+class PP_PT_PuzzlePrintTutorialMenu(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "PUrP Tutorial"
+    bl_category = "PuzzleUrPrint"
+    #bl_options = {'DEFAULT_CLOSED'}
+
+    @ classmethod
+    def poll(cls, context):
+        # if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+        return True  # hasattr(context.scene, "PUrP")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        flow = layout.grid_flow(row_major=True, columns=0,
+                                even_columns=False, even_rows=False, align=True)
+        col = flow.column()
+        row = layout.row()
+
+        subcol = col.column()
+
+        # if not hasattr(context.scene, "PUrP"):
+        #    col.operator("purp.window_draw_operator", text="Start Tutorial", icon="LIGHT_DATA")
+        # else:
+        if "PUrP" in context.scene.name:
+            col.operator("purp.window_draw_operator",
+                         text="Refresh Tutorial Window", icon="LIGHT_DATA")
+        else:
+            col.operator("purp.window_draw_operator",
+                         text="Start Tutorial", icon="LIGHT_DATA")
 
 
 '''

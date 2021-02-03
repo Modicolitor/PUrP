@@ -73,11 +73,11 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         min=0,
     )
 
-    # TutorialCounter = bpy.props.IntProperty(
-    #    name='Tutorial Page Number',
-    #    description='Tutorial Page number to keep track of progress',
-    #    default=0,
-    # )
+    TutorialCounter = bpy.props.IntProperty(
+        name='Tutorial Page Number',
+        description='Tutorial Page number to keep track of progress',
+        default=0,
+    )
 
     CylVert = bpy.props.IntProperty(
         name='Vertexcount',

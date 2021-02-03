@@ -2048,6 +2048,11 @@ class PP_OT_Ini(bpy.types.Operator):
             description="True if obj was used as CenterObj for PUrP",
             default=False,
         )
+        bpy.types.Screen.PUrPTutcount = bpy.props.IntProperty(
+            name="PUrPTutorialCounter",
+            description="Counts tutorial Pages",
+            default=0,
+        )
         #########
         MColName = "PuzzleUrPrint"
 

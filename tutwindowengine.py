@@ -8,6 +8,8 @@ import bgl
 
 from gpu_extras.batch import batch_for_shader
 
+from bpy.app.handlers import persistent
+
 
 class BL_UI_Widget:
 
@@ -616,7 +618,7 @@ class BL_UI_OT_draw_operator(Operator):
     bl_idname = "object.bl_ui_ot_draw_operator"
     bl_label = "bl ui widgets operator"
     bl_description = "Operator for bl ui widgets"
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     def __init__(self):
         self.draw_handle = None
@@ -647,6 +649,7 @@ class BL_UI_OT_draw_operator(Operator):
         context.window_manager.modal_handler_add(self)
         return {"RUNNING_MODAL"}
 
+    # @persistent
     def register_handlers(self, args, context):
         self.draw_handle = bpy.types.SpaceView3D.draw_handler_add(
             self.draw_callback_px, args, "WINDOW", "POST_PIXEL")
@@ -681,7 +684,10 @@ class BL_UI_OT_draw_operator(Operator):
             return {'RUNNING_MODAL'}
 
         if event.type in {"ESC"}:
-            bpy.data.scenes.remove(self.tutorialscene)
+            try:
+                bpy.data.scenes.remove(self.tutorialscene)
+            except:
+                print("failed to delete scene")
             self.finish()
 
         return {"PASS_THROUGH"}

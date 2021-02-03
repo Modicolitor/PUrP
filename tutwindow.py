@@ -16,7 +16,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
     bl_idname = "purp.window_draw_operator"
     bl_label = "Start Tutorial"
     bl_description = "Brings you to Tutorialland. A distant World, one whole Blender Scene away, where you'll learn how to use the addon 'Puzzle your Print'"
-    bl_options = {'REGISTER', "UNDO"}
+    bl_options = {'REGISTER', 'UNDO'}
 
     def __init__(self):
 
@@ -92,18 +92,26 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.panel.add_widgets(widgets_panel)
 
         # Open the panel at the mouse location
-        print(
-            f" width {context.area.width} height {context.area.height} event.mouse_x {event.mouse_x} event.mouse_y {event.mouse_y} ")
+        # print(
+        #    f" width {context.area.width} height {context.area.height} event.mouse_x {event.mouse_x} event.mouse_y {event.mouse_y} ")
         self.panel.set_location(event.mouse_x - context.area.height/30,  # context.area.width -
                                 -context.area.height/4)  # context.area.height - event.mouse_y
-        self.context = context
-        self.slide00(context)
 
+        self.viewloc = (-0, -21, 2)
+        self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
+        self.viewdistance = 20
+        self.headloc = Vector((0, 0, 5))
+        self.headlinescale = Vector((3, 3, 3))
+
+        self.context = context
+        self.pageturner(context)
+        # self.slide00(context)
+    '''
     def on_chb_visibility_state_change(self, checkbox, state):
         active_obj = bpy.context.view_layer.objects.active
         if active_obj is not None:
             active_obj.hide_viewport = not state
-
+    
     def on_up_down_value_change(self, up_down, value):
         active_obj = bpy.context.view_layer.objects.active
         if active_obj is not None:
@@ -113,19 +121,27 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         active_obj = bpy.context.view_layer.objects.active
         if active_obj is not None:
             active_obj.scale = (1, 1, value)
-
+    '''
     # Button press handlers
+
     def button1_press(self, widget):
         context = self.context
-        self.TutorialCounter -= 1
+        #self.TutorialCounter -= 1
+        context.screen.PUrPTutcount -= 1
         self.pageturner(context)
 
     def button2_press(self, widget):
         context = self.context
-        self.TutorialCounter += 1
+        #self.TutorialCounter += 1
+        context.screen.PUrPTutcount += 1
         self.pageturner(context)
 
     def closebutton_press(self, widget):
+        bpy.data.scenes.remove(self.tutorialscene)
+        self.finish()
+
+    def refresh_widget(self, widget):
+        bpy.ops.purp.window_draw_operator()
         bpy.data.scenes.remove(self.tutorialscene)
         self.finish()
 
@@ -133,7 +149,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.tutorialscene = bpy.data.scenes.new("PUrPTutorial")
         context.window.scene = self.tutorialscene
 
-        if "PuzzleUrPrint" not in bpy.data.collections:
+        if not hasattr(context.scene, "PUrP"):
             bpy.ops.purp.init()
 
     def set_slidenum(self, num):
@@ -304,7 +320,14 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         bpy.ops.view3d.view_selected()
 
     def pageturner(self, context):
+
+        for n, hand in enumerate(bpy.app.handlers):
+            print(bpy.app.handlers[n])
+
+        self.TutorialCounter = context.screen.PUrPTutcount
         print(self.TutorialCounter)
+        print(self.lines[0].text)
+
         if self.TutorialCounter == 0:
             self.slide00(context)
         elif self.TutorialCounter == 1:
@@ -337,7 +360,6 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
             self.slide14(context)
         elif self.TutorialCounter == 15:
             self.slide15(context)
-
         else:
             self.TutorialCounter = 0
 
@@ -352,7 +374,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.headloc = Vector((0, 0, 5))
         self.headlinescale = Vector((3, 3, 3))
         self.linebreak(
-            "This little tutorial is designed to get you started. If you need a more detailed description try the documentation under PUrP.modicolitor.com or the Modicolitor Youtube channel.%% This interactive tutorial will generate new objects to show you what the addon is capable off. Be encouraged to play with the objects and settings in the scene. However, don't be sad when you go to another slide or out of the Tutorial and everything is gone :-D. %% BTW, If you think 'This guy just deleted my work.', don't worry. We are in a new scene, when you close the tutorial you'll get back to your original scene.")
+            "This little tutorial is designed to get you started. If you need a more detailed description try the documentation under PUrP.modicolitor.com or the Modicolitor Youtube channel.%% This interactive tutorial will generate new objects to show you what the addon is capable off. Be encouraged to play with the objects and settings in the scene. However, don't be sad when you go to another slide or out of the Tutorial and everything is gone :-D. %% BTW, If you think 'This guy just deleted my work.', don't worry. We are in a new scene, when you close the tutorial you'll get back to your original scene. Moreover, sorry this tutorial window is not very stable I'm working on it. If it stops reacting just close it and start a new tutorial session. You'll continue one the slide you left. The actual addon functionalities are super reliably!")
         headline = self.add_text(
             context, self.headloc, "Welcome to the Tutorial")
         headline.rotation_euler[0] = 1.507
@@ -384,7 +406,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.set_slidenum(1)
         self.label.text = "What does the addon do?"
         self.linebreak(
-            "The addon helps to cut models in pieces and simultansouly add connectors for simple reassambling after 3D Printing. The PuzzleUrPrint-addon can produce a broad variety of these Connector called objects (or combination of objects), which are internally used in boolean operation to eventually generate the transformation intended. Here you see a cube with a 'Single Connector' in male-female configuration with cube as Inlay type.... Lets see how it looks after applying%%% Press Next")
+            "The addon helps to cut models in pieces and simultansouly add connectors for simple reassambling after 3D Printing. The PuzzleUrPrint-addon can produce a broad variety of these Connector called objects (or combination of objects), which are internally used in boolean operation to eventually generate the transformation intended. Here you see a cube with a 'Single Connector' in male-female configuration with cube as Inlay type.... Lets see how it looks after applying")
         headline = self.add_text(
             context, self.headloc, "What does the addon do?")
         headline.rotation_euler[0] = 1.507
@@ -413,7 +435,6 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.viewrot = (0.75, 0.6565, 0.0325, 0.0262)
         self.viewdistance = 20
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
-
         self.set_slidenum(2)
         self.label.text = "The Result"
         self.linebreak("This is the result you would get when you apply the connector from the last slide to the cube. The cube is now cut in half. Moreover, the bottom part has a male connector attached while the top part has a hole in the shape of the connector. If you would print that you could put both parts together again easily. This can be helpful for many things.%% - Print large: 3D-printers are typically very small. Use the addon to desect large models into printable bits. Your lifesized Koro is only a few clicks and days of printing away (support cloud.blender.org!!)%- Add Functionality: Using cylinders as Inlays allows to turn parts against each other. A 'joint'-cut allows to make maken even more delicate joints.  Print your own actionfigures, monsters, sculptures,... with movable parts.% -Puzzles: Of course you can make puzzles with PuzzleUrPrint. Whether you deform a plane (with some thickness of course) and make a more tradition 2D puzzle, you can also make 3D Puzzles by disecting larger objects for a new generation of challenging puzzles  Sculpt your and print it. it'll change the whole experience. %- Wallholders and Fixation: You can add dovetail and other shapes to make objects slide into each other and if you like stop at the right point. This is ideal for wallholders and nice to hide the screws. ")
