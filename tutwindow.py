@@ -29,12 +29,13 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.label = BL_UI_Label(20, 20, 100, 15)
         self.label.text = "Welcome"
         self.label.text_size = 20
-        self.label.text_color = (0.2, 0.9, 0.9, 1.0)
+        self.label.text_color = (0.80, 0.2, 0.2, 0.8)
 
         self.closebutton = BL_UI_Button(460, 20, 30, 30)
-        self.closebutton.bg_color = (0.2, 0.8, 0.8, 0.8)
-        self.closebutton.hover_bg_color = (0.2, 0.9, 0.9, 1.0)
+        self.closebutton.bg_color = (0.80, 0.2, 0.2, 0.8)
+        self.closebutton.hover_bg_color = (0.80, 0.2, 0.2, 0.8)
         self.closebutton.text = "X"
+        self.closebutton.text_color = (0.8, 0.9, 0.9, 1.0)
         self.closebutton.set_mouse_down(self.closebutton_press)
 
         lineamount = 27
@@ -58,15 +59,17 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.slidenum.text_color = (0.2, 0.9, 0.9, 1.0)
 
         self.button1 = BL_UI_Button(20, 550, 120, 30)
-        self.button1.bg_color = (0.2, 0.8, 0.8, 0.8)
-        self.button1.hover_bg_color = (0.2, 0.9, 0.9, 1.0)
+        self.button1.bg_color = (0.80, 0.2, 0.2, 0.8)
+        self.button1.hover_bg_color = (0.80, 0.2, 0.2, 0.8)
         self.button1.text = "Back"
+        self.button1.text_color = (0.8, 0.9, 0.9, 1.0)
         self.button1.set_mouse_down(self.button1_press)
 
         self.button2 = BL_UI_Button(350, 550, 120, 30)
-        self.button2.bg_color = (0.2, 0.8, 0.8, 0.8)
-        self.button2.hover_bg_color = (0.2, 0.9, 0.9, 1.0)
+        self.button2.bg_color = (0.80, 0.2, 0.2, 0.8)
+        self.button2.hover_bg_color = (0.80, 0.2, 0.2, 0.8)
         self.button2.text = "Next"
+        self.button2. text_color = (0.8, 0.9, 0.9, 1.0)
         self.button2.set_mouse_down(self.button2_press)
 
     def on_invoke(self, context, event):
@@ -126,13 +129,13 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
     def button1_press(self, widget):
         context = self.context
-        #self.TutorialCounter -= 1
+        # self.TutorialCounter -= 1
         context.screen.PUrPTutcount -= 1
         self.pageturner(context)
 
     def button2_press(self, widget):
         context = self.context
-        #self.TutorialCounter += 1
+        # self.TutorialCounter += 1
         context.screen.PUrPTutcount += 1
         self.pageturner(context)
 
@@ -146,7 +149,11 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.finish()
 
     def initialzeviaTutorial(self, context):
-        self.tutorialscene = bpy.data.scenes.new("PUrPTutorial")
+        if not "PUrPTutorial" in context.scene.name:
+            self.tutorialscene = bpy.data.scenes.new("PUrPTutorial")
+        else:
+            self.tutorialscene = context.scene
+
         context.window.scene = self.tutorialscene
 
         if not hasattr(context.scene, "PUrP"):
@@ -386,7 +393,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         daughters = self.applycoup(context, [con1])
         daughters[0].location[2] -= 1
         daughters[1].location[2] += 1
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
         deselectall(context)
         context.view_layer.objects.active = headline
         # arrow = gen_arrow(context, (-12, 0, 0))
@@ -417,7 +424,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         con1 = self.add_single(context, cubeloc, 1, 1, '2',  True,
                                '1',  16, '1', 1.5, 0.04, 16, 0, 0, 1, 1, False)
         # self.applyallscene(context)
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
 
         arrow = gen_arrow(context, (-6.5, 0, 0))
         arrow.rotation_euler[1] = pi/2
@@ -426,7 +433,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         text.rotation_euler[0] = pi/2
 
         deselectall(context)
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
         context.view_layer.objects.active = headline
 
     def slide02(self, context):
@@ -464,7 +471,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         text = self.add_text(context, (-10, 0, -4.23), 'Male Part')
         text.rotation_euler[0] = pi/2
         # self.applyallscene(context)
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
         headline.select_set(True)
     # diversity
 
@@ -594,7 +601,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                 context, plancolloc, 1, 1, 0.04, False, str(type), 1.2, 1.2, 1, 3, 5, True, False, False, 3.2)
             plancolloc += Vector((0, 3, 0))
             type += 1
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
         deselectall(context)
         # headline.select_set(True)
         context.view_layer.objects.active = headline
@@ -879,7 +886,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
                 context, plancolloc, 1, 1, 0.04, False, str(type), 1.2, 1.2, 1, 3, 1.0, True, False, False, 3.2)
             plancolloc += Vector((0, 3, 0))
             type += 1
-        #self.focus(context, self.tutorialscene.objects)
+        # self.focus(context, self.tutorialscene.objects)
         deselectall(context)
         # headline.select_set(True)
         context.view_layer.objects.active = headline
@@ -933,7 +940,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
         # anweisung
         text = self.add_text(context, (0, 0, 5.5),
-                             "Position and rotate \nthe connector to complete \nthe character and the puzzle")
+                             "You can practice\n by positioning these")
         text.rotation_euler[0] = 1.57079632679489
         # up arrow
         arrow = gen_arrow(context, (-5.938, 0, 5.89))
@@ -1139,7 +1146,7 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
 
         # puzzle1
         self.add_text(context, (-15, -10, 0),
-                      "Select all Puzzlestripes, \n select Connector last  and \npress 'Planar to Multiple Objects'\nTry also 'Apply All'\nto see the difference")
+                      "Select all Puzzlestripes, \n select Connector last  and \npress 'Planar to Multiple Objects'")
         largeplaneloc = Vector((-12, 0, 0))
         largeplanep = self.add_primitive(context, largeplaneloc, 'Cube')
         largeplanep.scale = Vector((10, 10, 0.2))
@@ -1239,13 +1246,14 @@ class BE_OT_Draw_Operator(BL_UI_OT_draw_operator):
         self.set_view(context, self.viewloc, self.viewrot, self.viewdistance)
 
         self.set_slidenum(15)
-        self.label.text = "Last thoughts "
+        self.label.text = "Last thoughts"
         self.linebreak(
-            "Before I let you go explore more on your own here are somethings to keep in mind to have everything working nicely as intended:%- The objects you are using must be manifold (water tight). A single plane will not work. It needs thickness. Also enable the 3D Printing addon shiped with blender. It allows to check 'how manifold' (and pregnant) your object is and often repairs it (not the pregnancy). %- The addon is strongly reliant on blenders boolean modifier. With the 2.91 update the exact solver arrived and the number of fails drastically decreased. However, sometimes the boolean modifier just produce s***. In these cases increasing or reducing resolution and repositioning might help. %- All other modifiers must be applied before starting to apply the Connector. Keep in mind the Addon ignores all modifiers not created by itself. When you have a large stack of modifiers before (or just one) before you start cutting, the preview before and the result after applying the connector will look not as expected. %- Always also consider the orientation during printing. Overhangs are always a problem in fdm printing. In addition, also the x-y-resolution is different than in z-direction. Good cut design can lead to less overhangs and better results. However, the oversize might change when the orientation during printing changes (seen in rare cases where it needs to be really precise).% I guess it's obvious, but let me make sure everyone understands: we are cuttings things in pieces with this addon. When this model is the only version you have and you save the cutted model over the only original, that's it! The model is gone. The addon does not make any safety copies. Please keep your head together. :-) %%Useful Detail: Have Fun!!!")
+            "Before I let you go explore more on your own here are somethings to keep in mind to have everything working nicely as intended:%- The objects you are using must be manifold (water tight). A single plane will not work. It needs thickness. Also enable the 3D Printing addon shiped with blender. It allows to check 'how manifold' (and pregnant) your object is and often repairs it (not the pregnancy). %- The addon is strongly reliant on blenders boolean modifier. With the 2.91 update the exact solver arrived and the number of fails drastically decreased. However, sometimes the boolean modifier just produce s***. In these cases increasing or reducing resolution and repositioning might help. %- All other modifiers must be applied before starting to apply the Connector. Keep in mind the Addon ignores all modifiers not created by itself. When you have a large stack of modifiers before (or just one) before you start cutting, the preview before and the result after applying the connector will look not as expected. %- Always also consider the orientation during printing. Overhangs are always a problem in fdm printing. In addition, also the x-y-resolution is different than in z-direction. Good cut design can lead to less overhangs and better results. However, the oversize might change when the orientation during printing changes (seen in rare cases where it needs to be really precise).% I guess it's obvious, but let me make sure everyone understands: we are cuttings things in pieces with this addon. When this model is the only version you have and you save the cutted model over the only original, that's it! The model is gone. The addon does not make any safety copies. Please keep your head together. :-)%Useful Detail: Have Fun and create great things!!!")
         headline = self.add_text(
-            context, (self.headloc[0], self.headloc[1], self.headloc[2]), "Last thoughts ")
+            context, (self.headloc[0], self.headloc[1], self.headloc[2]+12), "Last thoughts\n\nHave Fun and \ncreate great things")
         headline.rotation_euler[0] = 1.507
         headline.scale = (5, 5, 5)
+
         # [page3?]
         # headline.select_set(True)
         context.view_layer.objects.active = headline
