@@ -27,6 +27,16 @@ general operator bug:
 
 [] Apply All: Single not cutting everything --> Problem??? 
 
+[] apply all Pallid large mit  Build Volume present: location: <unknown location>:-1
+Error: Python: Traceback (most recent call last):
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1736, in execute
+    centerObjDecider(context, obj)
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1430, in centerObjDecider
+    context, Cobj.modifiers[mod].object, Cobj, True)
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1587, in applySingleCoup
+    coup = objects[coupname]
+KeyError: 'bpy_prop_collection[key]: key "PUrP_BuildVol_ArrayX" not found'
+
 
 
 

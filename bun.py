@@ -1157,7 +1157,7 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 for Centerobj in Centerobjs:
                     print(f'Test now Cobj {Centerobj}')
                     if Centerobj.type == 'MESH':
-                        if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj):
+                        if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj) and not is_buildvolume(context, Centerobj):
                             if bvhOverlap(context, coup, Centerobj):
                                 TouchedCobjs.append(Centerobj)
                 print(f'Found Touched Cobjs {TouchedCobjs}')
@@ -1361,7 +1361,7 @@ def centerObjDecider(context, CenterObj):
         if PUrP.CutAll:
             for pCobj in Objects[:]:
                 if pCobj.type == 'MESH':
-                    if not is_coup(context, pCobj) and not is_inlay(context, pCobj):
+                    if not is_coup(context, pCobj) and not is_inlay(context, pCobj) and not is_buildvolume(context, pCobj):
                         Cobjlist.append(pCobj)
         else:
             Cobjlist = [Objects[mod].parent]
@@ -3485,6 +3485,10 @@ def is_order(context, coup):
         return True
     else:
         return False
+
+
+def is_buildvolume(context, obj):
+    return "BuildVolume" in obj.name
 
 
 def is_inlay(context, coup):
