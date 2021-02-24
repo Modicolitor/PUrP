@@ -17,7 +17,7 @@ after applying
 ###############################################################
 
 bugs:
-general operator bug:
+
 
 
 
@@ -25,24 +25,14 @@ general operator bug:
 [Test] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
-[] Apply All: Single not cutting everything --> Problem??? 
 
-[] Correctname error when exchanging duplicated planar: es wird nur der object  name verändert aber nicht der name der Modifier
 
-[] error in Apply when planar lands in side of plane --> scheinbar wird ein mesh geschickt ohne vertices: Error: Python: Traceback (most recent call last):
-  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1736, in execute
-    centerObjDecider(context, obj)
-  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1425, in centerObjDecider
-    context, Cobj.modifiers[mod].object, Cobj, False)
-  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1552, in applySingleCoup
-    direction = SideOfPlane(context, obj, DaughterOne)
-  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1464, in SideOfPlane
-    CenterObj.data.vertices[test].co@CenterObj.matrix_world)
-IndexError: bpy_prop_collection[-1]: out of range.
+
+
 
 [] Cone MF cone is way to high, and that why gizmos not working right
 
-[] logo order in one case not deleted
+[??] logo order in one case not deleted
 
 [] MF logo T, applied wrong direction 
 
@@ -110,6 +100,9 @@ Publishing:
 
 
 resolved bug:
+[???] Correctname error when exchanging duplicated planar: es wird nur der object  name verändert aber nicht der name der Modifier --> code looks nice and seems to work
+[+] error in Apply when planar lands in side of plane --> scheinbar wird ein mesh geschickt ohne vertices: Error: Python: Traceback (most recent call last):
+    File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1464, in SideOfPlane CenterObj.data.vertices[test].co@CenterObj.matrix_world) inbdex  out of range. --> probably silent
 [+] refresh system for the tutorial
 [+] shift increase precision of Gizmos
 [+] cut all option in tutorial

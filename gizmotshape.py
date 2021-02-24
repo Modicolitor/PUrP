@@ -1,8 +1,13 @@
-# Example of a custom widget that defines it's own geometry.
 #
-# Usage: Select a light in the 3D view and drag the arrow at it's rear
-# to change it's energy value.
+# Copyright (C) 2020 by Modicolitor
 #
+# This file is part of PuzzleUrPrint.
+#
+# License Text
+#
+# You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
+# not, see <https://www.gnu.org/licenses/>.
+
 import bpy
 import mathutils
 from bpy.types import (

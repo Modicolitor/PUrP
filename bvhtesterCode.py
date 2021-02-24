@@ -1,4 +1,12 @@
-
+#
+# Copyright (C) 2020 by Modicolitor
+#
+# This file is part of PuzzleUrPrint.
+#
+# License Text
+#
+# You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
+# not, see <https://www.gnu.org/licenses/>.
 
 import bpy
 import mathutils

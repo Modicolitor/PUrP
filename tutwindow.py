@@ -1,3 +1,14 @@
+#
+# Copyright (C) 2020 by Modicolitor
+#
+# This file is part of PuzzleUrPrint.
+#
+# License Text
+#
+# You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
+# not, see <https://www.gnu.org/licenses/>.
+
+
 from .gen_mesh import gen_arrow, gen_figure, gen_hat
 import bpy
 

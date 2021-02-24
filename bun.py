@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2020 by Modicolitor
+#
+# This file is part of PuzzleUrPrint.
+#
+# License Text
+#
+# You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
+# not, see <https://www.gnu.org/licenses/>.
+
 import bmesh
 import bpy
 import mathutils
@@ -8,7 +18,7 @@ import random
 import os
 # from .intersect import bmesh_check_intersect_objects
 from .bvh_overlap import bvhOverlap
-from .warning import noCutthroughWarn, coneTrouble
+from .warning import noCutthroughWarn, coneTrouble, noVertsWarn
 from . gen_mesh import gen_figure, gen_hat, gen_arrow
 import copy
 
@@ -1155,8 +1165,8 @@ class PP_OT_ApplyCoupling(bpy.types.Operator):
                 # collecte all CObjs which are touching
                 TouchedCobjs = []
                 for Centerobj in Centerobjs:
-                    print(f'Test now Cobj {Centerobj}')
                     if Centerobj.type == 'MESH':
+                        print(f'Test now Cobj {Centerobj}')
                         if not is_coup(context, Centerobj) and not is_inlay(context, Centerobj) and not is_buildvolume(context, Centerobj):
                             if bvhOverlap(context, coup, Centerobj):
                                 TouchedCobjs.append(Centerobj)
@@ -1454,23 +1464,26 @@ def SideOfPlane(context, coup, CenterObj):
     # test = 0
     test = len(CenterObj.data.vertices)-1
     DirecDistance = 0
-    while DirecDistance == 0:
+    if test >= 0:
+        while DirecDistance == 0:
 
-        # CouplingNormal = coup_tmp.data.vertices[0].normal
-        CouplingNormal = mathutils.Vector((0, 0, 1))
-        print(f"CouplingNormal {CouplingNormal}")
+            # CouplingNormal = coup_tmp.data.vertices[0].normal
+            CouplingNormal = mathutils.Vector((0, 0, 1))
+            print(f"CouplingNormal {CouplingNormal}")
 
-        direction = CouplingNormal.dot(
-            CenterObj.data.vertices[test].co@CenterObj.matrix_world)
-        # print(f"direction {direction} CenterObj.data.vertices[n].co {CenterObj.data.vertices[test].co}")
+            direction = CouplingNormal.dot(
+                CenterObj.data.vertices[test].co@CenterObj.matrix_world)
+            # print(f"direction {direction} CenterObj.data.vertices[n].co {CenterObj.data.vertices[test].co}")
 
-        planedistanceorigin = CouplingNormal.dot(
-            coup_tmp.data.vertices[0].co@coup_tmp.matrix_world)
-        # print(f"planedistance {planedistance} coup_tmp.data.vertices[0].co {coup_tmp.data.vertices[0].co} plane.data.vertices[0].co@plane.matrix_world {plane.data.vertices[0].co@plane.matrix_world}")
+            planedistanceorigin = CouplingNormal.dot(
+                coup_tmp.data.vertices[0].co@coup_tmp.matrix_world)
+            # print(f"planedistance {planedistance} coup_tmp.data.vertices[0].co {coup_tmp.data.vertices[0].co} plane.data.vertices[0].co@plane.matrix_world {plane.data.vertices[0].co@plane.matrix_world}")
 
-        DirecDistance = direction - planedistanceorigin
-        # print(f"difference {difference}")
-        test -= 1
+            DirecDistance = direction - planedistanceorigin
+            # print(f"difference {difference}")
+            test -= 1
+    else:
+        noVertsWarn(context)
     bpy.data.objects.remove(coup_tmp)
 
     return DirecDistance

@@ -16,6 +16,12 @@ def noCutthroughWarn(self, context):
         text="This Coupling didn't cut through!! Is this really what you want?")
 
 
+def noVertsWarn(self, context):
+    self.layout.label(
+        text="No object left after initial boolean apply")
+    print("No verts left")
+
+
 def coneTrouble(self, context):
     self.layout.label(
         text="Using a Cone in a Stick Connector will not work! But maybe you have a greater vision...")
