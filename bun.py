@@ -394,9 +394,9 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
         if PrimTypes == "3":  # cone must be higher
             for v in bm.verts:
                 if nameadd == "_diff":
-                    v.co.z += 0.5
+                    v.co.z += 0.0  # 5
                 elif nameadd == "_union":
-                    v.co.z += 0.5
+                    v.co.z += 0.0  # 5
 
         # Finish up, write the bmesh back to the mesh
         bm.to_mesh(me)
