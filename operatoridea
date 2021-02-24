@@ -27,6 +27,26 @@ general operator bug:
 
 [] Apply All: Single not cutting everything --> Problem??? 
 
+[] Correctname error when exchanging duplicated planar: es wird nur der object  name verändert aber nicht der name der Modifier
+
+[] error in Apply when planar lands in side of plane --> scheinbar wird ein mesh geschickt ohne vertices: Error: Python: Traceback (most recent call last):
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1736, in execute
+    centerObjDecider(context, obj)
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1425, in centerObjDecider
+    context, Cobj.modifiers[mod].object, Cobj, False)
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1552, in applySingleCoup
+    direction = SideOfPlane(context, obj, DaughterOne)
+  File "C:\Users\Burn\AppData\Roaming\Blender Foundation\Blender\2.91\scripts\addons\purp\bun.py", line 1464, in SideOfPlane
+    CenterObj.data.vertices[test].co@CenterObj.matrix_world)
+IndexError: bpy_prop_collection[-1]: out of range.
+
+[] Cone MF cone is way to high, and that why gizmos not working right
+
+[] logo order in one case not deleted
+
+[] MF logo T, applied wrong direction 
+
+
 
 [???] inlay where selectable in last testing
 
@@ -38,6 +58,20 @@ general operator bug:
     Cut all option --> crashes at alide 3
 
 own tutorial panel
+
+#########################
+Tutorial Videos 
+
+[] Multicolor panels and Puzzles
+[] Trouble Shouting
+    - wrong mf apply  
+    - oversize planar self overlap --> Exact, Fast 
+    -wrong mapping (to many objects) 
+[] ui and basic functions: wie tutorial 
+[] Wallmount 
+[] 3d Puzzles Löwe 
+
+
 
 Known Issues
 [] Apply all will also cut another object when a connector is mapped wrongly too 

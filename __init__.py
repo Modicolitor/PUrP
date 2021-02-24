@@ -5,7 +5,7 @@
 #
 # License Text
 #
-# You should have received a copy of the GNU General Public License along with Power Sequencer. If
+# You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
 # not, see <https://www.gnu.org/licenses/>.
 
 from .tutwindow import BE_OT_Draw_Operator
@@ -93,10 +93,11 @@ import bpy
 bl_info = {  # für export als addon
     "name": "PuzzleUrPrint",
     "author": "Modicolitor",
-    "version": (0, 9),
+    "version": (1, 0),
     "blender": (2, 91, 0),
     "location": "View3D > Tools",
-    "description": "Cut your Objects into pieces and get Connectors to fit parts after Printing",
+    "description": "Cut your Objects into pieces and reassemble them easily after 3d printing",
+    "doc_url": "http://purp.modicolitor.com/Dokumentation.html",
     "category": "Object"}
 
 # modules = addon_auto_imports.setup_addon_modules(
