@@ -76,33 +76,33 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         if not add_unmap:
             if active != None:
                 if active.type == "MESH":
-                    if is_coup(context, active):
+                    if is_coup(context, active) or is_buildvolume(context, active):
                         CenterObj = PUrP.CenterObj
                     else:
                         CenterObj = active
                         PUrP.CenterObj = CenterObj
-            else:
-                if PUrP.CenterObj != None:
-                    if not is_coup(context, PUrP.CenterObj):
-                        if not in_view_layer(context, PUrP.CenterObj):
-                            print(
-                                f"evaluation {in_view_layer(context, PUrP.CenterObj)}")
-                            self.report(
-                                {'WARNING'}, "Set Centerobject doesn't exist anymore. Please select a mesh object")
-                            return{"FINISHED"}
-                        else:
-
-                            active = context.scene.PUrP.CenterObj
-                            active.select_set(True)
+            # else:
+            if PUrP.CenterObj != None:
+                if not is_coup(context, PUrP.CenterObj):
+                    if not in_view_layer(context, PUrP.CenterObj):
+                        print(
+                            f"evaluation {in_view_layer(context, PUrP.CenterObj)}")
+                        self.report(
+                            {'WARNING'}, "Set Centerobject doesn't exist anymore. Please select a mesh object")
+                        return{"FINISHED"}
                     else:
-                        self.report(
-                            {'WARNING'}, "A connector cannot be a Centerobj. Please select another mesh object")
-                        return{"FINISHED"}
+
+                        active = PUrP.CenterObj
+                        active.select_set(True)
                 else:
-                    if not add_unmap:
-                        self.report(
-                            {'WARNING'}, "No, centerobject selected or set. Please select a mesh object")
-                        return{"FINISHED"}
+                    self.report(
+                        {'WARNING'}, "A connector cannot be a Centerobj. Please select another mesh object")
+                    return{"FINISHED"}
+            else:
+                if not add_unmap:
+                    self.report(
+                        {'WARNING'}, "No, centerobject selected or set. Please select a mesh object")
+                    return{"FINISHED"}
 
             # apply scale to CenterObj
             # bpy.ops.object.transform_apply(
@@ -1483,7 +1483,8 @@ def SideOfPlane(context, coup, CenterObj):
             # print(f"difference {difference}")
             test -= 1
     else:
-        noVertsWarn(context)
+        bpy.context.window_manager.popup_menu(
+            noVertsWarn, title="Warning", icon='ERROR')
     bpy.data.objects.remove(coup_tmp)
 
     return DirecDistance

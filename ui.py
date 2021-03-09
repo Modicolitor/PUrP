@@ -71,10 +71,11 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                     subcol.prop(PUrP, "CoupSize", text='Inlay Size')
                     subcol.prop(PUrP, "zScale", text='z-Scale')
                     subcol.prop(PUrP, "Oversize", text='Oversize')
-                subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
+
                 if not PUrP.SingleCouplingModes == '3':
                     subcol.prop(PUrP, "BevelOffset", text='Bevel Offset')
                     subcol.prop(PUrP, "BevelSegments", text='Bevel Segments')
+            subcol.prop(PUrP, "CutThickness", text='Cut Thickness')
             if PUrP.SingleMainTypes == '2' and not PUrP.SingleCouplingModes == '4' and not PUrP.SingleCouplingModes == '3':
                 subcol.prop(context.scene.PUrP, "MaincutVert",
                             text='Maincut Verts')
