@@ -2548,8 +2548,9 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         CenterObj = active
         applyScale(CenterObj)
 
-        if is_coup(context, active):
-            self.report({'WARNING'}, "Active object is a connector!")
+        if is_coup(context, active) or is_buildvolume(context, active):
+            self.report(
+                {'WARNING'}, "Active object is a connector or BuildVolume!")
             return {'FINISHED'}
         elif not CenterObj.PUrPCobj:
             print('Active was never a Centerobject before')
