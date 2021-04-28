@@ -25,14 +25,14 @@ bugs:
 [Test] Godzilla problem: added test for existing parent in remove coupl, but it should be a check before to keep the unmpped   if Coupl.parent != None: verdeckt das und sorgt dafür dass es immer gelöscht wird 
 
 
+[]  toogle edit operator in 1541 pol incorrect
 
 
 
 
 
-[] Cone MF cone is way to high, and that why gizmos not working right
 
-[??] logo order in one case not deleted
+[??] logo order in two case not deleted
 
 [] MF logo T, applied wrong direction 
 
