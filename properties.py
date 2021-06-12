@@ -13,90 +13,90 @@ from bpy.types import Scene, Image, Object
 
 
 class PUrPropertyGroup(bpy.types.PropertyGroup):
-    CenterObj = bpy.props.PointerProperty(name="Object", type=Object)
+    CenterObj: bpy.props.PointerProperty(name="Object", type=Object)
 
-    PUrP_name = bpy.props.StringProperty(
+    PUrP_name: bpy.props.StringProperty(
         name="PUrPname", default="PUrP_")
-    CutThickness = bpy.props.FloatProperty(
+    CutThickness: bpy.props.FloatProperty(
         name="Maintcut Thickness", default=0.04, min=0.0)
-    CoupSize = bpy.props.FloatProperty(
+    CoupSize: bpy.props.FloatProperty(
         name="Inlay Size", default=1.0, min=0.0)
-    Oversize = bpy.props.FloatProperty(
+    Oversize: bpy.props.FloatProperty(
         name="DynamicOversize", default=0.040, min=0.000, precision=3)
-    zScale = bpy.props.FloatProperty(
+    zScale: bpy.props.FloatProperty(
         name="zScale", default=1.0, min=0.0001)
-    aRadius = bpy.props.FloatProperty(
+    aRadius: bpy.props.FloatProperty(
         name="Radius 1", default=1.0, min=0.0)
-    bRadius = bpy.props.FloatProperty(
+    bRadius: bpy.props.FloatProperty(
         name="Radius 2", default=0.0, min=0.0)
-    OffsetLeft = bpy.props.FloatProperty(
+    OffsetLeft: bpy.props.FloatProperty(
         name="OffsetLeft", default=1.0, min=0.0)
-    OffsetRight = bpy.props.FloatProperty(
+    OffsetRight: bpy.props.FloatProperty(
         name="OffsetRight", default=1.0, min=0.0)
-    GlobalScale = bpy.props.FloatProperty(
+    GlobalScale: bpy.props.FloatProperty(
         name="Globalscale ", default=1.0, min=0.0)
-    LineDistance = bpy.props.FloatProperty(
+    LineDistance: bpy.props.FloatProperty(
         name="Linedistance", default=5.0, min=0.0)
-    LineCount = bpy.props.IntProperty(
+    LineCount: bpy.props.IntProperty(
         name="Linecount", default=1, min=0)
-    LineLength = bpy.props.IntProperty(
+    LineLength: bpy.props.IntProperty(
         name="Linelength", default=5, min=0)
-    BevelSegments = bpy.props.IntProperty(
+    BevelSegments: bpy.props.IntProperty(
         name="Bevelsegements", default=1, min=0)
-    BevelOffset = bpy.props.FloatProperty(
+    BevelOffset: bpy.props.FloatProperty(
         name="Beveloffset", default=0.0, min=0.0)
-    StopperHeight = bpy.props.FloatProperty(
+    StopperHeight: bpy.props.FloatProperty(
         name="Beveloffset", default=1.0, min=0.0)
-    StopperBool = bpy.props.BoolProperty(
+    StopperBool: bpy.props.BoolProperty(
         name="Beveloffset", default=False)
-    InlayToggleBool = bpy.props.BoolProperty(
+    InlayToggleBool: bpy.props.BoolProperty(
         name="InlayToggle", default=False)
-    BuildplateX = bpy.props.FloatProperty(
+    BuildplateX: bpy.props.FloatProperty(
         name="Buildplate X-Dimensions", default=19, min=0.0)
-    BuildplateY = bpy.props.FloatProperty(
+    BuildplateY: bpy.props.FloatProperty(
         name="Buildplate Y-Dimensions", default=19, min=0.0)
-    BuildplateZ = bpy.props.FloatProperty(
+    BuildplateZ: bpy.props.FloatProperty(
         name="Buildplate Z-Dimensions", default=19, min=0.0)
-    CoupScale = bpy.props.FloatProperty(
+    CoupScale: bpy.props.FloatProperty(
         name="Connector Scale", default=1, min=0.0)
-    PlanarCorScale = bpy.props.FloatProperty(
+    PlanarCorScale: bpy.props.FloatProperty(
         name="PlanarKorrekturBG", default=1)
-    KeepCoup = bpy.props.BoolProperty(
+    KeepCoup: bpy.props.BoolProperty(
         name="Keep Connector", default=False)
-    IgnoreMainCut = bpy.props.BoolProperty(
+    IgnoreMainCut: bpy.props.BoolProperty(
         name="Keep Connector", default=False)
-    ViewPortVisAdd = bpy.props.BoolProperty(
+    ViewPortVisAdd: bpy.props.BoolProperty(
         name="Add with Viewport Visibility", default=False)
-    AddUnmapped = bpy.props.BoolProperty(
+    AddUnmapped: bpy.props.BoolProperty(
         name="Add with Connector without center object", default=False)
-    ExactOptBool = bpy.props.BoolProperty(
+    ExactOptBool: bpy.props.BoolProperty(
         name="Is Exactoption in Bool available", default=True)
-    OrderBool = bpy.props.BoolProperty(
+    OrderBool: bpy.props.BoolProperty(
         name="Is Order on or off", default=False)
-    CutAll = bpy.props.BoolProperty(
+    CutAll: bpy.props.BoolProperty(
         name="When False Connectors are only applied to the parent, when True Connectors are applied to all objects they touch", default=True)
 
-    MaincutVert = bpy.props.IntProperty(
+    MaincutVert: bpy.props.IntProperty(
         name='Vertexcount',
         description='Set the resolution of the main cut joint',
         default=16,
         min=0,
     )
 
-    TutorialCounter = bpy.props.IntProperty(
+    TutorialCounter: bpy.props.IntProperty(
         name='Tutorial Page Number',
         description='Tutorial Page number to keep track of progress',
         default=0,
     )
 
-    CylVert = bpy.props.IntProperty(
+    CylVert: bpy.props.IntProperty(
         name='Vertexcount',
         description='Set the resolution of the cylic objects',
         default=16,
         min=0,
     )
 
-    SingleCouplingTypes = bpy.props.EnumProperty(
+    SingleCouplingTypes: bpy.props.EnumProperty(
         name='',  # SingleCoupltypes
         description='List of forms avaiable in single connector mode',
         default='1',
@@ -106,7 +106,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ]
     )
 
-    SingleMainTypes = bpy.props.EnumProperty(
+    SingleMainTypes: bpy.props.EnumProperty(
         name='',  # SingleCoupltypes
         description='List of forms avaiable in single connector mode',
         default='1',
@@ -115,7 +115,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ]
     )
 
-    PlanarCouplingTypes = bpy.props.EnumProperty(
+    PlanarCouplingTypes: bpy.props.EnumProperty(
         name='',  # PlanarCoupltypes
         description='List of forms avaiable in planar connector mode',
         default='1',
@@ -139,7 +139,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ]
     )
 
-    SingleCouplingModes = bpy.props.EnumProperty(
+    SingleCouplingModes: bpy.props.EnumProperty(
         name='SingleCouplModes',
         description='List of forms avaiable in single connector mode',
         items=[('1', 'Stick', ''),
@@ -149,7 +149,7 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
                ]
     )
 
-    BoolModSettings = bpy.props.EnumProperty(
+    BoolModSettings: bpy.props.EnumProperty(
         name='BoolModSettings',
         description='Mode selection in Bool Modifier',
         items=[('1', 'Exact', ''),
