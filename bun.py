@@ -2086,10 +2086,10 @@ class PP_OT_Ini(bpy.types.Operator):
         PUrP = bpy.context.scene.PUrP
         PUrP.PUrP_name = "PUrP_"
 
-        version = float(bpy.app.version_string[:4])
-        print(f"Blender version is {version} vergleich {version <= 2.90}")
-        if version <= 2.90:
-            PUrP.ExactOptBool = False
+        #version = float(bpy.app.version_string[:4])
+        #print(f"Blender version is {version} vergleich {version <= 2.90}")
+        # if version <= 2.90:
+        PUrP.ExactOptBool = True
         # PUrP.SingleCouplingtypes = ('Cube', 'Cylinder', 'Cone')
         # CylVert
 
