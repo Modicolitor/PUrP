@@ -533,11 +533,11 @@ def genPlanar(context, CenterObj, visibility, is_unmapped):
     nameadd = "_diff"
 
     appendCoupling(context, "planar.blend", objectname)
-    print(
-        f'nache append active {context.object.name}, CenterObj {CenterObj.name}')
+    #print(
+    #    f'nache append active {context.object.name}, CenterObj {CenterObj.name}')
     context.object.name = str(newname) + str(nameadd)
 
-    print(f'active {context.object.name}, CenterObj {CenterObj.name}')
+    #print(f'active {context.object.name}, CenterObj {CenterObj.name}')
     if not is_unmapped:
         context.object.parent = CenterObj
     context.object.display_type = 'WIRE'
@@ -2870,6 +2870,14 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         for coup in coups:
             # if "PlanarConnector" not in coup.name:
             #    continue
+            
+            ensure_mod(context, coup, CenterObj, "")
+
+
+            ####should just apply all modifiers without Seperation!!!!!!!!!!
+            #applySingleCoup(context, coup, CenterObj, not context.scene.PUrP.KeepCoup)
+
+            ''' 
             is_coup = False
             for mod in CenterObj.modifiers:
                 if mod.name == coup.name:
@@ -2877,15 +2885,25 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
                     break
             # make modifiers when there aren't the right ones
             if not is_coup:
+                
                 CenterObj.modifiers.new(coup.name, "BOOLEAN")
                 mod.object = coup
                 mod.operation = 'DIFFERENCE'
-
+            '''
             # context.view_layer.objects.active = CenterObj
+            #bpy.ops.object.modifier_apply(modifier=coup.name)
+            #removeCoupling(context, coup)
+        
+        ###apply all purp mods
+        context.view_layer.objects.active = CenterObj
+        for coup in coups:
+
             bpy.ops.object.modifier_apply(modifier=coup.name)
-            removeCoupling(context, coup)
+
+        
 
         CenterObj.select_set(True)
+        context.view_layer.objects.active = CenterObj
         bpy.ops.object.editmode_toggle()
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.separate(type='LOOSE')
