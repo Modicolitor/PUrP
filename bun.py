@@ -2893,8 +2893,13 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
             #removeCoupling(context, coup)
         
         ###apply all purp mods
-        context.view_layer.objects.active = CenterObj
+        
+
         for coup in coups[:]:
+            #bpy.ops.object.mode_set(mode = 'OBJECT')
+            deselectall(context)
+            CenterObj.select_set(True)
+            context.view_layer.objects.active = CenterObj
             bpy.ops.object.modifier_apply(modifier=coup.name)
             if PUrP.KeepCoup == False:
                 removeCoupling(context, coup)
@@ -3354,7 +3359,7 @@ def remove_order_tag(context, coup):
 
     if context.object != None:
         activename = context.object.name
-        
+
     deselectall(context)
     print('Welcome to order tag search of ' + coup.name)
     print(coup.children)

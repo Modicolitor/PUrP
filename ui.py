@@ -105,7 +105,9 @@ class PP_PT_PuzzlePrintAddMenu(bpy.types.Panel):
                     subcol.enabled = True
                 if PUrP.StopperBool:
                     subcol.prop(PUrP, "StopperHeight", text='Stopper Height')
-
+            
+            subcol = col.column()
+            #subcol.enabled = True
             subcol.prop(PUrP, "ViewPortVisAdd",
                         text='Add with Viewport Visibility')
             subcol.prop(PUrP, "AddUnmapped",
