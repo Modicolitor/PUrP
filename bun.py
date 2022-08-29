@@ -8,6 +8,7 @@
 # You should have received a copy of the GNU General Public License along with PuzzleUrPrint. If
 # not, see <https://www.gnu.org/licenses/>.
 
+from re import A
 import bmesh
 import bpy
 import mathutils
@@ -151,6 +152,7 @@ class PP_OT_AddSingleCoupling(bpy.types.Operator):
         else:
             unmapped_signal(context, newMain)
 
+        newMain.select_set(True)
         return{"FINISHED"}
 
 
@@ -1350,6 +1352,7 @@ def removeCoupling(context, Coupl):
             coup.name = ChildNames[num]
         unmap_coup(context, Coupl)
     else:
+        remove_order_tag(context, Coupl)
         Coupl.select_set(True)
         bpy.ops.object.delete(use_global=False)
 
@@ -1747,7 +1750,8 @@ class PP_OT_ApplyAllCouplings(bpy.types.Operator):
             print(
                 f"List of Centerobj on the way to the Cobjdecider {Cobjlist}")
             for obj in Cobjlist:
-                centerObjDecider(context, obj)
+                if obj != None:
+                    centerObjDecider(context, obj)
 
         # wenn coupling selected, apply für alle
 
@@ -2542,12 +2546,12 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         return False
 
     def execute(self, context):
-
+        
         selected = selectedtocouplist(context, context.selected_objects[:])
         active = context.object
-        CenterObj = active
+        CenterObj = context.object
         applyScale(CenterObj)
-
+        
         if is_coup(context, active) or is_buildvolume(context, active):
             self.report(
                 {'WARNING'}, "Active object is a connector or BuildVolume!")
@@ -2557,12 +2561,12 @@ class PP_OT_ReMapCoups(bpy.types.Operator):
         PUrP = context.scene.PUrP
         print(f'CenterObj {CenterObj}')
         CenterObj.PUrPCobj = True
-
+        
         # remove from original parent
         for coup in selected:
             correctname(context, coup)
             remap_coup(context, coup, CenterObj)
-
+        
         PUrP.CenterObj = CenterObj
         return {'FINISHED'}
 
@@ -2649,21 +2653,14 @@ def remap_coup(context, coup, CenterObj):
         mod.operation = 'DIFFERENCE'
         set_BoolSolver(context, mod)'''
 
-    matrix_w = coup.matrix_world
+    matrix_w = coup.matrix_world #.copy()
     print(matrix_w)
 
     coup.parent = CenterObj
     coup.matrix_world = matrix_w
-
+    
     # remove remap sign
-    for se in context.selected_objects:
-        se.select_set(False)
-
-    for child in coup.children:
-        if child.type == 'FONT':
-            print("delete order text in remap_coup")
-            child.hide_select = False
-            child.select_set(True)
+    remove_order_tag(context, coup)
 
     bpy.ops.object.delete(use_global=False)
 
@@ -2858,6 +2855,7 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
     def execute(self, context):
         selected = context.selected_objects[:]
         CenterObj = bpy.data.objects[context.object.name]
+        PUrP = context.scene.PUrP
 
         coups = []
         # deselect all for the separate by selection
@@ -2896,11 +2894,12 @@ class PP_OT_ApplyMultiplePlanarToObject(bpy.types.Operator):
         
         ###apply all purp mods
         context.view_layer.objects.active = CenterObj
-        for coup in coups:
-
+        for coup in coups[:]:
             bpy.ops.object.modifier_apply(modifier=coup.name)
-
+            if PUrP.KeepCoup == False:
+                removeCoupling(context, coup)
         
+
 
         CenterObj.select_set(True)
         context.view_layer.objects.active = CenterObj
@@ -2935,6 +2934,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         coup = bpy.data.objects[context.object.name]
         PUrP = context.scene.PUrP
 
+        
         # stop when its the wrong active
         if not is_coup(context, coup) or is_planar(context, coup) or is_flat(context, coup):
             self.report({'WARNING'}, "Wrong active Object")
@@ -2957,6 +2957,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
         if len(CenterObjs) == 0:
             return{'FINISHED'}
 
+        remove_order_tag(context, coup)
         # find the CenterObj with the closest distance to the mainplane
         # distancelist = []
         OverLapCenterObjs = []
@@ -2993,6 +2994,7 @@ class PP_OT_ApplySingleToObjects(bpy.types.Operator):
                     # ignore mainplane
                     remove_mod(context, coup, coup.parent, "")
                     remove_mod(context, diff, coup.parent, "stick_diff")
+                    
                     mw = coup.matrix_world.copy()
                     coup.parent = Cob
                     coup.matrix_world = mw
@@ -3345,6 +3347,28 @@ def zSym(obj):
 
     return False
 
+    ###removes only the text fragement when its called order
+def remove_order_tag(context, coup):
+    if coup == None:
+        return
+
+    if context.object != None:
+        activename = context.object.name
+        
+    deselectall(context)
+    print('Welcome to order tag search of ' + coup.name)
+    print(coup.children)
+    for child in coup.children:
+        print(child.name)
+        if "Order" in child.name:
+            print('found child ' + child.name)
+            child.hide_select = False
+            child.select_set(True)
+            context.view_layer.objects.active = child
+            bpy.ops.object.delete(use_global=False)
+            
+    if context.object != None:
+        context.view_layer.objects.active = bpy.data.objects[activename] 
 
 def removePUrPOrder():
     data = bpy.data
@@ -3580,10 +3604,10 @@ def remove_mod(context, ele, CObj, nameadd):
     else:
         coup = ele.parent
         modname = coup.name + "_" + nameadd
-
-    if modname in CObj.modifiers:
-        CObj.modifiers.remove(CObj.modifiers[modname])
-        return True
+    if CObj != None:
+        if modname in CObj.modifiers:
+            CObj.modifiers.remove(CObj.modifiers[modname])
+            return True
 
 
 def ensure_allmods(context, coup, CObj):

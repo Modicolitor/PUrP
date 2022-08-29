@@ -1024,7 +1024,11 @@ class PUrP_SinglCoupGizmo(GizmoGroup):
         mpo.matrix_offset[2][3] = 2
 
         mps = self.bevseggizm
-        if ob.children[0].modifiers[ob.children[0].name + "Bevel"].width > 0:
+        if len(children) == 3:
+            n=1
+        else:
+            n=0
+        if ob.children[n].modifiers[ob.children[n].name + "Bevel"].width > 0:
             # bev segment
             mps.matrix_basis = ob.matrix_world.normalized()
             mps.matrix_offset[0][3] = 3
