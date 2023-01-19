@@ -407,7 +407,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     # bevel for mode 2 - male-female
     obj = context.object
     # bevel weights need to enabled explizitly
-    context.object.data.use_customdata_edge_bevel = True
+    #context.object.data.use_customdata_edge_bevel = True
     upverz = 0
     downverz = 0
 
