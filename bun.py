@@ -412,6 +412,11 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
     downverz = 0
 
     # bevelweights
+    #mesh = bpy.context.object.data
+    bevel_weight_attr = obj.data.attributes.new("bevel_weight_edge", "FLOAT", "EDGE")
+    for idx, e in enumerate(obj.data.edges):
+        bevel_weight_attr.data[idx].value = 0.0 #if e.select else 1.0
+    
 
     for vert in obj.data.vertices:
         if upverz < vert.co.z:
@@ -424,13 +429,15 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
                 # print(f"setting weight for edge {edge}")
                 edge.bevel_weight = 1
     elif PUrP.SingleCouplingModes == "1":  # stick --> upper and lower edge bevelt
-        for edge in context.object.data.edges:
+        for id, edge in enumerate(context.object.data.edges):
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
                 # print(f"setting weight for edge {edge}")
-                edge.bevel_weight = 1
+                bevel_weight_attr.data[id].value = 1
+                #edge.bevel_weight = 1
             if context.object.data.vertices[edge.vertices[0]].co.z == downverz and context.object.data.vertices[edge.vertices[1]].co.z == downverz:
                 # print(f"setting weight for edge {edge}")
-                edge.bevel_weight = 1
+                bevel_weight_attr.data[id].value = 1
+                #edge.bevel_weight = 1
 
     scalefactor = PUrP.GlobalScale * PUrP.CoupScale * PUrP.CoupSize
     obj.scale *= scalefactor
