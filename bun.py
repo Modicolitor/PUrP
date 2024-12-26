@@ -427,7 +427,7 @@ def genPrimitive(CenterObj, newname_mainplane, nameadd, is_unmapped):
         for id, edge in enumerate(context.object.data.edges):
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
                 # print(f"setting weight for edge {edge}")
-                bevel_weight_attr.data[id].value #edge.bevel_weight = 1
+                bevel_weight_attr.data[id].value = 1  #edge.bevel_weight = 1
     elif PUrP.SingleCouplingModes == "1":  # stick --> upper and lower edge bevelt
         for id, edge in enumerate(context.object.data.edges):
             if context.object.data.vertices[edge.vertices[0]].co.z == upverz and context.object.data.vertices[edge.vertices[1]].co.z == upverz:
