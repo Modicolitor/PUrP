@@ -93,7 +93,7 @@ import bpy
 bl_info = {  # für export als addon
     "name": "PuzzleUrPrint",
     "author": "Modicolitor",
-    "version": (4, 3),
+    "version": (4, 4),
     "blender": (4, 3, 0),
     "location": "View3D > Tools",
     "description": "Cut your Objects into pieces and reassemble them easily after 3d printing",

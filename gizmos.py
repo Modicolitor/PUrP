@@ -1538,6 +1538,35 @@ class PUrP_PlanarGizmo(GizmoGroup):
         mcsize.matrix_offset[2][3] = -0.5
 
 
+def changeplanar_Roffset(context, value):
+    ob = context.object
+    #
+    rightestx = 0
+    for v in ob.data.vertices:
+        if v.co.x > rightestx:
+            rightestx = v.co.x
+    # rightestx is now
+    rightestV = []
+    for v in ob.data.vertices:
+        if rightestx == v.co.x:
+            rightestV.append(v)
+    
+    PUrP = context.scene.PUrP
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+    PUrP.CoupScale = ob.data.vertices[3].co.x / coupfaktor
+    
+    
+    
+    PUrP = context.scene.PUrP
+    korrvalue = value - 1.5*coupfaktor * PUrP.CoupScale
+    PUrP.OffsetRight = korrvalue
+    # print(self.value)
+    if korrvalue >= 0:
+        for v in rightestV:
+            v.co.x = value
+        else:
+            pass
+
 class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
     '''Change the right offset of the connector'''
     bl_idname = "purp.roffsetgiz"
@@ -1552,7 +1581,8 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        ob = context.object
+        changeplanar_Roffset(context, self.value)
+        '''ob = context.object
         PUrP = context.scene.PUrP
         korrvalue = self.value - 1.5*self.coupfaktor * PUrP.CoupScale
         PUrP.OffsetRight = korrvalue
@@ -1564,7 +1594,7 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
                 pass
 
         # context.scene.PUrP.OffsetRight = ob.data.vertices[0].co.x - \
-        #    1.5*self.coupfaktor * PUrP.CoupScale
+        #    1.5*self.coupfaktor * PUrP.CoupScale'''
         return {'FINISHED'}
 
     def modal(self, context, event):
@@ -1613,6 +1643,35 @@ class PP_OT_PlanarRoffsetGizmo(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
+def changeplanar_Loffset(context, value):
+    ob = context.object
+        #
+    leftestx = 0
+    for v in ob.data.vertices:
+        if v.co.x < leftestx:
+            leftestx = v.co.x
+    # rightestx is now
+    leftestV = []
+    for v in ob.data.vertices:
+        if leftestx == v.co.x:
+            leftestV.append(v)
+    
+
+
+    PUrP = context.scene.PUrP
+    coupfaktor = PUrP.PlanarCorScale * PUrP.GlobalScale
+    PUrP.CoupScale = ob.data.vertices[3].co.x / coupfaktor
+    
+    korrvalue = -value - 1.5*coupfaktor * PUrP.CoupScale
+    PUrP.OffsetLeft = korrvalue
+    # print(self.value)
+    if korrvalue >= 0:
+        for v in leftestV:
+            v.co.x = value
+        else:
+            pass
+
+    
 
 class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
     '''Change the left offset of the connector'''
@@ -1630,7 +1689,8 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
                 return False
 
     def execute(self, context):
-        ob = context.object
+        changeplanar_Loffset(context, self.value)
+        '''ob = context.object
         PUrP = context.scene.PUrP
         korrvalue = -self.value - 1.5*self.coupfaktor * PUrP.CoupScale
         PUrP.OffsetLeft = korrvalue
@@ -1639,7 +1699,7 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
             for v in self.leftestV:
                 v.co.x = self.value
             else:
-                pass
+                pass'''
 
         # PUrP.OffsetLeft = - \
         #    ob.data.vertices[1].co.x - 1.5*self.coupfaktor * PUrP.CoupScale
@@ -1692,6 +1752,85 @@ class PP_OT_PlanarLoffsetGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+def changeplanar_zScale(context, has_stopper,valuelow, valuemiddle, PUrP):
+    ob = context.object
+    middleV = []
+    lowestV = []
+    lowestz = 0
+    middlez = 0
+    for v in ob.data.vertices:
+        if v.co.z < lowestz:
+            lowestz = v.co.z
+
+    has_stopper = has_stopper(ob)
+
+    if has_stopper:  # zscale with stopper is like moving all below the top line
+
+        for v in ob.data.vertices:
+            if v.co.z != 0 and v.co.z != lowestz:
+                middlez = v.co.z
+                middleV.append(v)
+
+        for v in ob.data.vertices:
+            if v.co.z == lowestz:
+                lowestV.append(v)
+
+        # for v in ob.data.vertices:
+        #    if v.co.z == self.middlez:
+        #        self.middleV.append(v)
+
+    else:
+        lowestz = 0
+        for v in ob.data.vertices:
+            if v.co.z < lowestz:
+                lowestz = v.co.z
+        # self.lowestV = []
+        for v in ob.data.vertices:
+            if v.co.z == lowestz:
+                lowestV.append(v)
+        # coordinaten aller
+
+    # self.init_position1 = lowestz
+    # self.init_position2 = self.middlez
+
+    #self.init_value = event.mouse_y
+
+    # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+    #valuelow = lowestz
+    #if has_stopper:
+    #    valuemiddle = middlez
+    
+    if has_stopper:
+        print('has stopper')
+        if valuemiddle >= 0:  # upper limiter
+            for v in middleV:
+                v.co.z = -0.01
+            for v in lowestV:
+                v.co.z = -0.01 - PUrP.StopperHeight
+            PUrP.zScale = 0.01
+        else:  # positioning
+
+            for v in middleV:
+                v.co.z = valuemiddle
+
+            for v in lowestV:
+                v.co.z = valuelow
+
+            PUrP.zScale = -valuemiddle
+    else:  # no stopper
+        if valuelow >= 0:
+            for v in lowestV:
+                v.co.z = -0.01
+            print('write purp low')
+            PUrP.zScale = 0.01
+        else:
+            print('else')
+            for v in lowestV:
+                v.co.z = valuelow
+            print(f'valuelow exe {valuelow}')
+            print('write purp else')
+            PUrP.zScale = - valuelow  
+
 class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
     '''Change the Zscale of the connector'''
     bl_idname = "purp.planzscalegiz"
@@ -1707,13 +1846,16 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
 
     def execute(self, context):
         PUrP = context.scene.PUrP
-        if self.has_stopper:
+        changeplanar_zScale(context, has_stopper,self.valuelow, self.valuemiddle, PUrP)
+        
+        '''if self.has_stopper:
+            print('has stopper')
             if self.valuemiddle >= 0:  # upper limiter
                 for v in self.middleV:
                     v.co.z = -0.01
                 for v in self.lowestV:
-                    v.co.z = -0.01 - context.scene.PUrP.StopperHeight
-                context.scene.PUrP.zScale = 0.01
+                    v.co.z = -0.01 - PUrP.StopperHeight
+                PUrP.zScale = 0.01
             else:  # positioning
 
                 for v in self.middleV:
@@ -1722,32 +1864,41 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
                 for v in self.lowestV:
                     v.co.z = self.valuelow
 
-                context.scene.PUrP.zScale = -self.valuemiddle
+                PUrP.zScale = -self.valuemiddle
         else:  # no stopper
+            
             if self.valuelow >= 0:
-                for v in self.lowestV:
-                    v.co.z = -0.01
-                context.scene.PUrP.zScale = 0.01
+                #for v in self.lowestV:
+                #    v.co.z = -0.01
+                print('write purp low')
+                PUrP.zScale = 0.01
             else:
-                for v in self.lowestV:
-                    v.co.z = self.valuelow
-                context.scene.PUrP.zScale = -self.valuelow
+                print('else')
+                #for v in self.lowestV:
+                #    v.co.z = self.valuelow
+                print(f'valuelow exe {self.valuelow}')
+                print('write purp else')
+                PUrP.zScale = - self.valuelow  
 
                 # if self.has_stopper:
                 #    for v in self.middleV:
                 #        v.co.z = self.valuemiddle
-
+            print('finishing')'''
+                
         return {'FINISHED'}
 
     def modal(self, context, event):
+        print('start modal')
         PUrP = context.scene.PUrP
         if event.type == 'MOUSEMOVE':  # Apply
             sensi = 100 if not event.shift else 1000
             self.delta = event.mouse_y - self.init_value
             self.valuelow = self.lowestz + self.delta * PUrP.GlobalScale / sensi
+            print(f'valuelow modal {self.valuelow}')
             # if self.has_stopper:
             self.valuemiddle = self.middlez + self.delta / sensi
-
+            
+            print(f'valuemiddle {self.valuemiddle}')
             self.execute(context)
 
         elif event.type == 'LEFTMOUSE':  # Confirm
@@ -1763,11 +1914,13 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def invoke(self, context, event):
+        print('invoke')
         ob = context.object
         self.middleV = []
         self.lowestV = []
         self.lowestz = 0
         self.middlez = 0
+        self.valuemiddle = 0
         for v in ob.data.vertices:
             if v.co.z < self.lowestz:
                 self.lowestz = v.co.z
@@ -1815,6 +1968,37 @@ class PP_OT_PlanarzScaleGizmo(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
+def changeplanar_StopperHeight(context, value):
+    ob = context.object
+    lowestV = []
+    lowestz = 0
+    print(f'ob {ob.name}')
+    for v in ob.data.vertices:
+        if v.co.z < lowestz:
+            lowestz = v.co.z
+
+    for v in ob.data.vertices:
+        if v.co.z == lowestz:
+            lowestV.append(v)
+        # coordinaten aller
+
+    # self.init_position1 = lowestz
+    # self.init_position2 = self.middlez
+
+    
+
+    # event.mouse_x #- self.window_width/21   ################mach mal start value einfach 00
+    #value = lowestz
+    
+    zscale = -context.scene.PUrP.zScale
+    if value - zscale >= 0:
+        for v in lowestV:
+            v.co.z = zscale - 0.01
+        context.scene.PUrP.StopperHeight = 0.01
+    else:
+        for v in lowestV:
+            v.co.z = value
+        context.scene.PUrP.StopperHeight = -value + zscale
 
 class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
     '''Change the stopper height of the connector'''
@@ -1830,7 +2014,9 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
             return False
 
     def execute(self, context):
-        zscale = -context.scene.PUrP.zScale
+        print('changeplanar_StopperHeight')
+        changeplanar_StopperHeight(context, self.value)
+        '''zscale = -context.scene.PUrP.zScale
         if self.value - zscale >= 0:
             for v in self.lowestV:
                 v.co.z = zscale - 0.01
@@ -1838,7 +2024,7 @@ class PP_OT_PlanarStopperHeightGizmo(bpy.types.Operator):
         else:
             for v in self.lowestV:
                 v.co.z = self.value
-            context.scene.PUrP.StopperHeight = -self.value + zscale
+            context.scene.PUrP.StopperHeight = -self.value + zscale'''
         return {'FINISHED'}
 
     def modal(self, context, event):
