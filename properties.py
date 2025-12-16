@@ -154,5 +154,6 @@ class PUrPropertyGroup(bpy.types.PropertyGroup):
         description='Mode selection in Bool Modifier',
         items=[('1', 'Exact', ''),
                ('2', 'Fast', ''),
+               ('3', 'Manifold', ''),
                ]
     )

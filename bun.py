@@ -2213,6 +2213,8 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                         PUrP.BoolModSettings = '1'
                     elif obj.parent.modifiers[obj.name].solver == 'FAST':
                         PUrP.BoolModSettings = '2'
+                    elif obj.parent.modifiers[obj.name].solver == 'MANIFOLD':
+                        PUrP.BoolModSettings = '3'
             # order correction
             for child in children:
                 if "diff" in child.name:
@@ -2304,6 +2306,7 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                                  ) / PUrP.GlobalScale
 
         elif is_planar(context, obj):
+            print('bin planar') 
             PUrP.SingleCouplingModes = "4"
             if "Cubic" in obj.data.name:
                 PUrP.PlanarCouplingTypes = "1"
@@ -2342,10 +2345,13 @@ class PP_OT_ActiveCoupDefaultOperator(bpy.types.Operator):
                 if is_unmapped:
                     PUrP.BoolModSettings = '1'
                 else:
+                    print('bin planar und setze solver')
                     if obj.parent.modifier[obj.name + "_diff"].solver == 'EXACT':
                         PUrP.BoolModSettings = '1'
                     elif obj.parent.modifier[obj.name + "_diff"].solver == 'FAST':
                         PUrP.BoolModSettings = '2'
+                    elif obj.parent.modifier[obj.name + "_diff"].solver == 'MANIFOLD':
+                        PUrP.BoolModSettings = '3'
 
             # Apply scale e.g. zscale determination
             bpy.ops.object.transform_apply(
@@ -3475,6 +3481,8 @@ def set_BoolSolver(context, mod):
             mod.solver = 'EXACT'
         elif PUrP.BoolModSettings == '2':
             mod.solver = 'FAST'
+        elif PUrP.BoolModSettings == '3':
+            mod.solver = 'MANIFOLD'
 
 # doppelt
 
